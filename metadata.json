@@ -1,0 +1,6 @@
+{
+  "name": "COS V1 Product Plan & Roadmap",
+  "description": "An interactive Context Engineer workspace demonstrating the complete COS V1 three-platform architecture (Sales & Marketing, Management, Customer) with a shared live state model, real-time cross-platform workflows, and role-based access rules.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

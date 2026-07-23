@@ -1,0 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Montserrat", sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-navy-900: #182A5C;
+  --color-navy-800: #264288;
+  --color-blue-600: #4065B3;
+  --color-blue-400: #6C84B8;
+  --color-blue-200: #899FD1;
+  --color-blue-100: #AFBFDA;
+  --color-blue-50: #EEF3FB;
+  --color-canvas: #FFFFFF;
+  --color-surface: #F7F9FC;
+  --color-hairline: #D9E0EA;
+  --color-text-primary: #111827;
+  --color-text-secondary: #4B5563;
+  --color-green-700: #166534;
+  --color-amber-800: #92400E;
+  --color-red-700: #B42318;
+  --color-purple-700: #6B21A8;
+}
+
+/* Base override layers to enforce the v1.0 Design System throughout the codebase */
+html, body {
+  font-family: "Inter", ui-sans-serif, system-ui, sans-serif !important;
+  background-color: #F7F9FC;
+  color: #4B5563;
+}
+
+h1, h2, h3, h4 {
+  font-family: "Montserrat", sans-serif !important;
+  letter-spacing: -0.025em;
+}
+
+/* Numeric alignment helper values */
+.font-mono, .font-tabular-nums {
+  font-family: "JetBrains Mono", ui-monospace, monospace !important;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Highlight tags styling */
+.ai-recommendation-badge {
+  background-color: rgba(107, 33, 168, 0.1);
+  border: 1px solid rgba(107, 33, 168, 0.2);
+  color: #6B21A8;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.governed-border {
+  border-width: 1px;
+  border-color: #D9E0EA;
+}
