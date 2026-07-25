@@ -173,7 +173,7 @@ export default function DesignSystemPlatform({ onLogoutToGateway }: DesignSystem
           <COSLogo className="w-8 h-8" variant="white" />
           <div>
             <h2 className="text-xs font-black tracking-widest text-[#AFBFDA] uppercase font-display">Central Operating System</h2>
-            <p className="text-sm font-extrabold text-white tracking-tight uppercase">COS v1.0 • DESIGN SYSTEM CORE</p>
+            <p className="text-sm font-extrabold text-white tracking-tight uppercase">COS_V1_Demo • DESIGN SYSTEM CORE</p>
           </div>
         </div>
 
@@ -263,7 +263,7 @@ export default function DesignSystemPlatform({ onLogoutToGateway }: DesignSystem
 
               <div className="space-y-3">
                 <h2 className="text-3xl font-black text-slate-900 font-display leading-tight sm:text-4xl">
-                  COS V1.0 • Design System Standard
+                  COS_V1_Demo • Design System Standard
                 </h2>
                 <p className="text-sm text-slate-500 font-medium max-w-xl mx-auto font-sans leading-relaxed">
                   Welcome to the Live Build-Ready Specification Workspace. This portal demonstrates the unified UI guidelines, layout structures, and governance rules required to run the Central Operating System.

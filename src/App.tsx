@@ -273,7 +273,7 @@ export default function App() {
                 <COSLogo className="w-10 h-10 shadow-sm" variant="full" />
                 <div className="text-left">
                   <h2 className="text-[10px] font-bold tracking-widest text-slate-400 uppercase font-display">Central Operating System</h2>
-                  <p className="text-base font-black text-slate-900 tracking-tight uppercase">COS V1.0 Portal Gateway</p>
+                  <p className="text-base font-black text-slate-900 tracking-tight uppercase">COS_V1_Demo</p>
                 </div>
               </div>
               <h1 className="text-3xl font-black text-slate-900 tracking-tight leading-none sm:text-4xl max-w-2xl mx-auto font-display">
