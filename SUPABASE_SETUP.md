@@ -13,8 +13,8 @@ Ensure you have the following installed on your machine:
 * **Git** (for version control and pushing to GitHub) -> [Download Git](https://git-scm.com/)
 
 ### 2. Download Project Files
-You can export the project files directly from Google AI Studio:
-1. In the top-right menu of AI Studio, open the settings/export options.
+You can export the project files directly from COS-V1:
+1. In the top-right menu of COS-V1, open the settings/export options.
 2. Select **Export as ZIP** (or export directly to GitHub if preferred).
 3. Extract the downloaded ZIP file to a folder on your computer (e.g., `C:\Projects\cos-portal` or `~/Projects/cos-portal`).
 
