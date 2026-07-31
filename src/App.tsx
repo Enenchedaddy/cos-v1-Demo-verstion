@@ -16,6 +16,7 @@ import SalesPlatform from './components/SalesPlatform';
 import MarketingPlatform from './components/MarketingPlatform';
 import ManagementPlatform from './components/ManagementPlatform';
 import DesignSystemPlatform from './components/DesignSystemPlatform';
+import IdentityGateway from './components/IdentityGateway';
 import COSLogo from './components/COSLogo';
 import { 
   Database, Activity, Users, TrendingUp, Building2, ShieldAlert, KeyRound, ArrowRight,
@@ -265,6 +266,165 @@ export default function App() {
       {/* Primary Workspace */}
       <main className="flex-1 overflow-hidden relative flex flex-col">
         {activePlatform === 'gateway' && (
+          <IdentityGateway
+            isSupabaseConfigured={isSupabaseConfigured}
+            onOpenDesignSystem={() => setActivePlatform('design-system')}
+            onEnterSales={() => {
+              setActivePlatform('sales');
+              handleAddLog('Sales Session Authorized', 'Customer', 'Chris Allen', 'S&M', 'Entered Sales from governed gateway');
+            }}
+            onEnterMarketing={() => {
+              setActivePlatform('marketing');
+              handleAddLog('Marketing Session Authorized', 'Customer', 'Aisha Bello', 'S&M', 'Entered Marketing from governed gateway');
+            }}
+            onEnterManagement={() => {
+              setActivePlatform('management');
+              handleAddLog('Executive Session Authorized', 'Permission', 'CEO', 'Management', 'Entered Management from governed gateway');
+            }}
+          />
+        )}
+
+        {false && activePlatform === 'gateway' && (
+          <div className="flex-1 overflow-y-auto bg-[#FCFBF7]">
+            <div className="mx-auto flex min-h-full w-full max-w-[1520px] flex-col px-5 py-5 sm:px-8 sm:py-8 lg:px-12">
+              <header className="flex items-center justify-between border-b border-[#D8D6CE] pb-5">
+                <div className="flex items-center gap-3">
+                  <COSLogo className="h-10 w-10" variant="full" />
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#5E6872]">Central Operating System</p>
+                    <p className="text-sm font-semibold text-[#15202B]">Identity gateway</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setActivePlatform('design-system')}
+                  className="hidden min-h-11 items-center gap-2 border-b border-[#15202B] text-xs font-semibold text-[#15202B] transition hover:border-[#C84F2A] hover:text-[#C84F2A] sm:flex"
+                >
+                  <Sliders size={16} strokeWidth={1.75} />
+                  Open design system
+                </button>
+              </header>
+
+              <div className="grid flex-1 items-center gap-12 py-12 lg:grid-cols-12 lg:gap-14 lg:py-16">
+                <section className="lg:col-span-5">
+                  <p className="mb-5 font-mono text-[11px] uppercase tracking-[0.12em] text-[#C84F2A]">
+                    Governed access · CO-10
+                  </p>
+                  <h1 className="max-w-3xl text-[42px] font-semibold leading-[0.98] text-[#15202B] sm:text-[56px] lg:text-[72px]">
+                    One governed view of the business.
+                  </h1>
+                  <p className="mt-7 max-w-xl text-base leading-7 text-[#5E6872] sm:text-lg sm:leading-8">
+                    Enter the workspace that matches your responsibility. Access, operational changes, and recommendations are recorded against your identity.
+                  </p>
+                  <div className="mt-10 max-w-xl border-l-2 border-[#C84F2A] pl-5">
+                    <p className="text-sm font-semibold text-[#15202B]">Session responsibility</p>
+                    <p className="mt-1 text-sm leading-6 text-[#5E6872]">
+                      You are entering a controlled demo environment. Decisions made here are written to the shared audit ledger.
+                    </p>
+                  </div>
+                </section>
+
+                <section className="lg:col-span-7" aria-labelledby="workspace-index-title">
+                  <div className="mb-4 flex items-end justify-between">
+                    <div>
+                      <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#5E6872]">Authorised destinations</p>
+                      <h2 id="workspace-index-title" className="mt-1 text-3xl font-semibold text-[#15202B]">Workspace index</h2>
+                    </div>
+                    <span className="font-mono text-[11px] text-[#5E6872]">03 workspaces</span>
+                  </div>
+
+                  <div className="grid gap-3 border-t border-[#15202B] pt-3 sm:grid-cols-2">
+                    {[
+                      {
+                        id: 'management',
+                        volume: '01',
+                        name: 'Management',
+                        purpose: 'Decisions, approvals, group performance',
+                        role: 'Olivia Reed · Group CEO',
+                        icon: Building2,
+                        lead: true,
+                        action: () => {
+                          setActivePlatform('management');
+                          handleAddLog('Executive Session Authorized', 'Permission', 'CEO', 'Management', 'Entered Management from governed gateway');
+                        }
+                      },
+                      {
+                        id: 'sales',
+                        volume: '02',
+                        name: 'Sales',
+                        purpose: 'Accounts, pipeline, quotes, controls',
+                        role: 'Marcus Hale · Sales Manager',
+                        icon: TrendingUp,
+                        lead: false,
+                        action: () => {
+                          setActivePlatform('sales');
+                          handleAddLog('Sales Session Authorized', 'Customer', 'Marcus Hale', 'S&M', 'Entered Sales from governed gateway');
+                        }
+                      },
+                      {
+                        id: 'marketing',
+                        volume: '03',
+                        name: 'Marketing',
+                        purpose: 'Campaigns, consent, attribution',
+                        role: 'Aisha Bello · Marketing Lead',
+                        icon: MessageSquare,
+                        lead: false,
+                        action: () => {
+                          setActivePlatform('marketing');
+                          handleAddLog('Marketing Session Authorized', 'Customer', 'Aisha Bello', 'S&M', 'Entered Marketing from governed gateway');
+                        }
+                      }
+                    ].map((workspace) => {
+                      const Icon = workspace.icon;
+                      return (
+                        <button
+                          key={workspace.id}
+                          onClick={workspace.action}
+                          className={`group relative flex min-h-[190px] w-full flex-col justify-between overflow-hidden border bg-white p-5 text-left transition-colors hover:border-[#C84F2A] focus-visible:border-[#C84F2A] ${
+                            workspace.lead
+                              ? 'border-[#183153] sm:col-span-2 sm:min-h-[176px]'
+                              : 'border-[#D8D6CE]'
+                          }`}
+                          aria-label={`Enter ${workspace.name} workspace`}
+                        >
+                          <span className="flex w-full items-start justify-between">
+                            <span className="flex h-10 w-10 items-center justify-center border border-[#D8D6CE] text-[#183153]">
+                              <Icon size={20} strokeWidth={1.75} />
+                            </span>
+                            <span className="font-mono text-[10px] tracking-[0.12em] text-[#C84F2A]">VOL {workspace.volume}</span>
+                          </span>
+
+                          <span className="mt-7 block w-full">
+                            <span className="flex items-end justify-between gap-4">
+                              <span>
+                                <span className="block text-xl font-semibold text-[#15202B]">{workspace.name}</span>
+                                <span className="mt-1 block text-sm leading-5 text-[#5E6872]">{workspace.purpose}</span>
+                              </span>
+                              <span className="flex h-9 w-9 shrink-0 items-center justify-center bg-[#183153] text-white transition-colors group-hover:bg-[#C84F2A]">
+                                <ArrowRight size={17} strokeWidth={1.75} className="transition-transform group-hover:translate-x-0.5" />
+                              </span>
+                            </span>
+                            <span className="mt-5 block border-t border-[#D8D6CE] pt-3 font-mono text-[10px] text-[#7A838C]">
+                              AUTHORISED ROLE · {workspace.role}
+                            </span>
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </section>
+              </div>
+
+              <dl className="evidence-rail mt-auto" aria-label="Gateway evidence">
+                <div><dt>Identity</dt><dd>Corporate SSO</dd></div>
+                <div><dt>Policy</dt><dd>CO-10 enforced</dd></div>
+                <div><dt>Data spine</dt><dd>{isSupabaseConfigured ? 'Supabase connected' : 'Demo ledger active'}</dd></div>
+                <div><dt>Session</dt><dd>TLS 1.3 · audited</dd></div>
+              </dl>
+            </div>
+          </div>
+        )}
+
+        {false && activePlatform === 'gateway' && (
           <div className="flex-1 overflow-y-auto bg-[#F7F9FC] flex flex-col justify-between p-6">
             
             {/* Top Branding Section */}

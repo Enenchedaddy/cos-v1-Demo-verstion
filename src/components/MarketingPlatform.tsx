@@ -11,7 +11,7 @@ import {
   Search, ShieldAlert, Phone, Mail, MapPin, DollarSign, Award, Clock, FileCheck, CheckCircle2, RefreshCw, 
   Layers, Sliders, Calendar, BookOpen, AlertCircle, PlayCircle, ShieldCheck, Database, HelpCircle, HardDrive, 
   UserCheck, Shield, Sparkles, Network, Clipboard, Compass, Info, ChevronRight, Minimize2, CheckSquare, XCircle, Ban,
-  Menu
+  Menu, X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -61,6 +61,23 @@ export default function MarketingPlatform({
   // Simulated state overrides ('loaded' | 'empty' | 'loading' | 'error' | 'restricted')
   const [simulatedState, setSimulatedState] = useState<'loaded' | 'empty' | 'loading' | 'error' | 'restricted'>('loaded');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  React.useEffect(() => {
+    if (!isSidebarOpen) return;
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsSidebarOpen(false);
+    };
+    const previousOverflow = document.body.style.overflow;
+
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isSidebarOpen]);
 
   // Search query state
   const [searchQuery, setSearchQuery] = useState('');
@@ -145,29 +162,45 @@ export default function MarketingPlatform({
   const [aiComposeDraft, setAiComposeDraft] = useState('Brand: DELabs | Product: Premium Medical-Grade Oxygen Cylinders. Yes — Friday delivery is available. I’ll confirm the slot once operations releases the allocation.');
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#F7F9FC] font-sans relative">
+    <div className="sales-platform-theme flex h-screen overflow-hidden bg-[#F7F9FC] font-sans relative">
       
-      {/* Sidebar Backdrop Overlay for Mobile */}
+      {/* Sidebar backdrop */}
       {isSidebarOpen && (
-        <div 
-          className="lg:hidden fixed inset-0 bg-slate-900/60 z-30 transition-opacity backdrop-blur-sm"
+        <button
+          type="button"
+          className="fixed inset-0 bg-slate-950/55 z-30 cursor-default"
           onClick={() => setIsSidebarOpen(false)}
           id="marketing-sidebar-backdrop"
+          aria-label="Close marketing navigation"
         />
       )}
       
-      {/* Sidebar with distinct color accents (Aligned with COS v1.0 standard Navy & Blue palette) */}
-      <aside className={`w-[240px] bg-[#182A5C] text-white flex flex-col justify-between shrink-0 h-full fixed lg:static z-40 transition-transform duration-300 ${
-        isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-      }`}>
+      {/* Pop-out sidebar */}
+      <aside
+        id="marketing-sidebar"
+        aria-label="Marketing navigation"
+        aria-hidden={!isSidebarOpen}
+        inert={!isSidebarOpen}
+        className={`w-[280px] max-w-[86vw] bg-[#182A5C] text-white flex flex-col justify-between h-full fixed inset-y-0 left-0 z-40 shadow-xl transition-transform duration-300 motion-reduce:transition-none ${
+          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
         <div className="flex flex-col overflow-y-auto">
           {/* Top Branding Section */}
-          <div className="p-5 border-b border-[#264288] flex items-center space-x-3 shrink-0">
+          <div className="p-4 border-b border-[#264288] flex items-center gap-3 shrink-0">
             <COSLogo className="w-8 h-8 shrink-0 shadow-md" variant="white" />
-            <div className="text-left">
+            <div className="text-left min-w-0">
               <h2 className="text-[10px] font-black tracking-widest text-[#AFBFDA] uppercase font-display">Central Operating System</h2>
               <p className="text-xs font-black text-white tracking-tight uppercase">Marketing Platform</p>
             </div>
+            <button
+              type="button"
+              onClick={() => setIsSidebarOpen(false)}
+              className="ml-auto w-11 h-11 rounded-lg grid place-items-center text-[#AFBFDA] hover:bg-[#264288] hover:text-white transition shrink-0"
+              aria-label="Close marketing navigation"
+            >
+              <X size={18} aria-hidden="true" />
+            </button>
           </div>
 
           {/* Navigation Items */}
@@ -425,14 +458,17 @@ export default function MarketingPlatform({
         {/* Top bar */}
         <header className="h-[56px] border-b border-[#D9E0EA] bg-white px-4 sm:px-6 flex items-center justify-between shrink-0">
           <div className="flex items-center space-x-1.5 sm:space-x-2 min-w-0">
-            {/* Hamburger toggle for mobile */}
+            {/* Pop-out navigation toggle */}
             <button 
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="lg:hidden p-1.5 text-slate-600 hover:bg-[#EEF3FB] rounded-lg transition shrink-0"
+              type="button"
+              onClick={() => setIsSidebarOpen(true)}
+              className="w-11 h-11 grid place-items-center text-slate-600 hover:bg-[#EEF3FB] rounded-lg transition shrink-0"
               id="marketing-sidebar-toggle"
-              aria-label="Toggle Sidebar"
+              aria-label="Open marketing navigation"
+              aria-controls="marketing-sidebar"
+              aria-expanded={isSidebarOpen}
             >
-              <Menu size={18} />
+              <Menu size={18} aria-hidden="true" />
             </button>
             <span className="text-[10px] bg-[#EEF3FB] text-[#4065B3] font-bold px-2 py-0.5 rounded uppercase tracking-wider shrink-0 hidden xs:inline">Marketing Workspace</span>
             <span className="text-slate-400 hidden xs:inline">/</span>
