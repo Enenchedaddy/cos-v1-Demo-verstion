@@ -16,7 +16,7 @@
 VITE_SUPABASE_URL=https://your-project-ref.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-public-key
 SUPABASE_URL=https://your-project-ref.supabase.co
-SUPABASE_KEY=your-anon-or-service-role-key
+SUPABASE_KEY=your-service-role-key
 ```
 
 2. In your Supabase project, open the SQL Editor and run `supabase_schema.sql` (provided in the repo) to create the tables the app expects.
@@ -24,10 +24,12 @@ SUPABASE_KEY=your-anon-or-service-role-key
 3. Seed the demo data (optional but recommended) with:
 
 ```
-npx tsx scripts/seedSupabase.ts
+npm run seed
 ```
 
-4. Start the dev server:
+4. If you have Row Level Security enabled, apply the policy in `supabase_rls.sql` before seeding or runtime writes.
+
+5. Start the dev server:
 
 ```
 npm run dev

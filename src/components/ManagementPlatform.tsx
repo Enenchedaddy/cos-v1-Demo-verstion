@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import COSLogo from './COSLogo';
+import SidebarEntityScope from './SidebarEntityScope';
 import { Company, Deal, Quote, Order, Invoice, CylinderBalance, SupportTicket, Campaign, AuditLog, ApprovalRequest, Product } from '../types';
 import { 
   Users, TrendingUp, Percent, FileText, Activity, MessageSquare, ArrowRight, Plus, Check, AlertTriangle, 
@@ -195,11 +196,11 @@ export default function ManagementPlatform({
         aria-label="Management navigation"
         aria-hidden={!isSidebarOpen}
         inert={!isSidebarOpen}
-        className={`w-[280px] max-w-[86vw] bg-[#182A5C] text-white flex flex-col justify-between h-full fixed inset-y-0 left-0 z-40 shadow-xl transition-transform duration-300 motion-reduce:transition-none ${
+        className={`cos-workspace-sidebar w-[280px] max-w-[86vw] bg-[#182A5C] text-white flex flex-col justify-between h-full fixed inset-y-0 left-0 z-40 shadow-xl transition-transform duration-300 motion-reduce:transition-none ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="flex flex-col overflow-y-auto">
+        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
           {/* Top Branding Section */}
           <div className="p-4 border-b border-[#264288] flex items-center gap-3 shrink-0">
             <COSLogo className="w-8 h-8 shrink-0 shadow-md" variant="white" />
@@ -216,6 +217,15 @@ export default function ManagementPlatform({
               <X size={18} aria-hidden="true" />
             </button>
           </div>
+
+          <SidebarEntityScope
+            workspaceName="Management"
+            companyScopes={[
+              'AG • Advanced Gases Nigeria',
+              'DL • DELabs Ltd (UK Hub)',
+            ]}
+            groupScopes={['OG • Operating Group', 'COS • Consolidated Group']}
+          />
 
           {/* Navigation Items */}
           <nav className="p-3 space-y-1" onClick={() => setIsSidebarOpen(false)}>

@@ -1,238 +1,589 @@
-# COS V1.1 • Design System Standard
+# COS V1.2 — Control Ledger Design Standard
 
-**Volume 0 • Build-ready UI Specification • V1 • 1.0.0 • 17 Jul 2026**  
-_Central Operating System Core Guidelines for Engineering and Design Alignment_
-
----
-
-## 00. How to Use This System
-
-To maintain absolute compliance and prevent design-drift under the CO-10 security mandate, every module built in the codebase must follow these six core engineering principles:
-
-1. **Start with Tokens:** Every colour, type size, spacing value, radius, elevation, and icon size must resolve directly from the defined token source. Do not use raw values, one-off overrides, or magic numbers.
-2. **Instantiate Components:** Every UI element has a designated component ID (e.g., `C-NAV-01`) and a corresponding states contract. Create or use the component before modifying.
-3. **Use a Frozen Layout:** Every app screen uses the exact same shell, viewport, annotation order, and footer rules. Keep the grid and spacing boundaries immutable.
-4. **Read Notes for Traceability:** Every screen view and module must correspond to concrete research bullets and mandated compliance parameters.
-5. **Build from the Dataset:** All visual views, charts, and metrics must leverage the same canonical demo figures, accounts, business units, and periods to avoid out-of-sync indicators.
-6. **Run the Release Audit:** Visual coverage, typographic consistency, WCAG AA accessibility, and package sanity checks act as mandatory release gates—not optional reviews.
+**Build-ready redesign specification · 25 Jul 2026**  
+_Central Operating System · one governed view of commercial operations_
 
 ---
 
-## 01. Brand & Palette
+## 00. Design Thesis
 
-### Approved Logo Lockups
+COS is not a generic SaaS dashboard. It is a governed operating environment where executives and operators inspect evidence, make decisions, and leave an auditable trail.
 
-- Wording is strictly fixed: **Central Operating System**. Never substitute with other variations.
-- **Full-colour Lockup:** Used for covers, section dividers, and formal sign-offs.
-- **All-white Mark + Wordmark:** Used exclusively for dark background rails and shell surfaces (e.g., sidebar).
-- **Monochrome Navy Mark:** Used for footers, favicons, or collapsed rail indicators.
+The interface should feel like a **modern control ledger**:
 
-### Clear Space & Minimum Sizes
+- calm enough for long operational sessions;
+- exact enough for finance and compliance;
+- legible under high information density;
+- visibly accountable whenever AI or automation is involved;
+- recognisable as COS without relying on decorative effects.
 
-- **Minimum Clear Space:** Defined as exactly one facet height of the hexagonal mark on all sides.
-- **Minimum Size Constraints:**
-  - Standalone Mark: `24px` minimum width.
-  - Logo Lockup: `96px` minimum width.
-- **Logo Misuse Restrictions (NEVER):**
-  - Never recolour.
-  - Never stretch or skew.
-  - Never rotate.
-  - Never outline the vector mark.
-  - Never apply drop shadows.
-  - Never overlay on busy imagery.
-  - Never re-typeset the tagline.
-  - Never reposition the footer mark relative to the wordmark.
+The signature visual device is the **evidence rail**: a narrow, structured line of source, owner, timestamp, and status metadata attached to decisions, metrics, and recommendations. It replaces ornamental badges with useful provenance.
 
-### Authoritative Color Tokens
+### The page’s single job
 
-Every visual block must inherit from these exact hex codes:
+At every level, answer:
 
-| Token Name           | Hex Value | Primary Role / Context                           |
-| :------------------- | :-------- | :----------------------------------------------- |
-| **`navy-900`**       | `#182A5C` | Sidebar background, dark mode shell              |
-| **`navy-800`**       | `#264288` | Dark active states, focused indicators           |
-| **`blue-600`**       | `#4065B3` | Primary action button, CTA background            |
-| **`blue-400`**       | `#6C84B8` | Focus border, supporting interactive boundary    |
-| **`blue-200`**       | `#899FD1` | Secondary chart support, soft UI lines           |
-| **`blue-100`**       | `#AFBFDA` | Selected item background tint, selected rail     |
-| **`blue-50`**        | `#EEF3FB` | Subtle hover state base, highlighted background  |
-| **`canvas`**         | `#FFFFFF` | Main card background, white content blocks       |
-| **`surface`**        | `#F7F9FC` | Global viewport base background                  |
-| **`hairline`**       | `#D9E0EA` | 1px thin borders, divider lines                  |
-| **`text-primary`**   | `#111827` | Headings, titles, high-contrast labels           |
-| **`text-secondary`** | `#4B5563` | Body copy, secondary descriptions, inactive tabs |
-| **`green-700`**      | `#166534` | Healthy status, verified compliance state        |
-| **`amber-800`**      | `#92400E` | At risk warnings, medium alerts                  |
-| **`red-700`**        | `#B42318` | Breach events, high priority warnings, holds     |
-| **`purple-700`**     | `#6B21A8` | AI-generated recommendations, Copilot origin     |
+> What needs attention, what evidence supports it, and who can act?
 
-### Contrast Release Gate (WCAG AA)
-
-The following token pairs are tested and verified for legal compliance. No one-off contrast ratios are permitted:
-
-- **Primary text / canvas (`#111827` / `#FFFFFF`):** `17.74:1` (Threshold: `4.5:1`) — **PASS**
-- **Secondary text / canvas (`#4B5563` / `#FFFFFF`):** `7.56:1` (Threshold: `4.5:1`) — **PASS**
-- **White / navy-900 (`#FFFFFF` / `#182A5C`):** `10.50:1` (Threshold: `4.5:1`) — **PASS**
-- **White / blue-600 (`#FFFFFF` / `#4065B3`):** `4.80:1` (Threshold: `4.5:1`) — **PASS**
-- **Green-700 / green-50 (`#166534` / `#EEF3FB`):** `6.20:1` (Threshold: `4.5:1`) — **PASS**
-- **Amber-800 / amber-50 (`#92400E` / `#EEF3FB`):** `5.90:1` (Threshold: `4.5:1`) — **PASS**
-- **Red-700 / red-50 (`#B42318` / `#EEF3FB`):** `5.10:1` (Threshold: `4.5:1`) — **PASS**
-- **Purple-700 / purple-50 (`#6B21A8` / `#EEF3FB`):** `8.13:1` (Threshold: `4.5:1`) — **PASS**
-- **Navy-800 / blue-50 (`#264288` / `#EEF3FB`):** `8.50:1` (Threshold: `4.5:1`) — **PASS**
-- **Blue-600 / canvas (`#4065B3` / `#FFFFFF`):** `5.63:1` (Threshold: `3.0:1`) — **PASS**
+If an element does not help answer that question, remove it.
 
 ---
 
-## 02. Typography
+## 01. Non-negotiable Principles
 
-### Two-Family Contract
+1. **Evidence before decoration.** Numbers, labels, and status markers must trace to real demo or production data.
+2. **Hierarchy before cards.** Use spacing, rules, typography, and grouping before placing content in a container.
+3. **One shell, adaptive compositions.** Navigation is consistent, but each workspace may arrange content around its actual task.
+4. **Human authority is visible.** AI never appears to approve, pay, publish, or override policy.
+5. **Dense does not mean cramped.** Operational screens can carry detail while retaining clear reading order.
+6. **Mobile is a companion mode.** Mobile prioritises review, approval, alerts, and handoff rather than shrinking every desktop control.
+7. **Every release is reviewed visually and interactively.**
 
-To restrict aesthetic divergence, only two font families are imported and permitted:
+### Hard bans
 
-- **Display Family (`Montserrat`):** Applied exclusively to covers, section dividers, and primary layout section headers.
-- **Workhorse Family (`Inter`):** Applied to every internal product label, numeric metric, text input, datagrid row, and system annotation.
-
-### Sizing and Permitted Use Scale
-
-| Token Name         | Font       | Size / Line Height | Weight | Permitted Use                        |
-| :----------------- | :--------- | :----------------- | :----- | :----------------------------------- |
-| **`Display`**      | Montserrat | `64 / 72 px`       | `700`  | Covers, division break sections      |
-| **`H1`**           | Inter      | `32 / 40 px`       | `700`  | Active screen primary title          |
-| **`H2`**           | Inter      | `24 / 32 px`       | `650`  | Primary section headers              |
-| **`H3`**           | Inter      | `18 / 24 px`       | `650`  | Card headers, panel titles           |
-| **`Body`**         | Inter      | `14 / 20 px`       | `400`  | Primary readable paragraphs, values  |
-| **`Body strong`**  | Inter      | `14 / 20 px`       | `650`  | Emphasised text, active buttons      |
-| **`Small`**        | Inter      | `12 / 16 px`       | `400`  | Metadata lines, secondary labels     |
-| **`Label caps`**   | Inter      | `11 / 16 px`       | `700`  | Section headers, table column titles |
-| **`Table data`**   | Inter      | `13 / 18 px`       | `450`  | Condensed datagrid rows              |
-| **`KPI numeral`**  | Inter      | `30 / 36 px`       | `700`  | Metric highlights, numeric displays  |
-| **`Annot. title`** | Inter      | `18 / 24 px`       | `700`  | Sidebar annotation section title     |
-| **`Annot. body`**  | Inter      | `14 / 19 px`       | `400`  | Sidebar explanation copy             |
-
-### Numbers & Truncation Standards
-
-- **Tabular Lining:** Always use monospace alignment (e.g., `font-variant-numeric: tabular-nums`) for currency, timestamps, and percentages.
-- **Money Formatting:** Render as full currency symbols paired with commas (`£1,284,600`) or standard compact notation (`£1.28m`) in limited metric cells.
-- **Null Values:** Never render missing entries as raw `0` or blank lines. Always use the canonical em-dash (`—`).
-- **Restricted Fields:** Hide sensitive legal, financial, or user values behind the standard masking string: `•••• Restricted`. Do not reveal partial digits or value shape.
-- **Dates:** Standardised to the UK format everywhere: `16 Jul 2026 · 08:30 BST`.
+- No purple, violet, or indigo as a dominant brand or AI colour.
+- No purple-to-blue or purple-to-pink gradients.
+- No gradient-filled headline text.
+- No glassmorphism, frosted cards, glow effects, or decorative blur.
+- No generic centred hero with two buttons and a stat row.
+- No giant unsourced metrics.
+- No emoji in headings, navigation, or statuses.
+- No “Why choose COS?”, “Transform your business”, or interchangeable SaaS copy.
+- No pill-badge clutter.
+- No shadow on every card.
+- No animation that exists only to make the interface feel active.
 
 ---
 
-## 03. Layout & Density
+## 02. Brand Expression
 
-### Spacing Scale
+### Brand character
 
-All margins, padding values, and dimensional constraints must align to a strict 8px base grid with a 4px half-step:
+**Measured · forensic · decisive · composed**
 
-- `4px` (half)
-- `8px` (base)
-- `12px` (1.5x)
-- `16px` (2x)
-- `24px` (3x)
-- `32px` (4x)
-- `48px` (6x)
-- `64px` (8x)
+COS should look like a system trusted with consequential decisions, not a promotional technology demo.
 
-### Sizing Constraints
+### Logo rules
 
-- **Shell Sidebar (Expanded):** `240px`
-- **Shell Sidebar (Collapsed Rail):** `64px`
-- **Top Navigation Bar:** `56px`
-- **Content Area Max Width:** `1440px` (fluid centering above this limit)
-- **Comfortable Row Height:** `44px` with `16–24px` padding
-- **Compact Row Height (Default):** `32px` with `12–16px` padding
-- **Dense Row Height:** `28px` with `8–12px` padding
+- Wording remains **Central Operating System**.
+- Preserve the existing hexagonal mark geometry.
+- Full-colour lockup: gateway, formal covers, and design-system documentation.
+- White lockup: dark navigation rail only.
+- Monochrome ink mark: print, exports, favicons, and restrained footer use.
+- Minimum standalone mark: `24px`.
+- Minimum lockup width: `96px`.
+- Clear space: one facet height on every side.
+- Never stretch, rotate, outline, shadow, recolour ad hoc, or place over busy imagery.
 
-### Radius Constraints
+### Signature composition
 
-- **Inputs, text fields, chips, badges:** `sm` (Max `6px` radius)
-- **Buttons, dashboard cards, layout panels:** `md` (Max `8px` radius)
-- **Outer viewports, grid columns, lists:** Flat edges (`0px` radius)
-- **Borders:** Constrained strictly to `1px` thickness using the `#D9E0EA` (`hairline`) color.
+Use the six-facet geometry as a structural cue, not a repeated illustration:
 
----
+- six-column subdivisions on wide executive views;
+- clipped or stepped rule endings;
+- facet-shaped data markers only where they encode state;
+- one large cropped mark may appear on the gateway, at very low contrast.
 
-## 04. Iconography Line-Icon Contract
-
-- **Vector Family:** Lucide icon library only. No other fonts or direct custom SVGs permitted.
-- **Line Weight:** Strictly locked at `1.75px` stroke width.
-- **Permitted Sizing:** Must be exactly `12px`, `16px`, `20px`, `24px`, or `32px` depending on hierarchy.
-- **Outline Only:** Never mix outline style with filled elements.
-- **Color Usage:** Always apply a validated semantic token color (`#111827`, `#166534`, `#B42318`, `#6B21A8`). Do not color icons with custom inline overrides.
+Do not scatter hexagons across cards or backgrounds.
 
 ---
 
-## 05. Component Library Index
+## 03. Colour System
 
-To assure absolute structural traceability, every visual block in the application must match an authoritative identifier:
+The redesign retains the recognisable COS navy while replacing framework-blue dominance with a warmer, more editorial control-room palette.
 
-- **`C-NAV-01` ... `C-NAV-04`:** Fixed app shell, top bar switcher, page header section, and navigation tab strip.
-- **`C-NAV-05` ... `C-NAV-08`:** Live breadcrumbs, keyboard command palette, platform workspace switcher, and group scope filters.
-- **`C-BTN-01` ... `C-BTN-06`:** Action button collection (primary, secondary, subtle, outline, and destructive).
-- **`C-INP-01` ... `C-INP-04`:** Standard forms: inputs, multiline textareas, selects, and dual multi-select pickers.
-- **`C-TBL-01` ... `C-TBL-05`:** Governed datagrid containing tabular lining rows, cell badges, and summed columns.
-- **`C-KAN-01` ... `C-KAN-03`:** Config-driven pipeline board supporting column lanes and state transition guards.
-- **`C-KPI-01` / `C-EXC-01` / `C-APR-01`:** Information dashboard metrics, SLA exception warnings, and inline action modals.
-- **`C-AI-01` / `C-INS-01` / `C-FBK-01`:** Purple-branded AI recommendation card, smart insights feed, and undo-toast notifications.
-- **`C-FBK-02` ... `C-FBK-04`:** Full-page status blocks, global warning banners, and circular operation pipelines.
-- **`C-OVR-01` ... `C-OVR-03`:** Slide-out drawer details, center modals, and step-by-step wizard panels.
-- **`C-OVR-04` ... `C-OVR-06`:** On-hover tooltips, dropdown popovers, and right-click context menus.
-- **`C-AI-02` ... `C-AI-06`:** AI confidence chips, why recommendation modals, sources checklists, and dual kill-switches.
-- **`C-DATA-01` ... `C-CNS-01`:** Provenance chains, stale-data indicators, margins warning badges, and user consent records.
-- **`C-DLV-01` ... `C-UNC-01`:** Fulfillment rates, statistical relevance, deviation bars, and credibility interval bands.
-- **`C-CHT-01` ... `C-CHT-11`:** Authorized charts: Trend, stacked column, waterfall, funnel, matrix heatmaps, and calibration paths.
-- **`C-MOB-01` ... `C-MOB-05`:** Companion-mode mobile view: device containers, swipe-to-approve, and desktop handoffs.
-- **`C-STA-01` ... `C-STA-05`:** View states: Empty results, skeleton loading, error trace logs, and restricted block masks.
-- **`C-NOT-01` ... `C-NOT-04`:** Alert items, notification severity indicators, digest summaries, and roll-up cards.
+### Core palette
 
----
+| Token | Hex | Role |
+| :-- | :-- | :-- |
+| `ink` | `#15202B` | Primary text, dark controls, chart anchors |
+| `cos-navy` | `#183153` | Navigation rail, formal brand surfaces |
+| `paper` | `#FCFBF7` | Primary canvas; warmer than default white |
+| `panel` | `#FFFFFF` | Tables, forms, overlays, focused work surfaces |
+| `rule` | `#D8D6CE` | Dividers, table rules, input boundaries |
+| `signal` | `#C84F2A` | Primary action, focus emphasis, selected evidence |
 
-## 06. AI & Governance Standards
+### Supporting functional colours
 
-### The Five AI Surface Classes
+| Token | Hex | Role |
+| :-- | :-- | :-- |
+| `muted` | `#5E6872` | Secondary copy and metadata |
+| `navy-soft` | `#DDE6EF` | Selected navigation and informational tint |
+| `signal-soft` | `#F7E7DF` | AI/recommendation and attention tint |
+| `success` | `#246B4A` | Verified, healthy, complete |
+| `success-soft` | `#E4F0E9` | Success background |
+| `warning` | `#8A5A12` | At risk, approaching threshold |
+| `warning-soft` | `#F5ECD8` | Warning background |
+| `danger` | `#A63A32` | Breach, destructive action, blocked state |
+| `danger-soft` | `#F6E3E1` | Danger background |
 
-Every element or recommendation generated or touched by an AI model must be clearly labeled under one of these five classes:
+### Usage rules
 
-1. **`AUTO` (Automatic):** Executed by system code based on strict predefined policies. Logged as immutable audit records.
-2. **`DRAFT` (Draft):** Editable suggestions. Nothing is transmitted or finalized without human review.
-3. **`RECOMMEND` (Recommend):** AI flags an anomaly or suggestion. Human action required to execute. Includes a Why panel.
-4. **`GATED` (Gated Approval):** Active policy blocks execution. Human override, MFA validation, or Board signature is required.
-5. **`BLOCKED` (Restricted):** Execution is constitutionally restricted for AI-agents (e.g., payments). Human credentials mandatory.
+- `paper` should occupy most of the viewport.
+- `cos-navy` anchors navigation and formal identity, not every heading.
+- `signal` is the single brand accent. Reserve it for primary actions, active markers, and AI provenance.
+- Semantic colours communicate state only; they do not identify whole workspaces.
+- Workspace identity comes from labels, content, and composition—not a different rainbow colour per module.
+- Charts use ink, navy, signal, and neutral tints first. Add semantic colours only when the data itself represents status.
+- No gradients.
 
-### AI Why Panel Requirements
+### Contrast gate
 
-Every recommendation (`REC`) must offer a slide-out drawer or popover containing:
+Before implementation, verify every text/background pair with an automated contrast checker:
 
-- The clear rating tag (e.g., `REC · High`).
-- **Sources Checklist:** Explicit bullet points referencing the actual database entries used (e.g., _Deal activity · 14 events_).
-- **Reasoning Statement:** Plain human language explanation of the logic (e.g., _Engagement is rising, but discount crosses the 12% approval band_).
-- Model metadata and prompt identifiers (e.g., _Model v1.7 · prompt v12_).
-- Clear action triggers: `Accept`, `Edit`, `Reject`.
+- body text: minimum `4.5:1`;
+- large text and essential graphical objects: minimum `3:1`;
+- focus indicators: minimum `3:1` against adjacent colours.
 
-### Governed Kill Switch
-
-- **Visual Representation:** Highly visible red-bordered panel stating the target feature.
-- **Activation Mechanic:** Strictly requires a long-press **Hold for 2 seconds** (with interactive loading animation) to avoid accidental triggers.
-- **Governance Rule:** Effective immediately. Demands an input text explanation from the administrator, logged straight to the immutable compliance ledger.
+Do not publish claimed ratios in the UI. Keep evidence in release documentation.
 
 ---
 
-## 07. Canonical Demo Dataset
+## 04. Typography
 
-To prevent divergence, all calculations and visual views in the application must draw from this fixed baseline data:
+Typography distinguishes executive interpretation, operational work, and machine evidence.
 
-- **MTD Revenue:** `£1,284,600` (+7.4% trend)
-- **Pipeline Value:** `£3,842,000` (Fixed)
-  - _Canonical pipeline distribution:_ 640k + 520k + 455k + 430k + 390k + 360k + 335k + 280k + 230k + 202k.
-- **Weighted Pipeline:** `£2,116,000` (Fixed)
-- **Forecast Revenue:** `£1,476,000` (+7.4% trend)
-- **Available Cash:** `£2,340,000` (Fixed)
-- **Open Approvals:** `14` (Fixed)
-- **ROAS (Return on Ad Spend):** `4.2x` (+7.4% trend)
-- **Open Tickets:** `38` (Fixed)
+### Family contract
 
-### Fictional Business Units
+- **Display and editorial headings:** `Newsreader`, serif; fallback `Georgia, serif`.
+- **Interface and body:** `IBM Plex Sans`; fallback `Arial, sans-serif`.
+- **Evidence and tabular data:** `IBM Plex Mono`; fallback `Consolas, monospace`.
+
+Load only required weights, use `font-display: swap`, and self-host for production where possible.
+
+### Type scale
+
+| Token | Family | Mobile | Desktop | Weight | Use |
+| :-- | :-- | :-- | :-- | :-- | :-- |
+| `display` | Newsreader | `40/42` | `64/64` | `600` | Gateway thesis and formal covers |
+| `h1` | Newsreader | `32/36` | `44/48` | `600` | Workspace title |
+| `h2` | Newsreader | `25/30` | `32/36` | `600` | Major section title |
+| `h3` | IBM Plex Sans | `18/24` | `20/26` | `600` | Panel and decision title |
+| `body-lg` | IBM Plex Sans | `16/25` | `17/27` | `400` | Introductions and important explanations |
+| `body` | IBM Plex Sans | `14/22` | `14/22` | `400` | General interface copy |
+| `small` | IBM Plex Sans | `12/18` | `12/18` | `400` | Supporting metadata |
+| `label` | IBM Plex Sans | `11/16` | `11/16` | `600` | Navigation groups and field labels |
+| `table` | IBM Plex Sans | `13/18` | `13/18` | `400` | Data-grid content |
+| `metric` | IBM Plex Mono | `26/30` | `32/36` | `500` | Verified KPI values |
+| `evidence` | IBM Plex Mono | `11/16` | `11/16` | `400` | IDs, timestamps, sources, model metadata |
+
+### Typesetting rules
+
+- Headings use sentence case, never all caps.
+- Labels may use uppercase with `0.06em` tracking; keep them short.
+- Use tabular numerals for currency, percentages, timestamps, and comparable quantities.
+- Use UK date format: `16 Jul 2026 · 08:30 BST`.
+- Use `£1,284,600` in detail views and `£1.28m` only where width is constrained.
+- Missing values display as `—`.
+- Restricted values display as `•••• Restricted`.
+- Keep paragraph measures between `55–75ch`.
+- Avoid ultra-bold weights as a substitute for hierarchy.
+
+---
+
+## 05. Layout and Rhythm
+
+### Spacing tokens
+
+Use a 4px base with an 8px working rhythm:
+
+`4 · 8 · 12 · 16 · 24 · 32 · 48 · 64 · 96`
+
+### Shell dimensions
+
+- Expanded navigation rail: `248px`.
+- Collapsed desktop rail: `72px`.
+- Top utility bar: `64px`.
+- Reading/content maximum: `1520px`.
+- Evidence or context drawer: `360–440px`.
+- Standard table row: `44px`.
+- Compact table row: `36px`.
+- Touch target: minimum `44×44px`.
+
+### Desktop grid
+
+Use a 12-column fluid grid with:
+
+- `24px` gutters at `1024px`;
+- `32px` gutters from `1280px`;
+- `32–48px` outer margins;
+- content aligned to shared vertical rules.
+
+Prefer asymmetric arrangements such as `7/5`, `8/4`, or `9/3`. Do not force every screen into equal cards.
+
+### Surface hierarchy
+
+1. **Canvas:** warm paper background.
+2. **Work surface:** white table, form, or decision panel with a `1px` rule.
+3. **Raised surface:** modal, command palette, or temporary overlay only.
+
+Use shadows only for raised surfaces:
+
+`0 12px 32px rgba(21, 32, 43, 0.14)`
+
+### Radius rules
+
+- inputs and compact controls: `4px`;
+- buttons and work panels: `6px`;
+- large overlays: `8px`;
+- tables, rails, and full-width sections: `0px`.
+
+Avoid excessive rounded containers and nested cards.
+
+---
+
+## 06. Core Shell
+
+### Navigation rail
+
+- Dark `cos-navy` surface with white primary labels.
+- Group items by real operational domain.
+- Active state uses a solid `3px signal` rule and `navy-soft` text—not a glowing tile.
+- Show a clear collapsed state at desktop widths.
+- On mobile, open as an accessible modal drawer with focus trap, Escape support, and labelled close control.
+
+### Top utility bar
+
+The bar contains only:
+
+- current workspace and business-unit scope;
+- global search/command access;
+- data freshness;
+- notifications;
+- user and role menu.
+
+Do not repeat the full logo lockup when the rail already displays it.
+
+### Page header
+
+Use an asymmetric two-zone header:
+
+- left: eyebrow, page title, one-sentence operational purpose;
+- right: owner, reporting period, last refresh, and one primary action.
+
+Do not place decorative status pills beneath the title.
+
+### Evidence rail
+
+Attach the evidence rail to consequential content:
+
+`SOURCE · OWNER · AS OF · POLICY/STATE`
+
+Example:
+
+`CRM + ERP · Finance Ops · 25 Jul 2026 09:40 BST · CO-10 VERIFIED`
+
+Render it as a slim ruled row using the evidence typeface. On mobile it wraps into two rows without horizontal scrolling.
+
+---
+
+## 07. Gateway Redesign
+
+The gateway should feel like the entrance to an operating institution, not a pricing page.
+
+### Desktop composition
+
+- Left `7/12`: COS mark, “Central Operating System,” and the thesis:
+  **One governed view of the business.**
+- Below: plain copy explaining that access, actions, and recommendations are recorded.
+- Right `5/12`: a structured workspace index, not three floating feature cards.
+- Each workspace row shows name, purpose, authorised role, and a direct `Enter workspace` action.
+- A narrow bottom evidence strip shows identity provider, policy, session, and audit status.
+
+### Workspace index order
+
+1. Management — decisions, approvals, group performance.
+2. Sales — accounts, pipeline, quotes, commercial controls.
+3. Marketing — campaigns, consent, attribution, recommendations.
+4. Design System — tokens, components, states, and release evidence.
+
+Do not colour-code the four workspaces with unrelated hues. Use one accent and distinct Lucide icons.
+
+### Mobile composition
+
+- Brand and thesis first.
+- Identity/scope selector second.
+- Workspace rows become a simple divided list.
+- The action spans the available width.
+- Remove nonessential gateway explanation after the first visit if product state supports it.
+
+---
+
+## 08. Workspace Composition
+
+### Management: decision desk
+
+Prioritise:
+
+1. items requiring executive action;
+2. exceptions and breaches;
+3. verified performance context;
+4. recent decisions and their effects.
+
+Use a dominant decision queue with a narrower context column. Avoid opening with a uniform KPI-card row. A metric appears large only when it changes the next decision.
+
+### Sales: commercial ledger
+
+Use:
+
+- a compact account/pipeline table as the primary surface;
+- a persistent quote-margin and approval context area;
+- stage progression that communicates requirements, not just colour;
+- provenance for price, discount, and margin calculations.
+
+### Marketing: governed campaign room
+
+Use:
+
+- timeline or calendar as the main composition where scheduling is central;
+- consent and audience eligibility beside publishing controls;
+- performance evidence below, not as decorative hero stats;
+- AI suggestions labelled and visually subordinate to human actions.
+
+### Design System: working specification
+
+Present tokens and components as a documentation workspace:
+
+- chapter navigation;
+- live examples beside concise rules;
+- copyable token values;
+- state and accessibility matrices;
+- release checklist with actual pass/fail evidence.
+
+Avoid a dark “developer console” theme unless displaying literal logs or code.
+
+---
+
+## 09. Components
+
+Retain existing component IDs for traceability. Redesign their visual treatment under this standard.
+
+### Buttons — `C-BTN-01…06`
+
+- Primary: `signal` fill, white label.
+- Secondary: `panel` fill, `ink` label, `rule` border.
+- Quiet: text-only with underline or arrow on hover.
+- Destructive: `danger` fill or outlined confirmation treatment.
+- Use verb-led labels: `Approve quote`, `Open evidence`, `Return to owner`.
+- Never use shadow as the primary affordance.
+
+### Inputs — `C-INP-01…04`
+
+- Labels remain visible above fields.
+- Focus uses a `2px signal` outline with offset.
+- Help and error text reserve layout space.
+- Do not use placeholder text as the label.
+
+### Tables — `C-TBL-01…05`
+
+- Prefer horizontal rules to boxed cells.
+- Sticky headers are allowed when row count requires them.
+- Align numbers right and labels left.
+- Keep row actions discoverable through a labelled menu.
+- Provide sort direction in text for assistive technology.
+- On mobile, switch to a prioritised record view rather than forcing horizontal scroll.
+
+### Status markers
+
+- Pair colour with an icon or text label.
+- Use compact rectangular labels, not a cloud of pills.
+- Show status only where it changes interpretation or action.
+
+### Charts — `C-CHT-01…11`
+
+- Every chart has a specific question in its title.
+- Include units, reporting period, source, and last refresh.
+- Direct-label important series where space allows.
+- Avoid legends with more than six items.
+- Provide a table alternative for complex data.
+- Never use 3D effects, gradients, or decorative animation.
+
+### Overlays — `C-OVR-01…06`
+
+- Use a drawer for evidence, history, or record detail.
+- Use a modal for one bounded decision.
+- Use a full page for multi-step or high-risk work.
+- Return focus to the invoking control on close.
+
+### State views — `C-STA-01…05`
+
+Empty, loading, error, and restricted states must explain:
+
+- what happened;
+- whether data is safe;
+- what the user can do next;
+- who owns resolution where relevant.
+
+---
+
+## 10. AI and Governance
+
+AI is identified by **language, provenance, and the `signal` accent**, not purple styling or sparkle icons.
+
+### Surface classes
+
+1. `AUTO` — deterministic policy execution; immutable audit record.
+2. `DRAFT` — editable material; not transmitted without review.
+3. `RECOMMEND` — suggestion requiring human action and evidence.
+4. `GATED` — blocked pending required approval, MFA, or signature.
+5. `BLOCKED` — action constitutionally unavailable to AI.
+
+### Recommendation anatomy — `C-AI-01…06`
+
+Every recommendation includes:
+
+- class and confidence stated in plain text;
+- one-sentence recommendation;
+- expected operational effect;
+- sources and freshness;
+- reasoning summary;
+- model and prompt identifiers;
+- `Accept`, `Edit`, and `Reject` where permitted;
+- named human owner for the resulting action.
+
+Do not animate an AI badge. Do not use sparkle icons as the default AI symbol.
+
+### “Why” panel
+
+The panel must separate:
+
+1. **Evidence used**
+2. **Interpretation**
+3. **Policy constraints**
+4. **Uncertainty**
+5. **Available human actions**
+
+### Kill switch
+
+- Present as a flat, red-ruled governance panel.
+- Require a two-second hold plus a typed explanation.
+- Announce progress accessibly.
+- Record administrator, scope, reason, timestamp, and result.
+- Never rely on colour or animation alone.
+
+---
+
+## 11. Iconography and Imagery
+
+### Icons
+
+- Lucide only.
+- Stroke width: `1.75px`.
+- Sizes: `16`, `20`, `24`, or `32px`; `12px` only in dense evidence metadata.
+- Use one icon per action or concept when it improves scanning.
+- Do not place every icon inside a coloured rounded square.
+- Accessible names belong on icon-only controls.
+
+### Imagery
+
+The product should not depend on stock photography. If imagery is introduced:
+
+- use documentary industrial or operational material tied to the represented business unit;
+- avoid abstract 3D blobs, floating UI renders, generic office teams, and neon AI imagery;
+- use one strong image rather than a decorative gallery;
+- provide meaningful alt text or empty alt text for purely decorative images.
+
+---
+
+## 12. Motion
+
+Motion communicates state change only.
+
+- One short gateway entrance sequence may reveal the thesis and workspace index.
+- Drawers use a restrained `180–220ms` transition.
+- Hover motion is limited to colour, underline, or a `2px` directional shift.
+- Loading indicators communicate actual loading.
+- No pulsing compliance dots, floating cards, or perpetual sparkle animation.
+- Respect `prefers-reduced-motion`; remove nonessential transitions entirely when enabled.
+
+---
+
+## 13. Responsive Behaviour
+
+Design mobile-first and verify at:
+
+- `375px`
+- `768px`
+- `1024px`
+- `1440px`
+
+### Breakpoint intent
+
+- `<768px`: companion mode; alerts, review, approve, search, and handoff.
+- `768–1023px`: compact workspace; drawer navigation and single primary column.
+- `1024–1279px`: full shell with reduced context width.
+- `≥1280px`: 12-column composition and persistent evidence/context panels.
+
+### Required checks
+
+- no horizontal page scroll;
+- no clipped labels or controls;
+- no overlapping drawers, menus, or sticky regions;
+- minimum `44×44px` touch targets;
+- mobile menu opens, traps focus, closes, and restores focus;
+- complex tables have prioritised mobile alternatives;
+- charts preserve readable labels and data access;
+- type and spacing scale intentionally rather than merely shrinking.
+
+---
+
+## 14. Accessibility and Content
+
+### Accessibility floor
+
+- semantic landmarks and heading order;
+- visible `:focus-visible` treatment;
+- keyboard access to all actions;
+- labelled controls and programmatic errors;
+- alt text for meaningful images;
+- text alternatives for charts;
+- colour-independent status communication;
+- reduced-motion support;
+- WCAG AA contrast;
+- live-region announcements for asynchronous approval, save, and error states.
+
+### Voice
+
+Write like an accountable operator:
+
+- specific;
+- calm;
+- direct;
+- free of hype.
+
+Prefer:
+
+- `3 quotes require margin approval`
+- `Source data last refreshed 18 minutes ago`
+- `This recommendation cannot issue payment`
+
+Avoid:
+
+- `Unlock powerful insights`
+- `Supercharge your workflow`
+- `Seamless AI-driven transformation`
+- `Everything you need, all in one place`
+
+---
+
+## 15. Canonical Demo Dataset
+
+Only show these figures when the screen’s task genuinely calls for them:
+
+- MTD revenue: `£1,284,600` (`+7.4%`)
+- Pipeline value: `£3,842,000`
+- Weighted pipeline: `£2,116,000`
+- Forecast revenue: `£1,476,000` (`+7.4%`)
+- Available cash: `£2,340,000`
+- Open approvals: `14`
+- ROAS: `4.2x`
+- Open tickets: `38`
+
+Pipeline distribution:
+
+`640k + 520k + 455k + 430k + 390k + 360k + 335k + 280k + 230k + 202k`
+
+Business units:
 
 1. Electronics
 2. Industrial Gases
@@ -240,7 +591,7 @@ To prevent divergence, all calculations and visual views in the application must
 4. Imports
 5. Agency
 
-### Fictional Accounts (The 10 Accounts)
+Accounts:
 
 1. Northwind Industrial
 2. Calder Gas Services
@@ -253,7 +604,7 @@ To prevent divergence, all calculations and visual views in the application must
 9. Tynebridge Foods
 10. Meriden Medical
 
-### Fictional Users (The 12 Initials-Only Users)
+Users:
 
 - `OR` Olivia Reed · Group CEO
 - `MH` Marcus Hale · Sales Manager
@@ -267,3 +618,53 @@ To prevent divergence, all calculations and visual views in the application must
 - `EM` Erin Moore · Platform Admin
 - `IK` Idris Khan · Data Analyst
 - `SG` Sophie Grant · Legal & Compliance
+
+---
+
+## 16. Release Review
+
+Before calling a redesign complete:
+
+1. Build and type-check the project.
+2. Preview the gateway and each workspace at all four target widths.
+3. Capture desktop and mobile screenshots.
+4. Exercise navigation, menus, search, forms, approvals, drawers, and destructive confirmations.
+5. Verify keyboard order, focus return, labels, errors, and reduced motion.
+6. Check data provenance and canonical figures.
+7. Read every prominent sentence and remove generic SaaS language.
+8. Run the checklist below.
+9. Remove one visual element that is not earning its place.
+10. Record failures fixed during the review.
+
+### Vibe-code checklist — every answer must be “No”
+
+- [ ] Is purple, violet, or indigo visually dominant?
+- [ ] Is any purple/blue/pink gradient present?
+- [ ] Is headline text gradient-filled?
+- [ ] Are unsourced giant stats used as decoration?
+- [ ] Are emoji used in headings or statuses?
+- [ ] Is there a generic “Why choose us?” or transformation slogan?
+- [ ] Is the page one centred column of interchangeable sections?
+- [ ] Does typography rely only on Inter or system fonts?
+- [ ] Are frosted glass, glow, or blur used decoratively?
+- [ ] Are shadows applied to most cards?
+- [ ] Are there too many rounded containers or badges?
+- [ ] Does motion continue without communicating state?
+- [ ] Does mobile look like a compressed desktop screen?
+
+---
+
+## 17. Implementation Order
+
+1. Tokenise the new palette, typography, spacing, radii, and elevation.
+2. Rebuild the shell and responsive navigation.
+3. Redesign the gateway as the asymmetric workspace index.
+4. Establish the evidence rail and recommendation anatomy.
+5. Update buttons, fields, tables, status markers, overlays, and state views.
+6. Recompose Management around decisions and exceptions.
+7. Recompose Sales around the commercial ledger.
+8. Recompose Marketing around campaign governance.
+9. Recompose the Design System as working documentation.
+10. Complete the release review and record evidence.
+
+This document defines the target state. Existing implementation details do not override it unless required for security, data integrity, or an explicit product constraint.

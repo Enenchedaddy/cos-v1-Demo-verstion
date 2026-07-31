@@ -71,22 +71,18 @@ export default function DesignSystemPlatform({ onLogoutToGateway }: DesignSystem
 
   // Color tokens data
   const colors = [
-    { name: 'navy-900', hex: '#182A5C', role: 'Sidebar background' },
-    { name: 'navy-800', hex: '#264288', role: 'Dark active elements' },
-    { name: 'blue-600', hex: '#4065B3', role: 'Primary actions' },
-    { name: 'blue-400', hex: '#6C84B8', role: 'Focus & supporting indicators' },
-    { name: 'blue-200', hex: '#899FD1', role: 'Chart lines & visualization' },
-    { name: 'blue-100', hex: '#AFBFDA', role: 'Selected grid row tint' },
-    { name: 'blue-50',  hex: '#EEF3FB', role: 'Subtle hover & highlight tints' },
-    { name: 'canvas',   hex: '#FFFFFF', role: 'Main content containers' },
-    { name: 'surface',  hex: '#F7F9FC', role: 'Application viewport base' },
-    { name: 'hairline', hex: '#D9E0EA', role: '1px clean structural borders' },
-    { name: 'text-primary', hex: '#111827', role: 'Bold headings & display copy' },
-    { name: 'text-secondary', hex: '#4B5563', role: 'Subtle captions & labels' },
-    { name: 'green-700', hex: '#166534', role: 'Healthy state / compliant values' },
-    { name: 'amber-800', hex: '#92400E', role: 'At risk warning / medium alert' },
-    { name: 'red-700',   hex: '#B42318', role: 'Breach / high risk credit holds' },
-    { name: 'purple-700', hex: '#6B21A8', role: 'AI recommendations & origin' }
+    { name: 'ink', hex: '#15202B', role: 'Primary text and chart anchors' },
+    { name: 'cos-navy', hex: '#183153', role: 'Navigation and brand surfaces' },
+    { name: 'paper', hex: '#FCFBF7', role: 'Warm application canvas' },
+    { name: 'panel', hex: '#FFFFFF', role: 'Focused work surfaces' },
+    { name: 'rule', hex: '#D8D6CE', role: 'Dividers and input boundaries' },
+    { name: 'signal', hex: '#C84F2A', role: 'Primary action and AI provenance' },
+    { name: 'muted', hex: '#5E6872', role: 'Secondary copy and metadata' },
+    { name: 'navy-soft', hex: '#DDE6EF', role: 'Information and selection tint' },
+    { name: 'signal-soft', hex: '#F7E7DF', role: 'Recommendation and attention tint' },
+    { name: 'success', hex: '#246B4A', role: 'Verified and complete' },
+    { name: 'warning', hex: '#8A5A12', role: 'At risk and approaching threshold' },
+    { name: 'danger', hex: '#A63A32', role: 'Breach and destructive action' }
   ];
 
   // Icon registry database
@@ -425,7 +421,7 @@ export default function DesignSystemPlatform({ onLogoutToGateway }: DesignSystem
                 <div className="bg-[#182A5C] rounded-xl p-6 border border-[#264288] text-white flex flex-col justify-between min-h-[11rem] h-auto gap-4 shadow-md">
                   <div>
                     <span className="text-[10px] bg-[#264288] text-[#AFBFDA] rounded px-2 py-0.5 uppercase font-mono font-bold">BRAND & DISPLAY</span>
-                    <h3 className="text-3xl font-black font-display tracking-tight mt-2">Montserrat</h3>
+                    <h3 className="text-3xl font-black font-display tracking-tight mt-2">Newsreader</h3>
                   </div>
                   <p className="text-xs text-[#AFBFDA]">Covers, section dividers, and page level titles only. Expresses professional weight.</p>
                 </div>
@@ -433,7 +429,7 @@ export default function DesignSystemPlatform({ onLogoutToGateway }: DesignSystem
                 <div className="bg-white rounded-xl p-6 border border-[#D9E0EA] text-slate-800 flex flex-col justify-between min-h-[11rem] h-auto gap-4 shadow-sm">
                   <div>
                     <span className="text-[10px] bg-[#EEF3FB] text-[#4065B3] rounded px-2 py-0.5 uppercase font-mono font-bold">UI WORKHORSE</span>
-                    <h3 className="text-3xl font-bold font-sans tracking-tight mt-2">Inter</h3>
+                    <h3 className="text-3xl font-bold font-sans tracking-tight mt-2">IBM Plex Sans</h3>
                   </div>
                   <p className="text-xs text-slate-500">Every single label, system action, metric, table cell value, form field and user data.</p>
                 </div>
@@ -447,7 +443,7 @@ export default function DesignSystemPlatform({ onLogoutToGateway }: DesignSystem
                   <div className="pt-0 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="w-48 text-xs font-mono">
                       <span className="font-bold text-slate-900 block">Display Title</span>
-                      <span className="text-slate-400">Montserrat • 64 / 72px</span>
+                      <span className="text-slate-400">Newsreader · 64 / 64px</span>
                     </div>
                     <div className="flex-1 font-display text-4xl font-extrabold text-[#111827] tracking-tight">
                       Aa 012345 £%,
@@ -457,7 +453,7 @@ export default function DesignSystemPlatform({ onLogoutToGateway }: DesignSystem
                   <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="w-48 text-xs font-mono">
                       <span className="font-bold text-slate-900 block">H1 Page Title</span>
-                      <span className="text-slate-400">Inter • 32 / 40px</span>
+                      <span className="text-slate-400">Newsreader · 44 / 48px</span>
                     </div>
                     <div className="flex-1 font-sans text-2xl font-bold text-[#111827] tracking-tight">
                       Aa 012345 £%,
@@ -467,7 +463,7 @@ export default function DesignSystemPlatform({ onLogoutToGateway }: DesignSystem
                   <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="w-48 text-xs font-mono">
                       <span className="font-bold text-slate-900 block">H2 Section Heading</span>
-                      <span className="text-slate-400">Inter • 24 / 32px</span>
+                      <span className="text-slate-400">Newsreader · 32 / 36px</span>
                     </div>
                     <div className="flex-1 font-sans text-xl font-bold text-slate-800">
                       Aa 012345 £%,
@@ -477,7 +473,7 @@ export default function DesignSystemPlatform({ onLogoutToGateway }: DesignSystem
                   <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="w-48 text-xs font-mono">
                       <span className="font-bold text-slate-900 block">H3 Card Heading</span>
-                      <span className="text-slate-400">Inter • 18 / 24px</span>
+                      <span className="text-slate-400">IBM Plex Sans · 20 / 26px</span>
                     </div>
                     <div className="flex-1 font-sans text-md font-bold text-slate-800">
                       Aa 012345 £%,
@@ -487,7 +483,7 @@ export default function DesignSystemPlatform({ onLogoutToGateway }: DesignSystem
                   <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="w-48 text-xs font-mono">
                       <span className="font-bold text-slate-900 block">Body Copy</span>
-                      <span className="text-slate-400">Inter • 14 / 20px</span>
+                      <span className="text-slate-400">IBM Plex Sans · 14 / 22px</span>
                     </div>
                     <div className="flex-1 font-sans text-sm text-slate-600 leading-normal">
                       The quick brown fox jumps over the lazy dog in active system state models.

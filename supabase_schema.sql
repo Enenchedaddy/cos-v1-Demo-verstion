@@ -1,20 +1,22 @@
 -- Supabase schema for COS demo app
 -- Run this in Supabase SQL Editor to create the required tables.
+--
+-- This schema uses camelCase column names to match the application model exactly.
 
 CREATE TABLE IF NOT EXISTS companies (
   id text PRIMARY KEY,
   name text,
-  customer_number text,
+  customerNumber text,
   industry text,
   employees text,
-  annual_revenue text,
-  billing_address jsonb,
-  delivery_addresses jsonb,
-  credit_limit numeric,
-  available_credit numeric,
-  payment_terms text,
-  credit_status text,
-  account_owner text,
+  annualRevenue text,
+  billingAddress jsonb,
+  deliveryAddresses jsonb,
+  creditLimit numeric,
+  availableCredit numeric,
+  paymentTerms text,
+  creditStatus text,
+  accountOwner text,
   contacts jsonb
 );
 
@@ -22,100 +24,100 @@ CREATE TABLE IF NOT EXISTS products (
   id text PRIMARY KEY,
   name text,
   unit text,
-  bottle_sizes jsonb,
-  stock_on_hand integer,
-  days_cover numeric,
-  reserved_stock integer,
-  reorder_point integer,
-  list_price numeric
+  bottleSizes jsonb,
+  stockOnHand integer,
+  daysCover numeric,
+  reservedStock integer,
+  reorderPoint integer,
+  listPrice numeric
 );
 
 CREATE TABLE IF NOT EXISTS deals (
   id text PRIMARY KEY,
   title text,
-  company_id text,
-  company_name text,
+  companyId text,
+  companyName text,
   amount numeric,
   stage text,
   probability integer,
-  close_date date,
+  closeDate text,
   owner text,
   health text,
-  last_activity text,
+  lastActivity text,
   notes text
 );
 
 CREATE TABLE IF NOT EXISTS quotes (
   id text PRIMARY KEY,
-  quote_number text,
-  deal_id text,
-  company_name text,
-  valid_until date,
+  quoteNumber text,
+  dealId text,
+  companyName text,
+  validUntil text,
   items jsonb,
   discount numeric,
   subtotal numeric,
-  discount_amount numeric,
+  discountAmount numeric,
   total numeric,
   margin numeric,
   status text,
-  approver_needed text,
-  requested_by text
+  approverNeeded text,
+  requestedBy text
 );
 
 CREATE TABLE IF NOT EXISTS orders (
   id text PRIMARY KEY,
-  order_number text,
-  company_id text,
-  company_name text,
-  po_number text,
-  date date,
-  delivery_date date,
-  delivery_type text,
-  delivery_address text,
+  orderNumber text,
+  companyId text,
+  companyName text,
+  poNumber text,
+  date text,
+  deliveryDate text,
+  deliveryType text,
+  deliveryAddress text,
   items jsonb,
   status text,
-  credit_hold_triggered boolean,
-  assigned_driver text,
+  creditHoldTriggered boolean,
+  assignedDriver text,
   eta text,
-  stop_number integer,
-  total_stops integer,
+  stopNumber integer,
+  totalStops integer,
   total numeric,
   vat numeric,
-  grand_total numeric
+  grandTotal numeric
 );
 
 CREATE TABLE IF NOT EXISTS invoices (
   id text PRIMARY KEY,
-  invoice_number text,
-  order_number text,
-  company_id text,
-  company_name text,
-  due_date date,
+  invoiceNumber text,
+  orderNumber text,
+  companyId text,
+  companyName text,
+  dueDate text,
   amount numeric,
   status text,
-  pdf_url text
+  pdfUrl text
 );
 
 CREATE TABLE IF NOT EXISTS cylinder_balances (
-  company_id text,
-  gas_type text,
-  bottle_size text,
-  full_on_site integer,
-  empty_on_site integer,
-  in_transit integer,
-  overdue_returns integer,
-  risk_level text
+  companyId text,
+  gasType text,
+  bottleSize text,
+  fullOnSite integer,
+  emptyOnSite integer,
+  inTransit integer,
+  overdueReturns integer,
+  riskLevel text
 );
 
 CREATE TABLE IF NOT EXISTS support_tickets (
   id text PRIMARY KEY,
-  ticket_number text,
-  company_id text,
-  company_name text,
-  request_type text,
-  order_reference text,
-  cylinder_type text,
-  created_on timestamptz,
+  ticketNumber text,
+  companyId text,
+  companyName text,
+  requestType text,
+  orderReference text,
+  cylinderType text,
+  createdOn text,
   status text,
   priority text,
   description text,
@@ -139,33 +141,33 @@ CREATE TABLE IF NOT EXISTS campaigns (
 CREATE TABLE IF NOT EXISTS approvals (
   id text PRIMARY KEY,
   type text,
-  reference_id text,
-  customer_name text,
+  referenceId text,
+  customerName text,
   details text,
-  impact_value text,
-  requested_by text,
-  request_date date,
-  sla_days integer,
+  impactValue text,
+  requestedBy text,
+  requestDate text,
+  slaDays integer,
   status text,
-  audit_trail jsonb
+  auditTrail jsonb
 );
 
 CREATE TABLE IF NOT EXISTS audit_logs (
   id text PRIMARY KEY,
-  timestamp timestamptz DEFAULT now(),
+  timestamp text,
   "user" text,
   action text,
-  entity_type text,
-  entity_name text,
+  entityType text,
+  entityName text,
   platform text,
-  ip_address text,
+  ipAddress text,
   details text,
-  before_value text,
-  after_value text
+  beforeValue text,
+  afterValue text
 );
 
 -- Optional: add indexes for common queries
-CREATE INDEX IF NOT EXISTS idx_orders_company_id ON orders(company_id);
-CREATE INDEX IF NOT EXISTS idx_deals_company_id ON deals(company_id);
-CREATE INDEX IF NOT EXISTS idx_quotes_deal_id ON quotes(deal_id);
+CREATE INDEX IF NOT EXISTS idx_orders_company_id ON orders(companyId);
+CREATE INDEX IF NOT EXISTS idx_deals_company_id ON deals(companyId);
+CREATE INDEX IF NOT EXISTS idx_quotes_deal_id ON quotes(dealId);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_timestamp ON audit_logs(timestamp DESC);

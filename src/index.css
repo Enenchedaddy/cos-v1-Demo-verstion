@@ -372,6 +372,114 @@ main > div > header {
   box-shadow: 0 8px 24px rgba(15, 31, 65, 0.11) !important;
 }
 
+/* Shared workspace navigation: reference-matched navy shell and entity scope. */
+.cos-workspace-sidebar {
+  background-color: #1d356d !important;
+  color: #ffffff;
+  font-family: "IBM Plex Sans", Arial, sans-serif !important;
+}
+
+.cos-workspace-sidebar h1,
+.cos-workspace-sidebar h2,
+.cos-workspace-sidebar h3,
+.cos-workspace-sidebar h4,
+.cos-workspace-sidebar h5,
+.cos-workspace-sidebar h6,
+.cos-workspace-sidebar .font-display {
+  color: inherit;
+  font-family: "IBM Plex Sans", Arial, sans-serif !important;
+}
+
+.cos-workspace-sidebar .bg-\[\#264288\] {
+  background-color: #2e4f9a !important;
+}
+
+.cos-workspace-sidebar .hover\:bg-\[\#264288\]:hover,
+.cos-workspace-sidebar .hover\:bg-\[\#4065B3\]:hover {
+  background-color: #365aa8 !important;
+}
+
+.cos-workspace-sidebar .border-\[\#264288\] {
+  border-color: #294886 !important;
+}
+
+.cos-workspace-sidebar .border-\[\#4065B3\] {
+  border-color: #5c82d1 !important;
+}
+
+.cos-workspace-sidebar .text-\[\#AFBFDA\] {
+  color: #bed0ed !important;
+}
+
+.cos-workspace-sidebar .text-\[\#AFBFDA\]\/50 {
+  color: #7892c3 !important;
+}
+
+.workspace-entity-scope {
+  border-bottom: 1px solid #294886;
+  padding: 14px 12px 16px;
+}
+
+.workspace-entity-scope__label {
+  color: #91a9d2;
+  display: block;
+  font-family: "IBM Plex Mono", Consolas, monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  margin-bottom: 7px;
+  text-transform: uppercase;
+}
+
+.workspace-entity-scope__select {
+  background-color: #2b4c96;
+  border: 1px solid #4265ae;
+  border-radius: 10px;
+  color: #ffffff;
+  color-scheme: dark;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  min-height: 40px;
+  padding: 0 12px;
+  width: 100%;
+}
+
+.workspace-entity-scope__select:hover {
+  background-color: #3155a2;
+  border-color: #6385cc;
+}
+
+.workspace-entity-scope__modes {
+  background-color: #0b2858;
+  border: 1px solid #315a9f;
+  border-radius: 10px;
+  display: grid;
+  gap: 3px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 12px;
+  padding: 4px;
+}
+
+.workspace-entity-scope__mode {
+  border-radius: 6px;
+  color: #b9cbea;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  min-height: 36px;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.workspace-entity-scope__mode:hover {
+  color: #ffffff;
+}
+
+.workspace-entity-scope__mode[data-active="true"] {
+  background-color: #426dc2;
+  color: #ffffff;
+}
+
 /* Portal gateway cards: theme-matched moving edge light. */
 .gateway-workspace-card {
   --gateway-card-accent: #3159ac;
