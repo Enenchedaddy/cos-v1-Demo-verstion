@@ -577,6 +577,63 @@ main > div > header {
   background: var(--rule);
 }
 
+.workspace-logo-watermark {
+  z-index: 0;
+}
+
+.workspace-logo-watermark ~ * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Shared feedback for genuinely interactive card surfaces. */
+[data-card-surface],
+[data-interactive-card],
+.gateway-workspace-card {
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease !important;
+}
+
+:is(
+  [data-card-surface],
+  [data-interactive-card],
+  .gateway-workspace-card
+):hover,
+:is(
+  [data-card-surface],
+  [data-interactive-card],
+  .gateway-workspace-card
+):active,
+:is(
+  [data-card-surface],
+  [data-interactive-card],
+  .gateway-workspace-card
+):focus-within,
+.card-interaction-selected {
+  transition-duration: 180ms !important;
+  border-color: #4065B3 !important;
+  box-shadow:
+    inset 0 0 0 9999px rgba(238, 243, 251, 0.32),
+    0 0 0 4px rgba(64, 101, 179, 0.14),
+    0 14px 30px rgba(24, 42, 92, 0.13) !important;
+  transform: translateY(-1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-card-surface],
+  [data-interactive-card],
+  .gateway-workspace-card {
+    transition: none !important;
+  }
+
+  .card-interaction-selected {
+    transform: none;
+  }
+}
+
 .evidence-rail > * {
   min-width: 0;
   padding: 10px 12px;

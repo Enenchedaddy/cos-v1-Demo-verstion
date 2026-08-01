@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Company, Deal, Quote, Order, Invoice, CylinderBalance, SupportTicket, Campaign, AuditLog, ApprovalRequest, Product, UserRole } from './types';
 import { 
   INITIAL_COMPANIES, INITIAL_ORDERS, 
@@ -18,6 +18,8 @@ import ManagementPlatform from './components/ManagementPlatform';
 import DesignSystemPlatform from './components/DesignSystemPlatform';
 import IdentityGateway from './components/IdentityGateway';
 import COSLogo from './components/COSLogo';
+import CardInteractionManager from './components/CardInteractionManager';
+import HexLoader from './components/HexLoader';
 import { 
   Database, Activity, Users, TrendingUp, Building2, ShieldAlert, KeyRound, ArrowRight,
   ShieldCheck, HelpCircle, Sparkles, Sliders, Globe, MessageSquare
@@ -40,7 +42,51 @@ export default function App() {
 
   const [showSimulatorLogs, setShowSimulatorLogs] = useState(false);
   const [activePlatform, setActivePlatform] = useState<'gateway' | 'sales' | 'marketing' | 'management' | 'design-system'>('gateway');
+  const [isInitializing, setIsInitializing] = useState(() => {
+    try {
+      return sessionStorage.getItem('cos-portal-initialized') !== 'true';
+    } catch {
+      return true;
+    }
+  });
+  const [launchTransition, setLaunchTransition] = useState<{
+    target: 'gateway' | 'sales' | 'marketing' | 'management' | 'design-system';
+    label: string;
+  } | null>(null);
+  const transitionTimer = useRef<number | null>(null);
   const [gatewaySelectedCompanyId, setGatewaySelectedCompanyId] = useState<string>('comp-acme');
+
+  useEffect(() => {
+    if (!isInitializing) return;
+    const timer = window.setTimeout(() => {
+      setIsInitializing(false);
+      try {
+        sessionStorage.setItem('cos-portal-initialized', 'true');
+      } catch {
+        // Storage may be unavailable in privacy-restricted browsers.
+      }
+    }, 2200);
+    return () => window.clearTimeout(timer);
+  }, [isInitializing]);
+
+  useEffect(() => () => {
+    if (transitionTimer.current) window.clearTimeout(transitionTimer.current);
+  }, []);
+
+  const beginPlatformTransition = (
+    target: 'gateway' | 'sales' | 'marketing' | 'management' | 'design-system',
+    label: string,
+    onComplete?: () => void,
+  ) => {
+    if (transitionTimer.current) window.clearTimeout(transitionTimer.current);
+    setLaunchTransition({ target, label });
+    transitionTimer.current = window.setTimeout(() => {
+      setActivePlatform(target);
+      setLaunchTransition(null);
+      transitionTimer.current = null;
+      onComplete?.();
+    }, 1750);
+  };
 
   // Fetch real-time data from Supabase if configured
   useEffect(() => {
@@ -262,24 +308,38 @@ export default function App() {
 
   return (
     <div className="flex flex-col h-screen overflow-hidden font-sans text-slate-800 bg-[#F7F9FC]">
+      <CardInteractionManager />
+      {isInitializing && (
+        <HexLoader
+          fullPage
+          size="lg"
+          label="Initializing core security contexts & database spine…"
+        />
+      )}
+      {launchTransition && !isInitializing && (
+        <HexLoader fullPage size="lg" label={launchTransition.label} />
+      )}
       
       {/* Primary Workspace */}
       <main className="flex-1 overflow-hidden relative flex flex-col">
         {activePlatform === 'gateway' && (
           <IdentityGateway
             isSupabaseConfigured={isSupabaseConfigured}
-            onOpenDesignSystem={() => setActivePlatform('design-system')}
+            onOpenDesignSystem={() => beginPlatformTransition('design-system', 'Opening COS Design System…')}
             onEnterSales={() => {
-              setActivePlatform('sales');
-              handleAddLog('Sales Session Authorized', 'Customer', 'Chris Allen', 'S&M', 'Entered Sales from governed gateway');
+              beginPlatformTransition('sales', 'Authenticating & Launching Sales Platform…', () => {
+                handleAddLog('Sales Session Authorized', 'Customer', 'Chris Allen', 'S&M', 'Entered Sales from governed gateway');
+              });
             }}
             onEnterMarketing={() => {
-              setActivePlatform('marketing');
-              handleAddLog('Marketing Session Authorized', 'Customer', 'Aisha Bello', 'S&M', 'Entered Marketing from governed gateway');
+              beginPlatformTransition('marketing', 'Authenticating & Launching Marketing Suite…', () => {
+                handleAddLog('Marketing Session Authorized', 'Customer', 'Aisha Bello', 'S&M', 'Entered Marketing from governed gateway');
+              });
             }}
             onEnterManagement={() => {
-              setActivePlatform('management');
-              handleAddLog('Executive Session Authorized', 'Permission', 'CEO', 'Management', 'Entered Management from governed gateway');
+              beginPlatformTransition('management', 'Authenticating & Launching Executive Management Suite…', () => {
+                handleAddLog('Executive Session Authorized', 'Permission', 'CEO', 'Management', 'Entered Management from governed gateway');
+              });
             }}
           />
         )}
@@ -671,7 +731,7 @@ export default function App() {
             onUpdateDeals={handleUpdateDeals}
             onAddApproval={handleAddApproval}
             onLogoutToGateway={() => {
-              setActivePlatform('gateway');
+              beginPlatformTransition('gateway', 'Returning to the Identity Gateway…');
             }}
           />
         )}
@@ -692,7 +752,7 @@ export default function App() {
             currentRole="Aisha Bello (Marketing Lead)"
             onAddLog={handleAddLog}
             onLogoutToGateway={() => {
-              setActivePlatform('gateway');
+              beginPlatformTransition('gateway', 'Returning to the Identity Gateway…');
             }}
           />
         )}
@@ -716,7 +776,7 @@ export default function App() {
             onUpdateCompanies={handleUpdateCompanies}
             onUpdateApprovals={handleUpdateApprovals}
             onLogoutToGateway={() => {
-              setActivePlatform('gateway');
+              beginPlatformTransition('gateway', 'Returning to the Identity Gateway…');
             }}
           />
         )}
@@ -724,7 +784,7 @@ export default function App() {
         {activePlatform === 'design-system' && (
           <DesignSystemPlatform
             onLogoutToGateway={() => {
-              setActivePlatform('gateway');
+              beginPlatformTransition('gateway', 'Returning to the Identity Gateway…');
             }}
           />
         )}

@@ -7,6 +7,7 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import COSLogo from './COSLogo';
+import COSLogoWatermark from './COSLogoWatermark';
 
 interface IdentityGatewayProps {
   isSupabaseConfigured: boolean;
@@ -91,7 +92,8 @@ export default function IdentityGateway({
   ];
 
   return (
-    <div className="flex-1 overflow-y-auto bg-[#F3F6FA]">
+    <div className="relative isolate flex-1 overflow-y-auto bg-[#F3F6FA]">
+      <COSLogoWatermark />
       <div className="mx-auto min-h-full w-full max-w-[1540px] px-4 pb-10 sm:px-7 lg:px-10">
         <header className="flex min-h-[76px] items-center justify-between border-b border-[#D7DEE8]">
           <div className="flex items-center gap-3">

@@ -5,6 +5,8 @@
 
 import React, { useState } from 'react';
 import COSLogo from './COSLogo';
+import COSLogoWatermark from './COSLogoWatermark';
+import HexLoader from './HexLoader';
 import SidebarEntityScope from './SidebarEntityScope';
 import { Company, Deal, Quote, Order, Invoice, CylinderBalance, SupportTicket, Campaign, AuditLog, ApprovalRequest, Product } from '../types';
 import { 
@@ -610,15 +612,15 @@ export default function ManagementPlatform({
         </header>
 
         {/* Viewport content */}
-        <div className="flex-1 overflow-y-auto p-6 relative">
+        <div className="flex-1 overflow-y-auto p-6 relative isolate">
+          <COSLogoWatermark />
           
           {/* Simulated view states */}
           {simulatedState === 'loading' ? (
-            <div className="flex flex-col items-center justify-center h-full py-20 bg-white rounded-xl border border-[#D9E0EA] p-8 shadow-sm">
-              <RefreshCw className="animate-spin text-[#4065B3] mb-4" size={40} />
-              <h3 className="text-sm font-bold text-slate-800 font-display">Loading Corporate Entities...</h3>
-              <p className="text-xs text-slate-500 mt-1 max-w-xs text-center">Enforcing legal and operational ledger sync bounds.</p>
-            </div>
+            <HexLoader
+              size="lg"
+              label="Loading corporate entities & executive controls…"
+            />
           ) : simulatedState === 'error' ? (
             <div className="flex flex-col items-center justify-center h-full py-20 bg-white rounded-xl border border-red-200 p-8 shadow-sm">
               <div className="bg-red-50 text-red-600 p-3 rounded-full mb-4 border border-red-200">
