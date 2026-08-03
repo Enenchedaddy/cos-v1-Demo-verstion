@@ -622,6 +622,93 @@ main > div > header {
   transform: translateY(-1px);
 }
 
+/* Shared Sales, Marketing, and Management sidebar navigation states. */
+.cos-workspace-sidebar nav > button,
+.cos-workspace-sidebar nav > div > button {
+  border-left: 4px solid transparent;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease,
+    color 180ms ease !important;
+}
+
+.cos-workspace-sidebar nav > button svg,
+.cos-workspace-sidebar nav > div > button svg {
+  transform-origin: center;
+  transition: transform 180ms ease, color 180ms ease;
+}
+
+.cos-workspace-sidebar nav > button:hover,
+.cos-workspace-sidebar nav > button:focus-visible,
+.cos-workspace-sidebar nav > div > button:hover,
+.cos-workspace-sidebar nav > div > button:focus-visible {
+  transform: translateX(0.25rem);
+  border-left-color: #38BDF8 !important;
+  background-color: rgba(37, 70, 99, 0.92) !important;
+  color: #FFFFFF !important;
+}
+
+.cos-workspace-sidebar nav > button:hover svg,
+.cos-workspace-sidebar nav > button:focus-visible svg,
+.cos-workspace-sidebar nav > div > button:hover svg,
+.cos-workspace-sidebar nav > div > button:focus-visible svg {
+  color: #7DD3FC !important;
+  transform: scale(1.16);
+}
+
+.cos-workspace-sidebar nav > button[class~="bg-[#264288]"],
+.cos-workspace-sidebar nav > div > button[class~="bg-[#264288]"] {
+  border-left: 4px solid #FBBF24 !important;
+  background: linear-gradient(90deg, #355D7E 0%, #203F61 100%) !important;
+  box-shadow:
+    0 0 0 1px rgba(251, 191, 36, 0.2),
+    0 0 16px rgba(251, 191, 36, 0.12) !important;
+  color: #FFFFFF !important;
+}
+
+.cos-workspace-sidebar nav > button[class~="bg-[#264288]"] svg,
+.cos-workspace-sidebar nav > div > button[class~="bg-[#264288]"] svg {
+  color: #FBBF24 !important;
+  filter: drop-shadow(0 0 5px rgba(251, 191, 36, 0.28));
+}
+
+.cos-workspace-sidebar nav > div > div > button {
+  min-height: 30px;
+  border-left: 2px solid transparent;
+  border-radius: 4px;
+  padding: 0.35rem 0.55rem;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease !important;
+}
+
+.cos-workspace-sidebar nav > div > div > button:hover,
+.cos-workspace-sidebar nav > div > div > button:focus-visible {
+  transform: translateX(0.25rem);
+  border-left-color: #38BDF8;
+  background-color: rgba(56, 189, 248, 0.12);
+  color: #FFFFFF !important;
+}
+
+.cos-workspace-sidebar nav > div > div > button[class~="text-white"][class~="font-bold"] {
+  transform: translateX(0.125rem);
+  border-left-color: #FBBF24;
+  background-color: rgba(251, 191, 36, 0.13);
+  color: #FEF3C7 !important;
+  font-weight: 700;
+}
+
+.cos-workspace-sidebar nav > div > div > button[class~="text-white"][class~="font-bold"]:hover,
+.cos-workspace-sidebar nav > div > div > button[class~="text-white"][class~="font-bold"]:focus-visible {
+  transform: translateX(0.35rem);
+  border-left-color: #FBBF24;
+  background-color: rgba(251, 191, 36, 0.18);
+}
+
 @media (prefers-reduced-motion: reduce) {
   [data-card-surface],
   [data-interactive-card],
@@ -630,6 +717,17 @@ main > div > header {
   }
 
   .card-interaction-selected {
+    transform: none;
+  }
+
+  .cos-workspace-sidebar nav button,
+  .cos-workspace-sidebar nav button svg {
+    transition: none !important;
+  }
+
+  .cos-workspace-sidebar nav button:hover,
+  .cos-workspace-sidebar nav button:focus-visible,
+  .cos-workspace-sidebar nav button[class~="text-white"][class~="font-bold"] {
     transform: none;
   }
 }
