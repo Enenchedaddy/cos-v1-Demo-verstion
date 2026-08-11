@@ -4,10 +4,10 @@
  */
 
 import React, { useState } from 'react';
-import COSLogo from './COSLogo';
 import COSLogoWatermark from './COSLogoWatermark';
 import HexLoader from './HexLoader';
 import SidebarEntityScope from './SidebarEntityScope';
+import { ContextRailHeader, ContextRailSearch, GlobalIconRail, type RailArea } from './DualRailNavigation';
 import { Company, Deal, Quote, Order, Invoice, CylinderBalance, SupportTicket, Campaign, AuditLog, ApprovalRequest, Product } from '../types';
 import { 
   Users, TrendingUp, Percent, FileText, Activity, MessageSquare, ArrowRight, Plus, Check, AlertTriangle, 
@@ -15,7 +15,6 @@ import {
   Layers, Sliders, Calendar, BookOpen, AlertCircle, PlayCircle, ShieldCheck, Database, HelpCircle, HardDrive, 
   UserCheck, Shield, Sparkles, Network, Clipboard, Compass, Info, ChevronRight, Minimize2, CheckSquare, XCircle, Ban,
   FolderOpen, Settings, UserPlus, Building, BarChart2, Briefcase, Zap, GitPullRequest, Globe, Users2,
-  Menu, X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -38,6 +37,17 @@ interface ManagementPlatformProps {
   onUpdateApprovals: (approvals: ApprovalRequest[]) => void;
   onLogoutToGateway?: () => void;
 }
+
+const MANAGEMENT_RAIL_AREAS: readonly RailArea[] = [
+  { id: 'home', label: 'Command Home', icon: Activity },
+  { id: 'performance', label: 'Performance & Business Units', icon: BarChart2 },
+  { id: 'governance', label: 'Governance & Audit', icon: Shield },
+  { id: 'strategy', label: 'Strategy & Planning', icon: Sliders },
+  { id: 'organisation', label: 'Organisation & Headcount', icon: Users },
+  { id: 'acquisitions', label: 'M&A Acquisitions', icon: Briefcase },
+  { id: 'alerts', label: 'Alerts & Policies', icon: AlertCircle },
+  { id: 'group-admin', label: 'Entity Registry', icon: Settings },
+];
 
 export default function ManagementPlatform({
   companies,
@@ -71,24 +81,7 @@ export default function ManagementPlatform({
 
   // Simulated view state overrides ('loaded' | 'empty' | 'loading' | 'error' | 'restricted')
   const [simulatedState, setSimulatedState] = useState<'loaded' | 'empty' | 'loading' | 'error' | 'restricted'>('loaded');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  React.useEffect(() => {
-    if (!isSidebarOpen) return;
-
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setIsSidebarOpen(false);
-    };
-    const previousOverflow = document.body.style.overflow;
-
-    document.body.style.overflow = 'hidden';
-    document.addEventListener('keydown', handleEscape);
-
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, [isSidebarOpen]);
+  const activeRailArea = MANAGEMENT_RAIL_AREAS.find((area) => area.id === activeTab) ?? MANAGEMENT_RAIL_AREAS[0];
 
   // Search query state
   const [searchQuery, setSearchQuery] = useState('');
@@ -181,63 +174,44 @@ export default function ManagementPlatform({
   return (
     <div className="sales-platform-theme flex h-screen overflow-hidden bg-[#F7F9FC] font-sans relative">
       
-      {/* Sidebar backdrop */}
-      {isSidebarOpen && (
-        <button
-          type="button"
-          className="fixed inset-0 bg-slate-950/55 z-30 cursor-default"
-          onClick={() => setIsSidebarOpen(false)}
-          id="management-sidebar-backdrop"
-          aria-label="Close management navigation"
-        />
-      )}
-      
-      {/* Pop-out sidebar */}
+      {/* Standardized dual-rail navigation */}
       <aside
         id="management-sidebar"
         aria-label="Management navigation"
-        aria-hidden={!isSidebarOpen}
-        inert={!isSidebarOpen}
-        className={`cos-workspace-sidebar w-[280px] max-w-[86vw] bg-[#182A5C] text-white flex flex-col justify-between h-full fixed inset-y-0 left-0 z-40 shadow-xl transition-transform duration-300 motion-reduce:transition-none ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className="dual-rail-sidebar cos-workspace-sidebar flex h-full w-[66px] shrink-0 overflow-visible border-r border-[#082B5B] text-white md:w-[382px]"
       >
+        <GlobalIconRail
+          areas={MANAGEMENT_RAIL_AREAS}
+          activeId={activeTab}
+          initials="OR"
+          onSelect={(id) => { setActiveTab(id as typeof activeTab); setSimulatedState('loaded'); }}
+          onExit={onLogoutToGateway}
+        />
+        <div className="contextual-rail hidden min-h-0 w-[316px] flex-1 flex-col bg-[#0B3672] md:flex">
         <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
           {/* Top Branding Section */}
-          <div className="p-4 border-b border-[#264288] flex items-center gap-3 shrink-0">
-            <COSLogo className="w-8 h-8 shrink-0 shadow-md" variant="white" />
-            <div className="text-left min-w-0">
-              <h2 className="text-[10px] font-black tracking-widest text-[#AFBFDA] uppercase font-display">Central Operating System</h2>
-              <p className="text-xs font-black text-white tracking-tight uppercase">Management Platform</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setIsSidebarOpen(false)}
-              className="ml-auto w-11 h-11 rounded-lg grid place-items-center text-[#AFBFDA] hover:bg-[#264288] hover:text-white transition shrink-0"
-              aria-label="Close management navigation"
-            >
-              <X size={18} aria-hidden="true" />
-            </button>
-          </div>
+          <ContextRailHeader area={activeRailArea} />
 
           <SidebarEntityScope
             workspaceName="Management"
             companyScopes={[
-              'AG • Advanced Gases Nigeria',
               'DL • DELabs Ltd (UK Hub)',
+              'AG • Advanced Gases Nigeria',
             ]}
             groupScopes={['OG • Operating Group', 'COS • Consolidated Group']}
           />
 
+          <ContextRailSearch navId="management-context-routes" />
+
           {/* Navigation Items */}
-          <nav className="p-3 space-y-1" onClick={() => setIsSidebarOpen(false)}>
+          <nav id="management-context-routes" className="dual-rail-context-nav flex-1 p-4">
             
             {/* HOME CATEGORY */}
-            <div>
-              <div className="px-3 text-[10px] font-bold text-[#AFBFDA]/50 uppercase tracking-widest mb-1">Command Centre</div>
+            <div className={activeTab === 'home' ? '' : 'hidden'}>
+              <div className="mb-2 px-2 text-[11px] font-bold uppercase tracking-[0.08em] text-[#8FB0E1]">Command Views</div>
               <button
                 onClick={() => { setActiveTab('home'); setSimulatedState('loaded'); }}
-                className={`w-full flex items-center space-x-3 px-3 py-2 text-xs font-semibold rounded-lg transition ${
+                className={`hidden w-full items-center space-x-3 px-3 py-2 text-xs font-semibold rounded-lg transition ${
                   activeTab === 'home' ? 'bg-[#264288] text-white border-l-2 border-[#4065B3]' : 'text-[#AFBFDA] hover:bg-[#264288]/40 hover:text-white'
                 }`}
               >
@@ -245,18 +219,18 @@ export default function ManagementPlatform({
                 <span>Command Home</span>
               </button>
               {activeTab === 'home' && (
-                <div className="ml-6 mt-1 space-y-1 border-l border-[#264288] pl-3">
+                <div className="space-y-1">
                   {(['functional', 'company', 'ceo'] as const).map(tab => (
                     <button
                       key={tab}
                       onClick={() => setHomeSubTab(tab)}
-                      className={`w-full text-left text-[11px] py-1 transition ${
+                      className={`w-full min-h-11 rounded-xl border-l-4 px-3 text-left text-sm transition-all duration-200 ${
                         homeSubTab === tab ? 'text-white font-bold' : 'text-[#AFBFDA] hover:text-white'
                       }`}
                     >
-                      {tab === 'functional' && '• Functional Home'}
-                      {tab === 'company' && '• Company Home'}
-                      {tab === 'ceo' && '• main CEO dashboard'}
+                      {tab === 'functional' && 'Functional Home'}
+                      {tab === 'company' && 'Company Home'}
+                      {tab === 'ceo' && 'Main CEO Dashboard'}
                     </button>
                   ))}
                 </div>
@@ -264,8 +238,8 @@ export default function ManagementPlatform({
             </div>
 
             {/* PERFORMANCE CATEGORY */}
-            <div className="pt-2">
-              <div className="px-3 text-[10px] font-bold text-[#AFBFDA]/50 uppercase tracking-widest mb-1">Corporate Performance</div>
+            <div className={activeTab === 'performance' ? '' : 'hidden'}>
+              <div className="mb-2 px-2 text-[11px] font-bold uppercase tracking-[0.08em] text-[#8FB0E1]">Performance Views</div>
               <button
                 onClick={() => { setActiveTab('performance'); setSimulatedState('loaded'); }}
                 className={`w-full flex items-center space-x-3 px-3 py-2 text-xs font-semibold rounded-lg transition ${
@@ -298,8 +272,8 @@ export default function ManagementPlatform({
             </div>
 
             {/* GOVERNANCE CATEGORY */}
-            <div className="pt-2">
-              <div className="px-3 text-[10px] font-bold text-[#AFBFDA]/50 uppercase tracking-widest mb-1">Risk & Gating</div>
+            <div className={activeTab === 'governance' ? '' : 'hidden'}>
+              <div className="mb-2 px-2 text-[11px] font-bold uppercase tracking-[0.08em] text-[#8FB0E1]">Governance Views</div>
               <button
                 onClick={() => { setActiveTab('governance'); setSimulatedState('loaded'); }}
                 className={`w-full flex items-center space-x-3 px-3 py-2 text-xs font-semibold rounded-lg transition ${
@@ -330,8 +304,8 @@ export default function ManagementPlatform({
             </div>
 
             {/* STRATEGY & PLANNING */}
-            <div className="pt-2">
-              <div className="px-3 text-[10px] font-bold text-[#AFBFDA]/50 uppercase tracking-widest mb-1">Corporate Strategy</div>
+            <div className={activeTab === 'strategy' ? '' : 'hidden'}>
+              <div className="mb-2 px-2 text-[11px] font-bold uppercase tracking-[0.08em] text-[#8FB0E1]">Strategy Views</div>
               <button
                 onClick={() => { setActiveTab('strategy'); setSimulatedState('loaded'); }}
                 className={`w-full flex items-center space-x-3 px-3 py-2 text-xs font-semibold rounded-lg transition ${
@@ -362,8 +336,8 @@ export default function ManagementPlatform({
             </div>
 
             {/* ORGANISATION */}
-            <div className="pt-2">
-              <div className="px-3 text-[10px] font-bold text-[#AFBFDA]/50 uppercase tracking-widest mb-1">Organisation</div>
+            <div className={activeTab === 'organisation' ? '' : 'hidden'}>
+              <div className="mb-2 px-2 text-[11px] font-bold uppercase tracking-[0.08em] text-[#8FB0E1]">Organisation Views</div>
               <button
                 onClick={() => { setActiveTab('organisation'); setSimulatedState('loaded'); }}
                 className={`w-full flex items-center space-x-3 px-3 py-2 text-xs font-semibold rounded-lg transition ${
@@ -392,8 +366,8 @@ export default function ManagementPlatform({
             </div>
 
             {/* ACQUISITIONS */}
-            <div className="pt-2">
-              <div className="px-3 text-[10px] font-bold text-[#AFBFDA]/50 uppercase tracking-widest mb-1">Expansion</div>
+            <div className={activeTab === 'acquisitions' ? '' : 'hidden'}>
+              <div className="mb-2 px-2 text-[11px] font-bold uppercase tracking-[0.08em] text-[#8FB0E1]">Acquisition Views</div>
               <button
                 onClick={() => { setActiveTab('acquisitions'); setSimulatedState('loaded'); }}
                 className={`w-full flex items-center space-x-3 px-3 py-2 text-xs font-semibold rounded-lg transition ${
@@ -422,8 +396,8 @@ export default function ManagementPlatform({
             </div>
 
             {/* ALERTS & KNOWLEDGE */}
-            <div className="pt-2">
-              <div className="px-3 text-[10px] font-bold text-[#AFBFDA]/50 uppercase tracking-widest mb-1">Directives</div>
+            <div className={activeTab === 'alerts' ? '' : 'hidden'}>
+              <div className="mb-2 px-2 text-[11px] font-bold uppercase tracking-[0.08em] text-[#8FB0E1]">Alert Views</div>
               <button
                 onClick={() => { setActiveTab('alerts'); setSimulatedState('loaded'); }}
                 className={`w-full flex items-center space-x-3 px-3 py-2 text-xs font-semibold rounded-lg transition ${
@@ -453,8 +427,8 @@ export default function ManagementPlatform({
             </div>
 
             {/* GROUP ADMIN */}
-            <div className="pt-2">
-              <div className="px-3 text-[10px] font-bold text-[#AFBFDA]/50 uppercase tracking-widest mb-1">Corporate Admin</div>
+            <div className={activeTab === 'group-admin' ? '' : 'hidden'}>
+              <div className="mb-2 px-2 text-[11px] font-bold uppercase tracking-[0.08em] text-[#8FB0E1]">Registry Views</div>
               <button
                 onClick={() => { setActiveTab('group-admin'); setSimulatedState('loaded'); }}
                 className={`w-full flex items-center space-x-3 px-3 py-2 text-xs font-semibold rounded-lg transition ${
@@ -489,26 +463,19 @@ export default function ManagementPlatform({
         </div>
 
         {/* Bottom profile info */}
-        <div className="p-4 border-t border-[#264288] bg-[#0B1E3F]/80 shrink-0">
-          <div className="flex items-center justify-between mb-3">
+        <div className="min-h-[67px] shrink-0 border-t border-[#2A4E82] bg-[#082B5B] px-4 py-3">
+          <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#5B91FF] bg-[#155EEF] text-xs font-bold text-white">
                 OR
               </div>
               <div className="text-left">
-                <p className="text-xs font-bold leading-none">Olivia Reed</p>
-                <p className="text-[10px] text-[#AFBFDA] leading-none mt-1">Group CEO</p>
+                <p className="text-sm font-bold leading-none">Olivia Reed</p>
+                <p className="mt-1 text-[11px] leading-none text-[#AFC8F2]">Group CEO</p>
               </div>
             </div>
           </div>
-          {onLogoutToGateway && (
-            <button 
-              onClick={onLogoutToGateway}
-              className="w-full bg-[#264288] hover:bg-[#4065B3] text-white text-[11px] font-bold py-1.5 px-3 rounded-md transition cursor-pointer text-center"
-            >
-              Exit Workspace
-            </button>
-          )}
+        </div>
         </div>
       </aside>
 
@@ -518,18 +485,6 @@ export default function ManagementPlatform({
         {/* Top bar (56px) */}
         <header className="h-[56px] border-b border-[#D9E0EA] bg-white px-4 sm:px-6 flex items-center justify-between shrink-0">
           <div className="flex items-center space-x-1.5 sm:space-x-2 min-w-0">
-            {/* Pop-out navigation toggle */}
-            <button 
-              type="button"
-              onClick={() => setIsSidebarOpen(true)}
-              className="w-11 h-11 grid place-items-center text-slate-600 hover:bg-[#EEF3FB] rounded-lg transition shrink-0"
-              id="management-sidebar-toggle"
-              aria-label="Open management navigation"
-              aria-controls="management-sidebar"
-              aria-expanded={isSidebarOpen}
-            >
-              <Menu size={18} aria-hidden="true" />
-            </button>
             <span className="text-[10px] bg-[#EEF3FB] text-[#4065B3] font-bold px-2 py-0.5 rounded uppercase tracking-wider font-mono shrink-0 hidden xs:inline">Governed Command Node</span>
             <span className="text-slate-400 hidden xs:inline">/</span>
             <span className="text-xs font-bold text-slate-700 capitalize font-display truncate">

@@ -413,25 +413,33 @@ export default function DesignSystemPlatform({ onLogoutToGateway }: DesignSystem
               <div className="border-b border-[#D9E0EA] pb-3">
                 <span className="text-xs font-bold text-[#4065B3] tracking-widest uppercase">Chapter 02</span>
                 <h1 className="text-2xl font-black text-slate-900 font-display tracking-tight mt-0.5">Typography Architecture</h1>
-                <p className="text-xs text-slate-500 mt-1">Two-family typography contract, tabular numerals alignment, and fixed sizing classes.</p>
+                <p className="text-xs text-slate-500 mt-1">Three-family typography contract, tabular numeral alignment, and fixed sizing classes.</p>
               </div>
 
-              {/* Two-family contract */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Three-family contract */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-[#182A5C] rounded-xl p-6 border border-[#264288] text-white flex flex-col justify-between min-h-[11rem] h-auto gap-4 shadow-md">
                   <div>
                     <span className="text-[10px] bg-[#264288] text-[#AFBFDA] rounded px-2 py-0.5 uppercase font-mono font-bold">BRAND & DISPLAY</span>
-                    <h3 className="text-3xl font-black font-display tracking-tight mt-2">Newsreader</h3>
+                    <h3 className="text-3xl font-extrabold font-display tracking-tight mt-2">Montserrat</h3>
                   </div>
-                  <p className="text-xs text-[#AFBFDA]">Covers, section dividers, and page level titles only. Expresses professional weight.</p>
+                  <p className="text-xs text-[#AFBFDA]">Headings, section titles, brand headers, badges, and platform status indicators.</p>
                 </div>
 
                 <div className="bg-white rounded-xl p-6 border border-[#D9E0EA] text-slate-800 flex flex-col justify-between min-h-[11rem] h-auto gap-4 shadow-sm">
                   <div>
                     <span className="text-[10px] bg-[#EEF3FB] text-[#4065B3] rounded px-2 py-0.5 uppercase font-mono font-bold">UI WORKHORSE</span>
-                    <h3 className="text-3xl font-bold font-sans tracking-tight mt-2">IBM Plex Sans</h3>
+                    <h3 className="text-3xl font-bold font-sans tracking-tight mt-2">Inter</h3>
                   </div>
-                  <p className="text-xs text-slate-500">Every single label, system action, metric, table cell value, form field and user data.</p>
+                  <p className="text-xs text-slate-500">Body copy, navigation, controls, forms, table content, and dialog text.</p>
+                </div>
+
+                <div className="bg-[#F7F9FC] rounded-xl p-6 border border-[#D9E0EA] text-slate-800 flex flex-col justify-between min-h-[11rem] h-auto gap-4 shadow-sm">
+                  <div>
+                    <span className="text-[10px] bg-white text-[#4065B3] rounded px-2 py-0.5 uppercase font-display font-bold">DATA & LEDGER</span>
+                    <h3 className="text-2xl font-semibold font-mono tracking-tight mt-2">JetBrains Mono</h3>
+                  </div>
+                  <p className="text-xs text-slate-500">Financial figures, IDs, timestamps, percentages, code, and audit records.</p>
                 </div>
               </div>
 
@@ -443,7 +451,7 @@ export default function DesignSystemPlatform({ onLogoutToGateway }: DesignSystem
                   <div className="pt-0 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="w-48 text-xs font-mono">
                       <span className="font-bold text-slate-900 block">Display Title</span>
-                      <span className="text-slate-400">Newsreader · 64 / 64px</span>
+                      <span className="text-slate-400">Montserrat · 64 / 64px</span>
                     </div>
                     <div className="flex-1 font-display text-4xl font-extrabold text-[#111827] tracking-tight">
                       Aa 012345 £%,
@@ -453,9 +461,9 @@ export default function DesignSystemPlatform({ onLogoutToGateway }: DesignSystem
                   <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="w-48 text-xs font-mono">
                       <span className="font-bold text-slate-900 block">H1 Page Title</span>
-                      <span className="text-slate-400">Newsreader · 44 / 48px</span>
+                      <span className="text-slate-400">Montserrat · 44 / 48px</span>
                     </div>
-                    <div className="flex-1 font-sans text-2xl font-bold text-[#111827] tracking-tight">
+                    <div className="flex-1 font-display text-2xl font-bold text-[#111827] tracking-tight">
                       Aa 012345 £%,
                     </div>
                   </div>
@@ -463,9 +471,9 @@ export default function DesignSystemPlatform({ onLogoutToGateway }: DesignSystem
                   <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="w-48 text-xs font-mono">
                       <span className="font-bold text-slate-900 block">H2 Section Heading</span>
-                      <span className="text-slate-400">Newsreader · 32 / 36px</span>
+                      <span className="text-slate-400">Montserrat · 32 / 36px</span>
                     </div>
-                    <div className="flex-1 font-sans text-xl font-bold text-slate-800">
+                    <div className="flex-1 font-display text-xl font-bold text-slate-800">
                       Aa 012345 £%,
                     </div>
                   </div>
@@ -473,9 +481,9 @@ export default function DesignSystemPlatform({ onLogoutToGateway }: DesignSystem
                   <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="w-48 text-xs font-mono">
                       <span className="font-bold text-slate-900 block">H3 Card Heading</span>
-                      <span className="text-slate-400">IBM Plex Sans · 20 / 26px</span>
+                      <span className="text-slate-400">Montserrat · 20 / 26px</span>
                     </div>
-                    <div className="flex-1 font-sans text-md font-bold text-slate-800">
+                    <div className="flex-1 font-display text-md font-bold text-slate-800">
                       Aa 012345 £%,
                     </div>
                   </div>
@@ -483,7 +491,7 @@ export default function DesignSystemPlatform({ onLogoutToGateway }: DesignSystem
                   <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="w-48 text-xs font-mono">
                       <span className="font-bold text-slate-900 block">Body Copy</span>
-                      <span className="text-slate-400">IBM Plex Sans · 14 / 22px</span>
+                      <span className="text-slate-400">Inter · 14 / 22px</span>
                     </div>
                     <div className="flex-1 font-sans text-sm text-slate-600 leading-normal">
                       The quick brown fox jumps over the lazy dog in active system state models.
@@ -493,7 +501,7 @@ export default function DesignSystemPlatform({ onLogoutToGateway }: DesignSystem
                   <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="w-48 text-xs font-mono">
                       <span className="font-bold text-slate-900 block">Tabular Lining Numeral</span>
-                      <span className="text-slate-400">Tabular Nums • 13 / 18px</span>
+                      <span className="text-slate-400">JetBrains Mono · 13 / 18px</span>
                     </div>
                     <div className="flex-1 text-sm font-semibold tracking-tight text-slate-900 font-mono">
                       £1,284,600 · 34.7% · 08:30 BST

@@ -1,0 +1,266 @@
+BRAND CIRCUIT | CENTRAL OPERATING SYSTEM
+
+               COS Sales & Marketing
+
+                      General Overview
+
+                 Global Main Menu + 13 Contextual Submenu Renders
+
+  14                                           13                                                        2-layer
+
+render plates                             Sales & Marketing areas                                     approved navigation model
+
+                                          Approved target-state navigation reference | 4 August 2026
+BRAND CIRCUIT | COS SALES & MARKETING GENERAL OVERVIEW
+
+Document purpose and authority
+
+This standalone overview defines the complete Sales & Marketing navigation shell: one global drawer, the approved 13-area menu order and one contextual
+submenu state for each area.
+
+Global state                                                                 Module state
+
+Full 13-area drawer with entity scope, user identity and workspace context.  Collapsed global icon rail plus the selected area's contextual submenu.
+
+Persistent context                                                           Render rule
+
+Entity scope and the user's authorised route remain visible and retained.    One full-resolution plate per landscape page so every submenu remains legible.
+
+Authority and boundaries
+
+Rule                      Meaning
+
+Supersedes                Earlier navigation-shell guidance, including the prior 248px single local rail.
+
+Does not change           Functional requirements, data, roles, workflows, integrations or QA decisions in the ten Content & Social specifications.
+
+Target-state status       The navigation hierarchy and visual language are approved; background data is illustrative and does not expand Launch scope.
+
+Launch authority          Launch / Scale / Native end-state classification remains controlled by the ten detailed specification documents.
+
+Recommended build sequence: Creators & Partnerships → Strategy & Planning → Campaigns → Home
+
+COS-SM-GEN-01 | Version 1.1 | 4 August 2026                                                                                                             Page 2
+BRAND CIRCUIT | COS SALES & MARKETING GENERAL OVERVIEW
+
+Authoritative menu and submenu hierarchy
+
+The following inventory is the source of truth for route names and order. Group labels shown inside the submenu renders are visual organisers, not additional
+clickable routes.
+
+# Main menu                                  Approved submenus
+
+1 Home                                       My Work; Team View; Client View; Alerts; Approvals; Master Calendar
+
+2 Strategy & Planning                        Research; ICPs & Personas; Positioning; Product/Offer Strategy; Annual & Quarterly Plans; GTM Plans; Targets; KPIs; Budgets
+
+3 CRM & Accounts                             Leads; Contacts; Accounts; Lead Capture; Scoring; Routing; Enrichment; Lists; Segments; Activity History
+
+4 Sales Execution                            Prospecting; Inbox; Sequences; Calls; Meetings; Pipeline; Opportunities; Account Plans; Pricing; Quotes; Proposals; Tenders; Contracts; E-signature; Forecasts;
+                                             Quotas; Commissions; Handoffs
+
+5 Campaigns                                  Campaign Portfolio; Briefs; Calendar; Audiences; Offers; Channels; Timelines; Dependencies; Budgets; Experiments; Retrospectives
+
+6 Content & Social                           Overview; Planning & Briefs; Production Pipeline; Content Calendar; Approvals; Asset Library; Social Publisher; Community Inbox; Social Listening;
+                                             Performance; Module Settings
+
+7 Paid Media                                 Media Plans; Campaigns; Audiences; Ads; Creative Testing; Budgets; Pacing; Optimisation; Conversion Tracking; Performance
+
+COS-SM-GEN-01 | Version 1.1 | 4 August 2026                                                                                                                                                      Page 3
+BRAND CIRCUIT | COS SALES & MARKETING GENERAL OVERVIEW
+
+Authoritative menu and submenu hierarchy (continued)
+
+# Main menu                                  Approved submenus
+
+8 Lifecycle & Customer Growth                Customer Profiles; Email; SMS; WhatsApp; Journeys; Automation; Consent; Deliverability; Onboarding; Support; Reviews; Loyalty; Referrals; Customer Health;
+                                             Renewals; Upselling
+
+9 Commerce & Conversion                      Products; Catalogue; Offers; Promotions; Landing Pages; Forms; Funnels; Storefronts; Merchandising; Marketplaces; Feed Health; SEO/GEO; CRO; Order
+                                             Signals
+
+10 Creators & Partnerships                   Creator Discovery; Outreach; Negotiation; Influencers; UGC; Sponsorships; Affiliates; Channel Partners; PR & Media; Events; Agreements; Rights; Deliverables;
+                                             Commissions; Payouts; Performance
+
+11 Analytics & Intelligence                  Sales Analytics; Marketing Analytics; Campaign Analytics; Content Analytics; Paid Media Analytics; Partnership Analytics; Customer Analytics; Attribution; ROI;
+                                             LTV; Cohorts; Profitability; Competitor Intelligence; Forecasts; Reports; Tracking Health
+
+12 Commercial Operations                     Clients & Brands; Onboarding; Service Scopes; Requests; Projects; Tasks; Workload; Deliverables; SLAs; QA; Central Approvals; Time; Costs; Client Reporting;
+                                             Profitability; SOPs
+
+13 Settings & Governance                     Users; Roles; Permissions; Integrations; Workflow Automation; Fields; Taxonomies; Claims Rules; Consent; Privacy; Notifications; Audit; Security
+
+Naming rule: Do not add an Overview route to a module unless it is explicitly listed above. Content & Social is the only current module with an approved
+Overview submenu.
+
+COS-SM-GEN-01 | Version 1.1 | 4 August 2026                                                                                                                                                    Page 4
+BRAND CIRCUIT | COS SALES & MARKETING GENERAL OVERVIEW
+
+Navigation model and design system
+
+Step          Action                                 Required behaviour
+
+1             Open global menu                       Show the complete 13-area drawer, entity scope and signed-in identity.
+
+2             Select an area                         Collapse the drawer to the icon rail and open the selected contextual submenu.
+
+3             Select a route                         Open the route while keeping the global area, local route and entity scope unambiguous.
+
+4             Dismiss navigation                     X, outside click or Escape restores the unchanged workspace and returns focus.
+
+Canonical visual tokens
+
+Token                             Value                 Use
+                                                        Global rail and darkest navigation surfaces
+Primary navy                      #061B3A               Inactive hover and supporting panel surface
+                                                        Contextual panel surface
+Navy hover                        #082B5B               Selected route or area
+                                                        Pressed/strong active state
+Secondary navy                    #0B3672               Focus, selected edge and supporting accents
+                                                        Non-interactive dimmed workspace
+Active blue                       #155EEF
+
+Pressed blue                      #004EEB
+
+Accent blue                       #2970FF
+
+Overlay                           rgba(6,27,58,.56)
+
+Search semantics
+
+Top-bar search searches authorised records. Search this area filters routes within the open contextual submenu only.
+
+COS-SM-GEN-01 | Version 1.1 | 4 August 2026                                                                                                   Page 5
+BRAND CIRCUIT | COS SALES & MARKETING GENERAL OVERVIEW
+
+RENDER 01 | Global Main Menu
+
+The full drawer exposes all 13 Sales & Marketing areas before the selected area opens its contextual submenu.
+
+COS-SM-GEN-01 | Version 1.1 | 4 August 2026                                                                    Page 6
+BRAND CIRCUIT | COS SALES & MARKETING GENERAL OVERVIEW
+
+RENDER 02 | Home
+
+Role-aware command centre for personal work, team and client visibility, alerts, approvals and scheduling.
+
+COS-SM-GEN-01 | Version 1.1 | 4 August 2026                                                                 Page 7
+BRAND CIRCUIT | COS SALES & MARKETING GENERAL OVERVIEW
+
+RENDER 03 | Strategy & Planning
+
+Converts research and commercial direction into positioning, plans, targets, KPIs and controlled budgets.
+
+COS-SM-GEN-01 | Version 1.1 | 4 August 2026                                                                Page 8
+BRAND CIRCUIT | COS SALES & MARKETING GENERAL OVERVIEW
+
+RENDER 04 | CRM & Accounts
+
+Maintains authoritative customer and prospect records from capture through segmentation and activity history.
+
+COS-SM-GEN-01 | Version 1.1 | 4 August 2026                                                                    Page 9
+BRAND CIRCUIT | COS SALES & MARKETING GENERAL OVERVIEW
+
+RENDER 05 | Sales Execution
+
+Manages the commercial journey from prospecting through contracting, forecasting, commissions and handoff.
+
+COS-SM-GEN-01 | Version 1.1 | 4 August 2026                                                                 Page 10
+BRAND CIRCUIT | COS SALES & MARKETING GENERAL OVERVIEW
+
+RENDER 06 | Campaigns
+
+Coordinates cross-channel campaigns from portfolio planning through delivery control, experimentation and learning.
+
+COS-SM-GEN-01 | Version 1.1 | 4 August 2026                                                                          Page 11
+BRAND CIRCUIT | COS SALES & MARKETING GENERAL OVERVIEW
+
+RENDER 07 | Content & Social
+
+Controls the content lifecycle from planning and production through approval, publishing, engagement and performance.
+
+COS-SM-GEN-01 | Version 1.1 | 4 August 2026                                                                            Page 12
+BRAND CIRCUIT | COS SALES & MARKETING GENERAL OVERVIEW
+
+RENDER 08 | Paid Media
+
+Controls paid campaign planning, creative testing, expenditure, optimisation, conversion tracking and results.
+
+COS-SM-GEN-01 | Version 1.1 | 4 August 2026                                                                     Page 13
+BRAND CIRCUIT | COS SALES & MARKETING GENERAL OVERVIEW
+
+RENDER 09 | Lifecycle & Customer Growth
+
+Orchestrates customer communication and growth across onboarding, support, retention, renewal and expansion.
+
+COS-SM-GEN-01 | Version 1.1 | 4 August 2026                                                                   Page 14
+BRAND CIRCUIT | COS SALES & MARKETING GENERAL OVERVIEW
+
+RENDER 10 | Commerce & Conversion
+
+Manages products, offers, conversion surfaces, channels, discoverability, optimisation and order signals.
+
+COS-SM-GEN-01 | Version 1.1 | 4 August 2026                                                                Page 15
+BRAND CIRCUIT | COS SALES & MARKETING GENERAL OVERVIEW
+
+RENDER 11 | Creators & Partnerships
+
+Manages creator sourcing, partnership execution, rights, deliverables, payments and performance.
+
+COS-SM-GEN-01 | Version 1.1 | 4 August 2026                                                       Page 16
+BRAND CIRCUIT | COS SALES & MARKETING GENERAL OVERVIEW
+
+RENDER 12 | Analytics & Intelligence
+
+Unifies analytics, attribution, profitability, competitive intelligence, forecasting and tracking health.
+
+COS-SM-GEN-01 | Version 1.1 | 4 August 2026                                                                Page 17
+BRAND CIRCUIT | COS SALES & MARKETING GENERAL OVERVIEW
+
+RENDER 13 | Commercial Operations
+
+Governs client setup, delivery, capacity, quality, approvals, economics, reporting and operating standards.
+
+COS-SM-GEN-01 | Version 1.1 | 4 August 2026                                                                  Page 18
+BRAND CIRCUIT | COS SALES & MARKETING GENERAL OVERVIEW
+
+RENDER 14 | Settings & Governance
+
+Controls access, system configuration, compliance, notifications, auditability and security.
+
+COS-SM-GEN-01 | Version 1.1 | 4 August 2026                                                   Page 19
+BRAND CIRCUIT | COS SALES & MARKETING GENERAL OVERVIEW
+
+Shared interaction, access and responsive rules
+
+Rule                  Required behaviour
+Active state          Exactly one global area and one local route are unmistakably active.
+
+Persistence           Entity scope and the last authorised route persist between navigation states and sessions.
+
+Workspace protection  The visible workspace is non-interactive beneath the dim overlay; navigation never discards dirty work without warning.
+
+Scrolling             Only the route list scrolls; module title, entity controls and local search remain available.
+
+Permissions           Unauthorised routes are hidden by default; a disabled state is used only when an explanation is operationally useful.
+
+Keyboard              Logical tab order, visible focus, Enter/Space activation and Escape dismissal; focus returns to the opener.
+
+Mobile                Show one navigation layer at a time; a back control returns from the contextual submenu to the global menu.
+
+Touch                 Maintain minimum 44px targets and adequate spacing between adjacent controls.
+
+Labels                Do not abbreviate approved route names unless a separate approved display label is recorded.
+
+Chevrons              Use only for genuine nested navigation, never as decoration on leaf routes.
+
+Acceptance gate: The global menu must contain all 13 areas in the approved order, and the gallery must contain exactly 13 contextual submenu renders with
+every approved route visible.
+
+Render inventory
+
+14 plates total: 1 global menu + 13 submenu states. The previously approved Global Main Menu and Creators & Partnerships renders are retained unchanged; twelve missing
+submenu states complete the set.
+
+COS-SM-GEN-01 | Version 1.1 | 4 August 2026                                                                                                    Page 20
+

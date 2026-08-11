@@ -1,0 +1,388 @@
+﻿[Paragraph] BRAND CIRCUIT  |  CENTRAL OPERATING SYSTEM
+[Paragraph] Product Requirements Document
+[Paragraph] Complete end-state requirements with a zero-nice-to-have Launch baseline.
+[Paragraph] Module: Content & Social
+[Paragraph] Document ID: C&S-01
+[Paragraph] Version: 1.0 - Requirements baseline
+[Paragraph] Date: 2 August 2026
+[Paragraph] Owner: Brand Circuit
+[Paragraph] Status: Approved direction; implementation details may be refined by engineering
+[Paragraph] PRIORITY RULE 0
+[Paragraph] Launch includes only capability essential to complete core work, support revenue or client delivery, prevent material data/security loss, meet a legal need, or replace no adequate manual/free/already-paid alternative.
+[Paragraph] Phase key
+[Paragraph] LAUNCH: Essential staff-built operating capability; additional non-payroll spend stays below Â£5,000 and is not a target.
+[Paragraph] SCALE: Added only when adoption, revenue, risk or measurable workload justifies the staff time and cost.
+[Paragraph] NATIVE END-STATE: COS progressively replaces third-party management tools while external networks and marketplaces remain channels.
+[Heading1] Contents
+[Paragraph] Document control
+[Paragraph] Phase and requirement conventions
+[Paragraph] Product decision
+[Paragraph] Scope
+[Paragraph] Users and operating roles
+[Paragraph] Core product rules
+[Paragraph] Functional requirements by area
+[Paragraph] Cross-cutting requirements
+[Paragraph] Canonical lifecycle and exception model
+[Paragraph] Shared records and integrations
+[Paragraph] Staff operational monitoring and KPI governance
+[Paragraph] Commercial and release controls
+[Paragraph] Launch release acceptance
+[Paragraph] Traceability map
+[Heading2] 
+1. Document control
+[TABLE]
+Field | Value
+Document | Product Requirements Document
+Document ID | COS-CS-PRD-001
+Product boundary | Content & Social module only
+Operating owner | Brand Circuit
+Status | Requirements baseline
+Primary consumers | Product, design, engineering, QA, Brand Circuit leadership
+Related documents | COS-CS-RPM-001 Roles & Permissions; COS-CS-WFM-001 Workflows & State Machines; Docs 4â€“10 in the COS pack
+[/TABLE]
+[Heading2] 2. Phase and requirement conventions
+[Paragraph] Every requirement is part of the approved complete blueprint, but its phase controls when it may be built.
+[TABLE]
+Tag | Meaning | Funding rule
+L â€” Launch | Smallest usable internal system for Brand Circuit staff | Staff-built; less than Â£5,000 additional non-payroll spend; use free, existing or fixed shared subscriptions; no optional paid service
+S â€” Scale | Added only when usage, reliability, client delivery or revenue justifies it | Requires a named trigger, estimated cost, expected benefit and approval
+N â€” Native end-state | COS-owned capability that progressively replaces third-party management tools | Build only when strategically or economically superior; migrate safely, parallel-run and preserve rollback
+[/TABLE]
+[BodyText] Requirement language:
+[Paragraph] Must is mandatory in the stated phase and testable.
+[Paragraph] May is permitted but not required.
+[Paragraph] Derived means calculated from governed records rather than edited directly.
+[Paragraph] All IDs are stable. A deferred requirement keeps its ID when promoted to a later release.
+[Heading2] 3. Product decision
+[Paragraph] Brand Circuit needs one controlled workspace to plan, produce, approve, publish and review content for:
+[Paragraph] OG companies, including DELabs; and
+[Paragraph] external clients managed by Brand Circuit.
+[Paragraph] One client may own multiple brands. Brand Circuit controls staff assignment, workflows, approval configuration and operating standards. A separate Customer Platform will later expose appropriate requests, feedback and approvals to clients; it is not part of this module.
+[Heading3] 3.1 Product hierarchy
+[Paragraph] Brand Circuit workspace â†’ Client/company â†’ Brand â†’ Campaign/plan â†’ Content item â†’ Channel variant/publish job
+[BodyText] All records, searches, dashboards, exports, credentials and audit events must preserve this hierarchy. Cross-client access is denied by default.
+[Heading3] 3.2 Product outcomes
+[Paragraph] Make every content item, owner, deadline, approval and next action visible.
+[Paragraph] Reduce missed deadlines, lost feedback, unapproved publishing and duplicated work.
+[Paragraph] Give management evidence-based staff and team performance visibility without invasive surveillance.
+[Paragraph] Create a clean operating record that can later power publishing, inbox, listening and analytics integrations.
+[Paragraph] Keep Launch cheap: staff time is also a cost, and no nice-to-have enters Launch.
+[Heading3] 3.3 Initial operating benchmark
+[Paragraph] The system must support configurable service-scope targets. The initial DELabs/Brand Circuit benchmark is:
+[Paragraph] 14 publish-ready short videos per week;
+[Paragraph] 5 publish-ready static or carousel assets per week; and
+[Paragraph] 1 batch-production cycle per week.
+[Paragraph] This is a seeded target template, not a hard-coded global quota. Targets vary by client, brand, period and role.
+[Heading2] 4. Scope
+[Heading3] 4.1 Canonical module areas
+[Paragraph] The menu order and names are fixed for this specification:
+[Paragraph] Overview (Command Centre)
+[Paragraph] Planning & Briefs
+[Paragraph] Production Pipeline
+[Paragraph] Content Calendar
+[Paragraph] Approvals
+[Paragraph] Asset Library
+[Paragraph] Social Publisher
+[Paragraph] Community Inbox
+[Paragraph] Social Listening
+[Paragraph] Performance
+[Paragraph] Settings
+[Paragraph] No area above is a separate COS module. â€œCommand Centreâ€ describes the Overview function and is not a twelfth menu item.
+[Heading3] 4.2 Supported end-state channels
+[Paragraph] Instagram, Facebook, TikTok, LinkedIn, YouTube, X, Pinterest, Threads, Snapchat and Google Business Profile.
+[Heading3] 4.3 Supported content formats
+[Paragraph] Static, carousel, short video, long video, story, text/thread, article/newsletter, live/event, poll/interactive and repost/UGC.
+[Heading3] 4.4 Explicit exclusions
+[Paragraph] Paid Media buying and optimisation.
+[Paragraph] Creator discovery, outreach, contracting, commissions and payouts.
+[Paragraph] CRM, sales pipeline, customer support case management and lifecycle messaging.
+[Paragraph] The external Customer Platform.
+[Paragraph] Native replacements for Canva, Adobe, CapCut, Google Drive or broad analytics/listening tools at Launch.
+[Paragraph] Invasive staff surveillance, including screenshots, keystrokes, camera, microphone or covert monitoring.
+[Paragraph] Automatic disciplinary, pay, promotion, dismissal or other employment decisions.
+[Paragraph] The module may link to or exchange shared records with the relevant COS modules without duplicating their source data.
+[Heading2] 5. Users and operating roles
+[TABLE]
+User group | Core need | Default access pattern
+Leadership | Portfolio status, risks, output and outcomes | Read across authorised clients/brands; no routine editing
+Content & Social management | Plan, assign, govern, approve and resolve exceptions | Manage authorised client/brand operations
+Account/brand management | Protect client context, scope, approvals and delivery | Manage assigned clients/brands; no platform administration
+Strategists/planners | Capture ideas and create briefs/plans | Create/edit planning records in scope
+Production contributors | Complete assigned copy, design and video work | Edit assigned records and submit for review
+Social/community staff | Schedule/publish, triage conversations and signals | Operate authorised brand channels subject to gates
+Performance staff | Maintain metrics, analysis and recommendations | Read content records; edit governed performance records
+Internal approvers | Decide briefs, content, assets and publishing gates | Decision rights only where assigned/configured
+Compliance/audit | Verify claims, rights and history | Read/export authorised evidence; no silent changes
+External client approvers | Review and decide client-facing approval requests | Basic secure approval page at Launch; later Customer Platform; never internal staff/workflow control
+[/TABLE]
+[BodyText] Job titles do not grant access. Access comes from customisable role templates and scopes defined in COS-CS-RPM-001.
+[Heading2] 6. Core product rules
+[TABLE]
+Rule ID | Phase | Rule | Acceptance condition
+CS-BR-001 | L | Every operational record belongs to exactly one client and one brand; workspace-level configuration is the only exception. | A record cannot be saved without valid scope; moving it between clients is a restricted, audited action.
+CS-BR-002 | L | Default content lifecycle is Idea â†’ Brief â†’ Assigned â†’ In Production â†’ Internal Review â†’ Client Approval â†’ Scheduled â†’ Published â†’ Performance Review â†’ Archived. | All standard transitions follow WF-CONTENT-01; no user can bypass a required gate through direct field editing.
+CS-BR-003 | L | Brand Circuit controls staff assignments, workflow templates and routing. | External/client identities cannot assign Brand Circuit staff or edit workflow/permission settings.
+CS-BR-004 | L | Approval routes are configurable per brand and content type. | A test brand can require both internal and client approval while another can lawfully skip client approval under an authorised, audited rule.
+CS-BR-005 | L | Rework returns the item to production without losing the rejected version or decision. | â€œChanges requestedâ€ creates a new work cycle and preserves reviewer, reason, timestamp and prior version.
+CS-BR-006 | L | Overdue and blocked are derived/exception flags, not hidden alternate workflows. | The item remains in its canonical stage while flags, age and next action are visible.
+CS-BR-007 | L | All significant actions are immutable audit events. | Actor, timestamp, scope, action, before/after values, item/version and outcome can be searched and exported by an authorised user.
+CS-BR-008 | L | Human approval is required before AI-generated work is published or an AI-drafted community response is sent. | No AI output can call a publish/send transition directly.
+CS-BR-009 | L | Brand Circuit uses existing tools before commissioning a paid integration or native replacement. | Every proposed paid dependency has a cost/alternative/benefit decision record and explicit approval.
+CS-BR-010 | S | No-code automations use Trigger â†’ Conditions â†’ Actions, are scoped per brand, testable, permission-controlled and logged. | A rule can be dry-run, enabled/disabled and traced from trigger through each action.
+CS-BR-011 | L | CCO/CEO involvement is exception-based, not a routine workflow substitute. | Normal items route to operating managers/assigned approvers; executive action requires a configured exception, reason and elevated audit event.
+[/TABLE]
+[Heading2] 7. Functional requirements by area
+[Heading3] 7.1 A01 â€” Overview (Command Centre)
+[TABLE]
+Requirement ID | Phase | Requirement | Acceptance criteria
+CS-OV-001 | L | Show a scope-aware summary of due/overdue work, blocked items, pending approvals, upcoming content and critical alerts. | Changing client/brand scope recalculates every tile; clicking a tile opens the filtered source records.
+CS-OV-002 | L | Provide My Work and authorised Team View queues with owner, stage, due date, priority and next action. | Contributors see only permitted/assigned records; managers see authorised teams; counts reconcile to Pipeline records.
+CS-OV-003 | L | Provide an authorised Client View roll-up without exposing one client to another. | A scope test using two clients returns zero cross-client records, counts or search results.
+CS-OV-004 | L | Surface current-period production targets versus actuals, including the configurable weekly benchmark. | Target source, period, calculation and last update are visible; manual adjustments require evidence and audit.
+CS-OV-005 | L | Surface staff operational exceptions: inactivity on assigned work, missed deadlines, repeat revisions and approval bottlenecks. | Each flag links to source evidence and cannot itself trigger HR action.
+CS-OV-006 | S | Allow saved dashboard views and cross-client portfolio trends. | Saved views retain filters and permission scope; totals reconcile to source records.
+CS-OV-007 | N | Add predictive workload, delivery-risk and performance recommendations using native COS data. | Recommendation shows inputs, confidence/limitations and requires human action.
+[/TABLE]
+[Heading3] 7.2 A02 â€” Planning & Briefs
+[TABLE]
+Requirement ID | Phase | Requirement | Acceptance criteria
+CS-PB-001 | L | Capture ideas with title, source, objective, client, brand, audience, pillar, format/channel candidates, priority, owner and notes. | An idea can be created in under two minutes, searched, filtered and promoted without rekeying its metadata.
+CS-PB-002 | L | Promote an idea into a versioned brief using a brand/template-specific structure. | Promotion preserves the idea link and creates a DRAFT brief; the idea is not deleted.
+CS-PB-003 | L | Briefs must support objective, audience, problem/insight, key message, offer/CTA, deliverables, channels/formats, brand/claim rules, references, due dates, approvers and success measure. | Required fields are configurable; submission is blocked with field-level errors when required data is missing.
+CS-PB-004 | L | Support draft, submit, approve, request changes, reject, supersede and archive brief actions. | Actions follow WF-BRIEF-01; every decision includes actor/time/version and required reason where applicable.
+CS-PB-005 | L | Link briefs to shared Strategy & Planning and Campaign records when available, without duplicating their source fields. | A shared-record update appears in the brief reference; locally cached values are labelled and refreshed.
+CS-PB-006 | L | Provide comments, mentions and attachments/links on a brief. | Comments distinguish internal notes from client-visible feedback; permissions are enforced at read and write.
+CS-PB-007 | S | Generate suggested child deliverables/variants and repurposing tasks after brief approval. | Suggestions remain draft until accepted; accepted children inherit scope and trace to the parent brief.
+CS-PB-008 | S | Provide AI ideas, captions, scripts, CTAs, repurposing and brand/claims checks. | Input/output and model metadata are logged; cross-client retrieval is blocked; human review remains mandatory.
+CS-PB-009 | N | Provide native research, content opportunity and content-strategy intelligence. | Every generated opportunity cites governed internal or permitted external evidence.
+[/TABLE]
+[Heading3] 7.3 A03 â€” Production Pipeline
+[TABLE]
+Requirement ID | Phase | Requirement | Acceptance criteria
+CS-PP-001 | L | Show the canonical lifecycle as a board and table with counts, owner, priority, due date, age, flags and next action. | Board/table filters return the same record set; lane counts reconcile after transitions.
+CS-PP-002 | L | Assign an approved brief/content item to one accountable owner and optional collaborators with due dates. | Only authorised Brand Circuit users can assign; reassignment records old/new owner, reason and timestamp.
+CS-PP-003 | L | Permit drag/drop only when the corresponding workflow transition and permission are valid. | Invalid moves are rejected with the missing guard; valid moves create one transition and one audit event.
+CS-PP-004 | L | Support task/checklist templates for copy, design, video, QA and platform preparation. | Completion rules can block review submission until mandatory checklist items are complete.
+CS-PP-005 | L | Support BLOCKED, ON_HOLD, OVERDUE and NEEDS_CHANGES flags with reason, owner and next-review date. | Flags do not overwrite the primary lifecycle stage and are searchable/reportable.
+CS-PP-006 | L | Record estimated and actual completion time, revisions, output volume and approval turnaround from normal workflow events. | Employees can see their data and challenge errors; managers cannot silently alter source events.
+CS-PP-007 | S | Add capacity planning, WIP limits, dependency management and automated delay escalation. | WIP/dependency rules are configurable by team/brand and do not change work without an auditable action.
+CS-PP-008 | N | Add native copy, design and video production workspaces while retaining the same item/task IDs. | Switching from external tools does not change the visible lifecycle or break historical links.
+[/TABLE]
+[Heading3] 7.4 A04 â€” Content Calendar
+[TABLE]
+Requirement ID | Phase | Requirement | Acceptance criteria
+CS-CC-001 | L | Provide month, week and list views of planned, due, scheduled and published content. | Views share filters for client, brand, campaign, channel, format, owner and status.
+CS-CC-002 | L | Display timezone explicitly and store scheduled timestamps unambiguously. | Two users in different timezones see labelled local time and the same underlying scheduled instant.
+CS-CC-003 | L | Allow authorised drag-rescheduling with conflict/approval impact warning. | The user confirms the change; previous/new dates and affected dependencies are audited.
+CS-CC-004 | L | Open the source content record and next action from any calendar item. | Calendar entries are views of source records, not duplicated events.
+CS-CC-005 | S | Detect channel-frequency, campaign, asset, dependency and approval conflicts. | Conflict rules identify cause, severity, affected items and resolution owner.
+CS-CC-006 | S | Synchronise relevant dates two ways with shared COS campaign calendars. | Sync conflicts are visible and resolved without creating duplicate records.
+[/TABLE]
+[Heading3] 7.5 A05 â€” Approvals
+[TABLE]
+Requirement ID | Phase | Requirement | Acceptance criteria
+CS-AP-001 | L | Provide one queue for brief, content, asset, schedule and exception approvals. | Queue supports scope, type, approver, due/overdue, priority and status filters.
+CS-AP-002 | L | Approval routes are configurable by client/brand, content type, channel and risk level. | A versioned route resolves the correct approver(s) at submission time and preserves that route with the request.
+CS-AP-003 | L | Reviewers can compare versions, comment, approve, request changes or reject with impact context. | Decision is bound to the exact version; material edits after approval invalidate or re-request approval under policy.
+CS-AP-004 | L | Support sequential and parallel internal approval steps with due dates, reminders and escalation recipients. | Overall status is derived from step outcomes; no unauthorised user can complete another approverâ€™s step.
+CS-AP-005 | L | Provide a zero-cost fallback that lets authorised staff record an externally received client decision with evidence when the approval page is unavailable or unsuitable. | Recorder, channel, date, decision, evidence link and exact version are mandatory and audited; the recorder is not impersonated as the client.
+CS-AP-006 | L | Provide basic secure, expiring client approval links/pages with only client-visible context. | Recipient can review/comment/decide one request/version without seeing internal notes, other brands, staff data or credentials; revoke/expiry is enforced without a paid approval service.
+CS-AP-007 | N | Route client approvals and feedback through the separate Customer Platform using shared approval records. | The Customer Platform and Content & Social show one approval ID and consistent status.
+CS-AP-008 | L | Approval bypass/skip is restricted to authorised rules and always requires a reason. | A skipped step records rule/version, actor, reason and downstream risk warning.
+CS-AP-009 | L | Allow controlled bundle approval only for explicitly selected near-identical platform variants. | The reviewer sees every exact variant/version; each receives a separate decision; any later edit invalidates the affected variant approval.
+[/TABLE]
+[Heading3] 7.6 A06 â€” Asset Library
+[TABLE]
+Requirement ID | Phase | Requirement | Acceptance criteria
+CS-AL-001 | L | Maintain an asset registry using existing shared-storage links, preview/thumbnail where free, metadata, owner, brand, format, rights and version. | Staff can find the authoritative asset without COS duplicating the original media file.
+CS-AL-002 | L | Support asset review statuses and allow production/publishing to select only approved assets unless an authorised exception is recorded. | An unapproved/quarantined asset is blocked at review/schedule gates with a clear reason.
+CS-AL-003 | L | Preserve version lineage and usage links from asset to content items/published posts. | Replacing an asset creates a new version; historic content still points to the version actually used.
+CS-AL-004 | L | Record basic ownership/licence, permitted channels, expiry and required disclosures. | Expired or missing rights produce a visible block/exception before approval or publishing.
+CS-AL-005 | S | Add managed uploads, automated metadata/tagging/transcription, duplicate detection, expiring share links and rights-expiry tasks. | Original file integrity, access control and audit are verified; automation output is human-reviewable.
+CS-AL-006 | N | Provide native, scalable storage, media processing, design guidelines, boards and usage maps. | Migration preserves IDs, versions, rights, checksum/provenance and rollback.
+[/TABLE]
+[Heading3] 7.7 A07 â€” Social Publisher
+[TABLE]
+Requirement ID | Phase | Requirement | Acceptance criteria
+CS-SP-001 | L | Provide a governed publishing checklist, platform-variant records, manual publish handoff/deep links and capture of published URL/time/status. | A user cannot mark Published without required approvals/checks and at least one destination result or authorised waiver.
+CS-SP-002 | L | Store intended channel, account, caption, asset version, CTA, tags, alt text, schedule and responsible publisher. | Published record identifies exactly what, where, when and by whom it was posted.
+CS-SP-003 | S | Integrate supported social APIs through the thin adapter layer for schedule, direct publish, result capture and failure retry. | Each publish job is idempotent, credential-scoped, logged and reports platform response/error without exposing secrets.
+CS-SP-004 | S | Support platform-specific validation and preview for all approved end-state formats/channels as APIs permit. | Invalid length/media/account constraints block scheduling and identify the exact correction.
+CS-SP-005 | S | Provide connection health, retry, sync logs, partial-publish handling and owner alerts. | One failed destination does not duplicate successful posts; retry targets only unresolved jobs.
+CS-SP-006 | S | Provide an authorised crisis pause for scheduled/queued posts by brand or workspace. | Activation requires confirmation/reason, stops eligible jobs, alerts owners and is fully reversible/audited.
+CS-SP-007 | N | Replace third-party social-management tooling where commercially justified; networks remain external channels. | Native replacement passes security/performance tests, parallel-runs, migrates history and retains rollback.
+[/TABLE]
+[Heading3] 7.8 A08 â€” Community Inbox
+[TABLE]
+Requirement ID | Phase | Requirement | Acceptance criteria
+CS-CI-001 | L | Provide a lightweight enquiry/action register linked to the source platform/thread, with brand, type, owner, priority, status and due date. | Staff can track a conversation to resolution without buying or building a unified-message ingestion service.
+CS-CI-002 | L | Distinguish internal notes from customer-facing response text and require human confirmation before any response is sent externally. | Internal notes cannot appear in an external-copy field/export by default.
+CS-CI-003 | L | Route sales, support, complaint, crisis and UGC opportunities to the relevant shared COS record or named manual owner. | Handoff preserves source link, context, consent/sensitivity indicator and audit trail.
+CS-CI-004 | S | Ingest permitted comments, mentions and messages into a unified, searchable thread view. | Messages retain platform ID, account, direction, timestamps and sync state; duplicate ingestion is prevented.
+CS-CI-005 | S | Add assignments, tags, SLAs, saved replies, AI response drafts, sentiment/intent suggestions and escalation rules. | AI/suggestions are labelled; sending remains permission-controlled and human-approved.
+CS-CI-006 | N | Provide native omnichannel moderation and conversation operations while external networks remain endpoints. | Provider replacement does not change conversation IDs or lose audit/history.
+[/TABLE]
+[Heading3] 7.9 A09 â€” Social Listening
+[TABLE]
+Requirement ID | Phase | Requirement | Acceptance criteria
+CS-SL-001 | L | Maintain a manual signal/opportunity register for mentions, trends, competitor observations, risks and UGC. | Each signal has source/evidence, brand, theme, severity, owner, status and action.
+CS-SL-002 | L | Support configurable manual thresholds and critical-alert routing without a paid monitoring dependency. | A critical signal can be escalated immediately and traced to its decision/action.
+CS-SL-003 | S | Ingest permitted listening data from native APIs or approved fixed-price services; support queries, saved views, volume, sentiment and anomaly alerts. | Data source, coverage limitations, last sync and query definition are visible.
+CS-SL-004 | S | Convert an accepted signal into an idea/brief or route it to support/crisis handling. | New record inherits scope, source evidence and originating signal ID.
+CS-SL-005 | S | Add AI summaries and sentiment/theme classification with human correction. | Classification confidence and corrections are recorded; no autonomous public response occurs.
+CS-SL-006 | N | Build native listening/benchmark intelligence where lawful, technically feasible and cheaper/strategically superior. | Coverage, data rights, cost and accuracy meet the approved replacement rule.
+[/TABLE]
+[Heading3] 7.10 A10 â€” Performance
+[TABLE]
+Requirement ID | Phase | Requirement | Acceptance criteria
+CS-PF-001 | L | Record content-level results manually or by CSV for each platform/measurement window. | Metrics preserve source, date range, currency/unit, entry method and evidence; duplicate windows are detected.
+CS-PF-002 | L | Show targets versus actuals for output, on-time delivery, approval time, revision/quality, SLA and available content outcomes. | Formula, weighting, target, source and version are visible for each KPI.
+CS-PF-003 | L | Generate weekly, monthly and quarterly role-specific scorecards balancing results, quality, speed, SOP compliance, collaboration and improvement. | Only equivalent roles are compared; raw activity cannot inflate a score without completed quality-assured output.
+CS-PF-004 | L | Permit employee comments/challenges and manager context without silent alteration of verified results. | Correction workflow retains original value, challenge, evidence, decision and audit trail.
+CS-PF-005 | L | Track workload/capacity, estimated versus actual time, output, revisions, approval turnaround, bottlenecks and inactivity from normal work events. | Employees see their own data; managers see authorised teams; no invasive capture is used.
+CS-PF-006 | S | Sync platform analytics and produce content/channel/campaign trends, attribution where supportable, recommendations and alerts. | Every metric identifies source and freshness; inferred attribution is labelled and reconciled.
+CS-PF-007 | S | Add the structured underperformance intervention workflow after separate approval. | COS flags evidence and supports coaching/actions; formal HR decisions remain human and outside automatic scoring.
+CS-PF-008 | N | Provide native analytics and recommendation capabilities that replace management/reporting tools progressively. | Replacement meets validated metric parity, migration, security, performance and rollback tests.
+[/TABLE]
+[Heading3] 7.11 A11 â€” Settings
+[TABLE]
+Requirement ID | Phase | Requirement | Acceptance criteria
+CS-ST-001 | L | Authorised users manage clients, brands, users, scopes, role templates, teams and status/reference values. | Changes take effect only within authorised scope and are audit recorded before/after.
+CS-ST-002 | L | Configure brief/task templates, approval rules, publishing gates, KPI targets/weights, notification rules and basic listening thresholds by brand. | Configuration is versioned; existing records retain the applicable version/effective date.
+CS-ST-003 | L | Manage hidden encrypted credentials/OAuth connections for shared subscriptions and direct-tool handoff. | Employees use individual COS permissions; credentials never appear in UI or logs; revocation is immediate.
+CS-ST-004 | L | Provide an immutable, searchable, filterable and exportable audit trail with permission-controlled visibility. | User, timestamp, client, brand, action, before/after, item/version and success/failure/reversal are retained.
+CS-ST-005 | L | Configure in-app and email notifications available at no unnecessary added service cost; critical alerts may be mandatory. | Assignment, mention, approval, overdue, failure and critical events produce the configured notification/log state.
+CS-ST-006 | L | Track fixed subscriptions at workspace level, unavoidable variable usage and duplicate/underused subscriptions. | Cost view distinguishes fixed from variable costs and raises configured internal thresholds. Client charging is deferred.
+CS-ST-007 | S | Provide no-code automation builder, test mode, execution log and rollback/disable controls. | See CS-BR-010 and WF-AUTO-01.
+CS-ST-008 | S | Provide integration connection health, retries, sync logs, credential-expiry alerts and adapter configuration. | An authorised admin can identify failed connector, affected scope, last success and safe retry action.
+CS-ST-009 | N | Internalise prioritised tool capabilities while keeping optional connectors/fallbacks. | Each replacement follows CS-BR-009, the replacement gate in Â§12.4 and Doc 6 integration contracts.
+[/TABLE]
+[Heading2] 8. Cross-cutting requirements
+[Heading3] 8.1 Identity, permissions and separation
+[TABLE]
+Requirement ID | Phase | Requirement | Acceptance criteria
+CS-XP-001 | L | Enforce least privilege at workspace, client, brand and assigned-record scope. | Deny overrides allow; API and UI return the same authorised data/actions.
+CS-XP-002 | L | Support custom role templates that authorised admins can clone and modify. | Template changes are versioned/audited and do not silently expand existing usersâ€™ access.
+CS-XP-003 | L | Mask restricted fields/actions and explain why an action is unavailable without revealing sensitive values. | Restricted-state tests show no protected data in page, API payload, logs or exports.
+CS-XP-004 | S | Support time-limited delegated access and formal access requests/approvals. | Expired grants stop access automatically and remain auditable.
+[/TABLE]
+[Heading3] 8.2 Audit, notifications, AI and automation
+[TABLE]
+Requirement ID | Phase | Requirement | Acceptance criteria
+CS-XG-001 | L | Significant creates, edits, transitions, decisions, exports, imports, deletes/restores, settings, credentials and AI interactions create immutable audit events. | An authorised auditor can reconstruct who changed what, when, where, from/to and outcome.
+CS-XG-002 | L | Notifications support in-app and email where available; assignment, mention, comment, status, approval, due/overdue and critical events are covered. | User preferences are honoured except mandatory critical alerts; delivery/read state is recorded when technically available.
+CS-XG-003 | S | Add push notifications, richer digests/escalations and full delivery analytics only when justified. | User/channel preferences and mandatory-alert rules remain consistent.
+CS-XG-004 | L | AI is optional, scoped by client/brand/user, isolated across clients and never directly publishes/responds. | Input/output/version history is auditable; disabling AI removes all AI actions for that scope.
+CS-XG-005 | S | Add AI asset tagging/transcription, listening summaries/sentiment and performance recommendations. | Human correction/approval paths and provenance are available.
+[/TABLE]
+[Heading3] 8.3 Security, continuity and data control
+[TABLE]
+Requirement ID | Phase | Requirement | Acceptance criteria
+CS-XS-001 | L | Encrypt credentials/tokens, use OAuth where available, hide secrets from employees/logs and restrict connection changes. | Secret scanning and role tests reveal no plaintext credential; connection changes are audited.
+CS-XS-002 | L | Automatic daily database backup, 30-day retention, controlled recovery and periodic restore testing. | A test restore recovers selected records with documented result; restore action is permission-controlled/audited.
+CS-XS-003 | S | Add multi-region disaster recovery and advanced cyber-threat monitoring when justified. | Recovery targets and monitoring response are defined/tested before release.
+CS-XD-001 | L | Archive inactive records by default; deleted records enter a 30-day recycle bin; permanent deletion is restricted/confirmed/audited. | Linked active work blocks deletion; restore returns identifiers/relationships.
+CS-XD-002 | L | CSV export key records/reports and permit original asset download through the authorised storage source. | Bulk exports are restricted/audited, client/brand scoped and preserve IDs/dates/owners/statuses.
+CS-XD-003 | L | CSV import key records with template, mapping, preview, validation, duplicate detection, errors and rollback. | No invalid row commits silently; import can be traced and safely reversed.
+CS-XD-004 | S | Add advanced retention/legal holds and full workspace migration tooling. | Retention precedence and migration reconciliation are testable.
+[/TABLE]
+[Heading3] 8.4 Search, responsive access and usability
+[TABLE]
+Requirement ID | Phase | Requirement | Acceptance criteria
+CS-XU-001 | L | Permission-controlled global search across clients/brands, content, briefs, tasks, assets, posts, comments, approvals and users. | Search never returns unauthorised titles/snippets/counts; filters and quick-open work.
+CS-XU-002 | S | Add semantic search and search inside media/transcripts. | Results show source and respect the same field/record permissions.
+CS-XU-003 | L | Responsive web app for desktop/tablet/mobile, with tasks, calendar, notifications, approvals/comments, status updates, links/uploads and scorecards. | Current Chrome/Edge desktop and Safari/Chrome mobile pass the critical-flow test suite.
+CS-XU-004 | L | Provide installable home-screen shortcut; complex planning/reporting/admin remains desktop-first; no native mobile app. | PWA/shortcut opens the authorised responsive app without separate app-store build.
+CS-XU-005 | L | Use lightweight pages, basic autosave, clear connection/error status and safe retry for failed form submissions at no added service cost. | Interrupted edit is recoverable; retry does not create duplicate records.
+CS-XU-006 | S | Add full offline mode, resumable COS media uploads and dedicated compression only when needed. | Conflict resolution and upload integrity are tested.
+CS-XU-007 | L | Basic accessibility through standard components: contrast, readable text, keyboard/focus, labels/errors, alt text, non-colour cues and mobile zoom. | Critical workflows pass keyboard and basic automated accessibility checks without paid tools.
+[/TABLE]
+[Heading2] 9. Canonical lifecycle and exception model
+[Paragraph] The primary ContentItem.lifecycle_status values are:
+[BodyText] IDEA, BRIEF, ASSIGNED, IN_PRODUCTION, INTERNAL_REVIEW, CLIENT_APPROVAL, SCHEDULED, PUBLISHED, PERFORMANCE_REVIEW, ARCHIVED.
+[BodyText] BLOCKED, ON_HOLD, OVERDUE, NEEDS_CHANGES, PARTIAL_PUBLISH, PUBLISH_FAILED and QUARANTINED are flags or child-record conditions, not additional default lanes. CANCELLED is a terminal exception state. Full guards and transitions are in COS-CS-WFM-001.
+[Heading2] 10. Shared records and integrations
+[Heading3] 10.1 Shared COS records
+[Paragraph] Content & Social referencesâ€”not duplicatesâ€”authoritative records from:
+[Paragraph] Strategy & Planning: objectives, audiences, positioning and content pillars.
+[Paragraph] Campaigns: campaigns, offers, budgets and dates.
+[Paragraph] Customer Lifecycle/Sales/Support: routed leads, enquiries and escalations.
+[Paragraph] Customer Platform: requests, feedback and approvals when built.
+[Paragraph] Shared COS services: identity, permissions, clients/brands, assets, notifications, audit and staff performance.
+[Paragraph] Two-way synchronisation is used only where both modules legitimately edit the same shared record and conflict rules are defined in Docs 5â€“6.
+[Heading3] 10.2 External tools and adapter direction
+[Paragraph] Launch: link/deep-link existing Canva, Adobe, CapCut, Drive and social tools; avoid unnecessary paid APIs.
+[Paragraph] Scale: add required connectors through a thin adapter layer.
+[Paragraph] Native: redirect the same COS command/interface to native capabilities progressively.
+[Paragraph] Social networks/marketplaces remain external channels even when management tooling is native.
+[Heading2] 11. Staff operational monitoring and KPI governance
+[Heading3] 11.1 Included at Launch
+[Paragraph] Assigned/completed/due/overdue work.
+[Paragraph] Workload and capacity context.
+[Paragraph] Estimated versus actual completion time.
+[Paragraph] Output volume and production speed.
+[Paragraph] Revision frequency and quality issues.
+[Paragraph] Approval turnaround and SLA compliance.
+[Paragraph] Individual/team trends, bottlenecks, inactivity and exception alerts.
+[Paragraph] Weekly, monthly and quarterly role-specific scorecards.
+[Heading3] 11.2 Governance
+[Paragraph] KPI formula, weighting, target and data source are defined per role and versioned prospectively.
+[Paragraph] Verified COS activity is used automatically where possible.
+[Paragraph] Manual entries require evidence and manager approval.
+[Paragraph] Employees may challenge inaccurate records.
+[Paragraph] Managers may add context but cannot silently alter results.
+[Paragraph] Comparisons are only between equivalent roles.
+[Paragraph] Raw activity is contextual, not a substitute for completed quality-assured outcomes.
+[Paragraph] Structured coaching/corrective intervention workflow is Scale; automatic employment decisions are prohibited in every phase.
+[Heading2] 12. Commercial and release controls
+[Heading3] 12.1 Launch budget gate
+[Paragraph] Launch is rejected if it requires more than the approved less-than-Â£5,000 non-payroll envelope without a separate user decision. The amount is contingency, not a spending target.
+[Heading3] 12.2 Cost hierarchy
+[Paragraph] Native capability already available in COS.
+[Paragraph] Existing fixed-price organisation subscription connected/shared through COS.
+[Paragraph] Fixed usage bundle or annual plan.
+[Paragraph] Pay-as-you-go only where unavoidable and capped.
+[Paragraph] Vendor licensing and client charging are deferred decisions. Credentials remain hidden and access uses individual COS identities.
+[Heading3] 12.3 Scale promotion gate
+[Paragraph] A Scale requirement may start only when its decision record identifies:
+[Paragraph] operational or commercial trigger;
+[Paragraph] affected clients/brands/users;
+[Paragraph] staff/build effort and cash cost;
+[Paragraph] cheapest adequate manual/free/already-paid alternative;
+[Paragraph] expected measurable benefit;
+[Paragraph] security/data impact; and
+[Paragraph] approving owner.
+[Heading3] 12.4 Native replacement gate
+[Paragraph] A third-party tool is replaced only when:
+[Paragraph] the capabilities Brand Circuit actually requires are ready;
+[Paragraph] native is cheaper or strategically superior;
+[Paragraph] historical data can be migrated safely;
+[Paragraph] security and performance tests pass;
+[Paragraph] old and new run in parallel before switch; and
+[Paragraph] rollback remains available.
+[Heading2] 13. Launch release acceptance
+[Paragraph] Launch is accepted only when all of the following pass:
+[Paragraph] Scope: the 11 areas exist, with expensive integrations represented by useful manual/link-based Launch workflows rather than false â€œcoming soonâ€ actions.
+[Paragraph] Core path: a permitted user can take one item from Idea to Archived through every applicable gate using WF-CONTENT-01, including a secure client approval page and the manual-evidence fallback.
+[Paragraph] Separation: automated tests prove no cross-client leakage in UI, API, search, notifications, exports or audit visibility.
+[Paragraph] Control: staff/client users cannot bypass permissions, approvals, required fields or Brand Circuit assignment control.
+[Paragraph] Evidence: transitions, decisions, changes, imports/exports, deletes/restores, settings and AI actions are auditable.
+[Paragraph] Operations: My Work, Team View, calendar, pipeline, approval queue and scorecards reconcile to the same source records.
+[Paragraph] Continuity: daily backup and a restore test pass; autosave/retry does not duplicate records.
+[Paragraph] Responsive access: critical flows pass supported desktop/mobile browser tests and basic accessibility checks.
+[Paragraph] Cost: no unapproved paid dependency or uncapped pay-as-you-go service is required to operate Launch.
+[Paragraph] Pilot: DELabs or another OG brand completes at least one full weekly batch cycle, with user issues triaged through COS-CS-QAP-001.
+[Heading2] 14. Traceability map
+[TABLE]
+PRD subject | Workflow reference | Permission reference | Downstream specification
+Canonical content lifecycle | WF-CONTENT-01 | PERM-CONTENT-* | Docs 4, 5, 7, 9, 10
+Brief approval | WF-BRIEF-01 | PERM-BRIEF-*, PERM-APPROVAL-* | Docs 4, 5, 7, 10
+Production/rework | WF-PROD-01 | PERM-CONTENT-*, PERM-TASK-* | Docs 4, 5, 7, 9
+Internal/client approval | WF-APPROVAL-01/02 | PERM-APPROVAL-* | Docs 4â€“7, 9, 10
+Scheduling/publishing | WF-PUBLISH-01/02 | PERM-PUBLISH-* | Docs 5, 6, 7, 9, 10
+Asset governance | WF-ASSET-01 | PERM-ASSET-* | Docs 4â€“7, 9, 10
+Inbox/listening | WF-INBOX-01, WF-LISTEN-01 | PERM-INBOX-*, PERM-LISTEN-* | Docs 4â€“7, 9, 10
+Performance/scorecards | WF-PERF-01, WF-KPI-01 | PERM-PERF-* | Docs 4, 5, 7, 9, 10
+Settings/audit/automation | WF-CONFIG-01, WF-AUTO-01 | PERM-SETTINGS-*, PERM-AUDIT-* | Docs 5, 6, 9, 10
+[/TABLE]
+[BodyText] Implementation note â€” Non-blocking choices. Hosting provider, database, framework and specific external tools are engineering recommendations in Docs 6 and 9. They may not change the product hierarchy, phase gates, lifecycle, permissions, auditability or cost rules in this PRD without a recorded product decision.
