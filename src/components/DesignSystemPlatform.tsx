@@ -152,10 +152,10 @@ export default function DesignSystemPlatform({ onLogoutToGateway }: DesignSystem
   ];
 
   return (
-    <div className="flex-1 bg-slate-950 flex flex-col h-full overflow-hidden text-slate-100 font-sans">
+    <div className="design-system-platform flex-1 bg-slate-950 flex flex-col h-full overflow-hidden text-slate-100 font-sans">
       
       {/* Top Bar with COS V1.0 Identity */}
-      <div className="bg-[#182A5C] border-b border-[#264288] px-6 h-14 shrink-0 flex items-center justify-between">
+      <div className="bg-[#182A5C] border-b border-[#264288] px-6 h-16 shrink-0 flex items-center justify-between">
         <div className="flex items-center space-x-3">
           {/* Hamburger toggle for mobile */}
           <button 
@@ -451,9 +451,9 @@ export default function DesignSystemPlatform({ onLogoutToGateway }: DesignSystem
                   <div className="pt-0 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="w-48 text-xs font-mono">
                       <span className="font-bold text-slate-900 block">Display Title</span>
-                      <span className="text-slate-400">Montserrat · 64 / 64px</span>
+                      <span className="text-slate-400">Montserrat · 36 / 44px · 700</span>
                     </div>
-                    <div className="flex-1 font-display text-4xl font-extrabold text-[#111827] tracking-tight">
+                    <div className="cos-type-display flex-1">
                       Aa 012345 £%,
                     </div>
                   </div>
@@ -461,9 +461,9 @@ export default function DesignSystemPlatform({ onLogoutToGateway }: DesignSystem
                   <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="w-48 text-xs font-mono">
                       <span className="font-bold text-slate-900 block">H1 Page Title</span>
-                      <span className="text-slate-400">Montserrat · 44 / 48px</span>
+                      <span className="text-slate-400">Montserrat · 24 / 32px · 900</span>
                     </div>
-                    <div className="flex-1 font-display text-2xl font-bold text-[#111827] tracking-tight">
+                    <div className="cos-type-page-title flex-1">
                       Aa 012345 £%,
                     </div>
                   </div>
@@ -471,9 +471,9 @@ export default function DesignSystemPlatform({ onLogoutToGateway }: DesignSystem
                   <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="w-48 text-xs font-mono">
                       <span className="font-bold text-slate-900 block">H2 Section Heading</span>
-                      <span className="text-slate-400">Montserrat · 32 / 36px</span>
+                      <span className="text-slate-400">Montserrat · 18 / 28px · 800</span>
                     </div>
-                    <div className="flex-1 font-display text-xl font-bold text-slate-800">
+                    <div className="cos-type-section-title flex-1">
                       Aa 012345 £%,
                     </div>
                   </div>
@@ -481,9 +481,9 @@ export default function DesignSystemPlatform({ onLogoutToGateway }: DesignSystem
                   <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="w-48 text-xs font-mono">
                       <span className="font-bold text-slate-900 block">H3 Card Heading</span>
-                      <span className="text-slate-400">Montserrat · 20 / 26px</span>
+                      <span className="text-slate-400">Inter · 13 / 18px · 800</span>
                     </div>
-                    <div className="flex-1 font-display text-md font-bold text-slate-800">
+                    <div className="cos-type-card-title flex-1">
                       Aa 012345 £%,
                     </div>
                   </div>
@@ -491,9 +491,9 @@ export default function DesignSystemPlatform({ onLogoutToGateway }: DesignSystem
                   <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="w-48 text-xs font-mono">
                       <span className="font-bold text-slate-900 block">Body Copy</span>
-                      <span className="text-slate-400">Inter · 14 / 22px</span>
+                      <span className="text-slate-400">Inter · 14 / 20px · 400</span>
                     </div>
-                    <div className="flex-1 font-sans text-sm text-slate-600 leading-normal">
+                    <div className="flex-1 font-sans text-sm leading-5 text-slate-600">
                       The quick brown fox jumps over the lazy dog in active system state models.
                     </div>
                   </div>
@@ -501,9 +501,9 @@ export default function DesignSystemPlatform({ onLogoutToGateway }: DesignSystem
                   <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="w-48 text-xs font-mono">
                       <span className="font-bold text-slate-900 block">Tabular Lining Numeral</span>
-                      <span className="text-slate-400">JetBrains Mono · 13 / 18px</span>
+                      <span className="text-slate-400">JetBrains Mono · 11 / 16px · 700</span>
                     </div>
-                    <div className="flex-1 text-sm font-semibold tracking-tight text-slate-900 font-mono">
+                    <div className="flex-1 font-mono text-[11px] font-bold leading-4 tracking-[.02em] text-slate-900">
                       £1,284,600 · 34.7% · 08:30 BST
                     </div>
                   </div>

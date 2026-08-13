@@ -18,6 +18,7 @@ import DesignSystemPlatform from './components/DesignSystemPlatform';
 import IdentityGateway from './components/IdentityGateway';
 import COSLogo from './components/COSLogo';
 import CardInteractionManager from './components/CardInteractionManager';
+import ClientApprovalPortal from './content-social/ClientApprovalPortal';
 import HexLoader from './components/HexLoader';
 import { 
   Database, Activity, Users, TrendingUp, Building2, ShieldAlert, KeyRound, ArrowRight,
@@ -304,6 +305,9 @@ export default function App() {
       }
     }
   };
+
+  const clientApprovalToken = new URLSearchParams(window.location.search).get('client_approval');
+  if (clientApprovalToken) return <ClientApprovalPortal token={clientApprovalToken} />;
 
   return (
     <div className="flex flex-col h-screen overflow-hidden font-sans text-slate-800 bg-[#F7F9FC]">

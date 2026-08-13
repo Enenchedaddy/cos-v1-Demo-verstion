@@ -16,19 +16,33 @@ interface GlobalIconRailProps {
   onExit?: () => void;
 }
 
-export function GlobalIconRail({ areas, activeId, initials, onSelect, onExit }: GlobalIconRailProps) {
+interface GlobalRailBrandProps {
+  onActivate: () => void;
+  label?: string;
+}
+
+export function GlobalRailBrand({ onActivate, label = 'Open COS home' }: GlobalRailBrandProps) {
   return (
-    <div className="dual-rail-global flex h-full w-[66px] shrink-0 flex-col items-center border-r border-[#2A4E82] bg-[#061B3A] py-4">
+    <div className="flex shrink-0 flex-col items-center" data-testid="cos-rail-brand">
       <button
         type="button"
-        onClick={() => areas[0] && onSelect(areas[0].id)}
-        className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[#082B5B] transition-colors hover:bg-[#155EEF] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-        aria-label="Open COS home"
+        onClick={onActivate}
+        className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[#082B5B] transition-colors duration-200 hover:bg-[#155EEF] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+        aria-label={label}
       >
         <COSLogo className="h-7 w-7" variant="white" />
       </button>
+      <span className="mt-5 h-px w-10 bg-[#123C70]" data-testid="cos-rail-brand-divider" aria-hidden="true" />
+    </div>
+  );
+}
 
-      <nav className="mt-5 flex min-h-0 flex-1 flex-col items-center gap-2.5 overflow-y-auto px-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Global workspace areas">
+export function GlobalIconRail({ areas, activeId, initials, onSelect, onExit }: GlobalIconRailProps) {
+  return (
+    <div className="dual-rail-global flex h-full w-[66px] shrink-0 flex-col items-center border-r border-[#2A4E82] bg-[#061B3A] py-4">
+      <GlobalRailBrand onActivate={() => areas[0] && onSelect(areas[0].id)} />
+
+      <nav className="mt-4 flex min-h-0 flex-1 flex-col items-center gap-2.5 overflow-y-auto px-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Global workspace areas">
         {areas.map((area) => {
           const Icon = area.icon;
           const isActive = area.id === activeId;
@@ -72,12 +86,26 @@ export function GlobalIconRail({ areas, activeId, initials, onSelect, onExit }: 
 
 export function ContextRailHeader({ area }: { area: RailArea }) {
   const Icon = area.icon;
+  const titleScale = area.label.length <= 12
+    ? 'text-xl leading-6 whitespace-nowrap'
+    : area.label.length <= 16
+      ? 'text-lg leading-6 whitespace-nowrap'
+      : area.label.length <= 22
+        ? 'text-[14px] leading-5 whitespace-nowrap'
+        : 'text-sm leading-[1.05rem] whitespace-normal';
+
   return (
-    <header className="flex min-h-[97px] flex-col justify-center border-b border-[#2A4E82] px-5">
-      <p className="truncate text-[11px] font-bold uppercase tracking-[0.08em] text-[#AFC8F2]">Central Operating System</p>
-      <div className="mt-2 flex min-w-0 items-center gap-3">
-        <Icon size={23} strokeWidth={1.8} className="shrink-0 text-[#2F7BFF]" aria-hidden="true" />
-        <p className="truncate font-display text-lg font-extrabold uppercase tracking-[-0.02em] text-white">{area.label}</p>
+    <header className="flex h-[90px] shrink-0 flex-col justify-center border-b border-[#2A4E82] px-5" data-testid="cos-context-rail-header">
+      <p className="truncate font-display text-[11px] font-bold uppercase tracking-[0.08em] text-[#AFC8F2]">Central Operating System</p>
+      <div className="mt-2 flex min-w-0 items-center gap-2.5">
+        <Icon size={23} strokeWidth={1.9} className="shrink-0 text-[#2F7BFF]" aria-hidden="true" />
+        <p
+          className={`min-w-0 max-w-full overflow-hidden font-display font-extrabold uppercase tracking-[-0.025em] text-white ${titleScale}`}
+          data-testid="cos-context-rail-title"
+          title={area.label}
+        >
+          {area.label}
+        </p>
       </div>
     </header>
   );

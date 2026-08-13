@@ -33,8 +33,10 @@ import {
   X,
   type LucideIcon,
 } from 'lucide-react';
-import COSLogo from './COSLogo';
 import COSLogoWatermark from './COSLogoWatermark';
+import ContentSocialModule from '../content-social/ContentSocialModule';
+import { ContextRailHeader, GlobalRailBrand } from './DualRailNavigation';
+import { PageTitleBar, SectionTitleBar } from './Typography';
 import type { ApprovalRequest, AuditLog, Campaign, Company, Deal } from '../types';
 
 type WorkspaceState = 'loaded' | 'empty' | 'loading' | 'error' | 'restricted';
@@ -153,6 +155,7 @@ export default function SalesMarketingPlatform({
   const [leads, setLeads] = useState<LeadRecord[]>(INITIAL_LEADS);
   const [inspectedRecord, setInspectedRecord] = useState<InspectableRecord | null>(null);
   const [creationType, setCreationType] = useState<CreationType | null>(null);
+  const [contentNotificationsOpen, setContentNotificationsOpen] = useState(false);
   const [creationForm, setCreationForm] = useState({ title: '', company: companies[0]?.name ?? '', owner: 'Aisha Bello', value: '', dueDate: '2026-08-31' });
 
   const activeArea = NAVIGATION_AREAS.find((area) => area.id === activeAreaId) ?? NAVIGATION_AREAS[0];
@@ -269,16 +272,14 @@ export default function SalesMarketingPlatform({
   return (
     <div className="sm-platform-v11 relative flex h-screen overflow-hidden bg-[#F7F9FC] font-sans text-[#172B4D]">
       <aside className="relative z-40 flex h-full w-16 shrink-0 flex-col items-center border-r border-[#082B5B] bg-[#061B3A] py-3" aria-label="Global Sales and Marketing navigation">
-        <button type="button" onClick={() => selectArea(NAVIGATION_AREAS[0])} className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#082B5B] text-white transition hover:bg-[#155EEF]" aria-label="Go to Sales and Marketing home">
-          <COSLogo className="h-7 w-7" variant="white" />
-        </button>
-        <nav className="mt-5 flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto px-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Authoritative areas">
+        <GlobalRailBrand onActivate={() => selectArea(NAVIGATION_AREAS[0])} label="Go to Sales and Marketing home" />
+        <nav className="mt-4 flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto px-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Authoritative areas">
           {NAVIGATION_AREAS.map((area) => {
             const Icon = area.icon;
             const active = area.id === activeAreaId;
             return (
               <button key={area.id} type="button" onClick={() => selectArea(area)} className={`group relative grid h-10 w-10 shrink-0 place-items-center rounded-lg transition-all ${active ? 'bg-[#155EEF] text-white shadow-[0_0_16px_rgba(21,94,239,0.38)]' : 'text-[#91A9D2] hover:bg-[#082B5B] hover:text-sky-300'}`} aria-label={area.label} aria-current={active ? 'page' : undefined}>
-                {active && <span className="absolute -left-2 h-5 w-1 rounded-r bg-[#2970FF]" />}
+                {active && <span className="absolute -left-2 h-5 w-1 rounded-r bg-amber-300" />}
                 <Icon size={17} aria-hidden="true" />
                 <span className="pointer-events-none absolute left-full z-50 ml-3 hidden whitespace-nowrap rounded-md bg-[#061B3A] px-2.5 py-1.5 text-[10px] font-semibold text-white shadow-lg group-hover:block">{area.label}</span>
               </button>
@@ -289,8 +290,8 @@ export default function SalesMarketingPlatform({
         {onLogoutToGateway && <button type="button" onClick={onLogoutToGateway} className="mt-2 grid h-10 w-10 shrink-0 place-items-center rounded-lg text-[#91A9D2] hover:bg-[#082B5B] hover:text-white" aria-label="Exit workspace"><X size={18} /></button>}
       </aside>
 
-      <aside className="hidden h-full w-72 shrink-0 flex-col border-r border-[#082B5B] bg-[#0B3672] text-white lg:flex" aria-label={`${activeArea.label} routes`}>
-        <div className="flex min-h-[72px] items-center gap-3 border-b border-[#244D80] px-4"><span className="grid h-9 w-9 place-items-center rounded-lg bg-[#061B3A]/55 text-sky-300"><ActiveAreaIcon size={18} /></span><div className="min-w-0"><p className="text-[9px] uppercase tracking-[0.12em] text-[#91A9D2]">Active module</p><h2 className="mt-1 truncate text-xs font-bold text-white">{activeArea.label}</h2></div></div>
+      <aside className="hidden h-full w-64 shrink-0 flex-col border-r border-[#082B5B] bg-[#0B3672] text-white lg:flex" aria-label={`${activeArea.label} routes`}>
+        <ContextRailHeader area={activeArea} />
         <div className="border-b border-[#244D80] p-3">
           <div className="flex items-center justify-between"><div><p className="text-[9px] uppercase tracking-[0.1em] text-[#91A9D2]">Entity scope</p><p className="mt-1 text-[11px] font-semibold">DL · DELabs Ltd (UK Hub)</p></div><ShieldCheck size={16} className="text-sky-300" /></div>
           <div className="mt-3 grid grid-cols-2 rounded-lg border border-[#31558B] bg-[#061B3A]/45 p-1">
@@ -299,27 +300,45 @@ export default function SalesMarketingPlatform({
         </div>
         <div className="border-b border-[#244D80] p-3"><label className="relative block"><span className="sr-only">Search this area</span><Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#91A9D2]" /><input value={areaSearch} onChange={(event) => setAreaSearch(event.target.value)} placeholder="Search this area" className="min-h-10 w-full rounded-lg border border-[#31558B] bg-[#061B3A]/45 pl-9 pr-8 text-xs text-white placeholder:text-[#91A9D2] focus:border-[#155EEF]" />{areaSearch && <button type="button" onClick={() => setAreaSearch('')} className="absolute right-1 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center text-[#91A9D2] hover:text-white" aria-label="Clear area search"><X size={13} /></button>}</label></div>
         <nav className="min-h-0 flex-1 overflow-y-auto p-3" aria-label={`${activeArea.label} submenu`}>
-          {routeGroups.length === 0 ? <p className="p-4 text-center text-xs text-[#91A9D2]">No routes match this search.</p> : routeGroups.map((group) => <div key={group.label} className="mb-5"><p className="mb-2 px-2 text-[9px] font-bold uppercase tracking-[0.12em] text-[#7E9AC2]">{group.label}</p><div className="space-y-1">{group.routes.map((route) => <button key={route} type="button" onClick={() => setActiveRoute(route)} className={`relative flex min-h-10 w-full items-center rounded-lg border-l-4 px-3 text-left text-[11px] transition ${activeRoute === route ? 'border-[#2970FF] bg-[#155EEF] font-bold text-white' : 'border-transparent text-[#C0D0E7] hover:translate-x-1 hover:border-sky-400 hover:bg-[#082B5B] hover:text-white'}`}>{route}{activeRoute === route && <span className="absolute right-3 h-1.5 w-1.5 rounded-full bg-[#2970FF] ring-2 ring-white/70" />}</button>)}</div></div>)}
+          {routeGroups.length === 0 ? <p className="p-4 text-center text-xs text-[#91A9D2]">No routes match this search.</p> : routeGroups.map((group) => <div key={group.label} className="mb-5"><p className="mb-2 px-2 text-[9px] font-bold uppercase tracking-[0.12em] text-[#7E9AC2]">{group.label}</p><div className="space-y-1">{group.routes.map((route) => <button key={route} type="button" onClick={() => setActiveRoute(route)} className={`relative flex min-h-10 w-full items-center rounded-lg border-l-4 px-3 text-left text-[11px] transition ${activeRoute === route ? 'border-amber-300 bg-gradient-to-r from-[#155EEF] to-[#2970FF] font-bold text-white' : 'border-transparent text-[#C0D0E7] hover:translate-x-1 hover:border-sky-400 hover:bg-[#082B5B] hover:text-white'}`}>{route}{activeRoute === route && <span className="absolute right-3 h-1.5 w-1.5 rounded-full bg-amber-300" />}</button>)}</div></div>)}
         </nav>
+        <div className="border-t border-[#244D80] p-3"><div className="rounded-xl bg-[#061B3A]/55 p-3"><div className="flex items-center gap-3"><span className="grid h-9 w-9 place-items-center rounded-full bg-[#155EEF] text-[10px] font-bold">AB</span><div><p className="text-[11px] font-bold text-white">Aisha Bello</p><p className="mt-0.5 text-[9px] text-[#91A9D2]">Marketing Lead</p></div></div></div></div>
       </aside>
 
       <section className="relative flex min-w-0 flex-1 flex-col overflow-hidden bg-[#F7F9FC]">
         <COSLogoWatermark />
-        <header className="relative z-10 flex min-h-[64px] shrink-0 items-center justify-between gap-3 border-b border-[#D9E0EA] bg-white px-3 sm:px-5">
+        <header className="cos-global-topbar relative z-10 flex shrink-0 items-center justify-between gap-3 px-3 sm:px-5">
           <div className="relative min-w-0 flex-1 sm:max-w-md"><Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6B7A90]" /><input value={globalSearch} onChange={(event) => setGlobalSearch(event.target.value)} placeholder="Search accounts, deals, tasks, campaigns..." className="min-h-10 w-full rounded-lg border border-[#D9E0EA] bg-[#F7F9FC] pl-9 pr-3 text-xs focus:border-[#155EEF]" /></div>
           <div className="hidden items-center gap-2 xl:flex"><span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" /><span className="text-[10px] font-bold text-emerald-700">Audit Stream Live</span></div>
           <div className="hidden items-center gap-1 rounded-lg border border-[#D9E0EA] bg-[#F7F9FC] p-1 md:flex" aria-label="Workspace state simulator">{(['loaded', 'empty', 'loading', 'error', 'restricted'] as const).map((state) => <button key={state} type="button" onClick={() => setWorkspaceState(state)} className={`min-h-8 rounded-md px-2 text-[9px] font-bold uppercase ${workspaceState === state ? 'bg-[#155EEF] text-white' : 'text-[#65758B] hover:bg-white'}`}>{state}</button>)}</div>
-          <button type="button" className="relative grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-[#D9E0EA] text-[#52617A] hover:border-[#155EEF] hover:text-[#155EEF]" aria-label="Notifications"><Bell size={16} /><span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-amber-400" /></button>
+          <button type="button" onClick={() => activeAreaId === 'content-social' ? setContentNotificationsOpen(true) : setInspectedRecord(allRecords.find((record) => record.kind === 'Audit') ?? null)} className="relative grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-[#D9E0EA] text-[#52617A] hover:border-[#155EEF] hover:text-[#155EEF]" aria-label="Notifications"><Bell size={16} /><span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-amber-400" /></button>
         </header>
 
         <main className="relative z-10 flex-1 overflow-y-auto p-4 sm:p-6">
+          {activeAreaId === 'content-social' && (
+            <ContentSocialModule
+              activeRoute={activeRoute}
+              globalSearch={globalSearch}
+              forcedState={workspaceState}
+              scopeMode={scopeMode}
+              notificationOpen={contentNotificationsOpen}
+              onNotificationClose={() => setContentNotificationsOpen(false)}
+              onRouteChange={setActiveRoute}
+            />
+          )}
+          {activeAreaId !== 'content-social' && <>
           {workspaceState === 'loading' && <StatePanel icon={RefreshCw} title="Loading governed workspace" detail="Synchronising entity records, permissions, and audit context." spinning />}
           {workspaceState === 'empty' && <StatePanel icon={Sparkles} title="No records in this view" detail={`Create the first record for ${activeArea.label} · ${activeRoute}.`} action={() => setCreationType('task')} actionLabel="Create a task" />}
           {workspaceState === 'error' && <StatePanel icon={AlertTriangle} title="Workspace data could not be reconciled" detail="Trace COS-SM-11F2 · No records were changed. Retry the governed query." action={() => setWorkspaceState('loaded')} actionLabel="Retry" danger />}
           {workspaceState === 'restricted' && <StatePanel icon={LockKeyhole} title="Restricted commercial view" detail="Your current DELabs scope masks this dataset. Request elevated access from Settings & Governance." action={() => { setActiveAreaId('settings'); setActiveRoute('Permissions'); setWorkspaceState('loaded'); }} actionLabel="Open permissions" />}
           {workspaceState === 'loaded' && (
             <div className="mx-auto max-w-[1500px] space-y-5">
-              <div className="flex flex-col gap-4 border-b border-[#D9E0EA] pb-5 sm:flex-row sm:items-end sm:justify-between"><div><div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.11em] text-[#155EEF]"><ActiveAreaIcon size={14} />{activeArea.label}<ChevronRight size={12} /><span className="text-[#68778D]">{activeRoute}</span></div><h1 className="mt-2 text-2xl font-extrabold text-[#172B4D] sm:text-3xl">{activeRoute}</h1><p className="mt-1 text-sm text-[#68778D]">DELabs Ltd · {scopeMode === 'company' ? 'Company' : 'Group'} scope · governed commercial workspace</p></div><div className="flex flex-wrap gap-2"><CreateButton icon={BriefcaseBusiness} label="New deal" onClick={() => setCreationType('deal')} /><CreateButton icon={ListTodo} label="New task" onClick={() => setCreationType('task')} /><CreateButton icon={UserPlus} label="New lead" primary onClick={() => setCreationType('lead')} /></div></div>
+              <PageTitleBar
+                eyebrow={<span className="flex items-center gap-2"><ActiveAreaIcon size={14} />{activeArea.label}<ChevronRight size={12} /><span>{activeRoute}</span></span>}
+                title={activeRoute}
+                subtitle={<>DELabs Ltd · {scopeMode === 'company' ? 'Company' : 'Group'} scope · governed commercial workspace</>}
+                actions={<><CreateButton icon={BriefcaseBusiness} label="New deal" onClick={() => setCreationType('deal')} /><CreateButton icon={ListTodo} label="New task" onClick={() => setCreationType('task')} /><CreateButton icon={UserPlus} label="New lead" primary onClick={() => setCreationType('lead')} /></>}
+              />
 
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 <MetricCard label="Open pipeline" value={formatMoney(deals.filter((deal) => deal.stage !== 'Closed Won').reduce((sum, deal) => sum + deal.amount, 0))} note={`${deals.length} governed opportunities`} icon={TrendingUp} />
@@ -330,7 +349,7 @@ export default function SalesMarketingPlatform({
 
               <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
                 <section className="overflow-hidden rounded-2xl border border-[#D9E0EA] bg-white shadow-2xs" data-card-ignore>
-                  <div className="flex items-center justify-between border-b border-[#E4E9F0] px-4 py-4 sm:px-5"><div><h2 className="text-sm font-bold text-[#172B4D]">Live records</h2><p className="mt-1 text-xs text-[#74839A]">Records relevant to {activeArea.shortLabel}</p></div><span className="font-mono text-[10px] text-[#74839A]">{visibleRecords.length} ITEMS</span></div>
+                  <SectionTitleBar title="Live records" detail={`Records relevant to ${activeArea.shortLabel}`} action={<span className="font-mono text-[10px] text-[#74839A]">{visibleRecords.length} ITEMS</span>} />
                   <div className="divide-y divide-[#E8ECF2]">{visibleRecords.slice(0, 10).map((record) => <button key={`${record.kind}-${record.id}`} type="button" onClick={() => setInspectedRecord(record)} className="grid min-h-[72px] w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 text-left transition hover:bg-[#F4F7FC] sm:grid-cols-[90px_minmax(0,1fr)_130px_110px_auto] sm:px-5"><span className="hidden text-[9px] font-bold uppercase tracking-[0.08em] text-[#155EEF] sm:block">{record.kind}</span><span className="min-w-0"><span className="block truncate text-xs font-bold text-[#172B4D]">{record.title}</span><span className="mt-1 block truncate text-[11px] text-[#74839A]">{record.subtitle}</span></span><span className="hidden truncate text-[11px] text-[#52617A] sm:block">{record.owner}</span><span className="hidden font-mono text-[10px] text-[#172B4D] sm:block">{record.value ?? record.date ?? '—'}</span><span className="rounded-md bg-[#EEF3FB] px-2 py-1 text-[9px] font-bold text-[#155EEF]">{record.status}</span></button>)}{visibleRecords.length === 0 && <div className="p-10 text-center"><Search className="mx-auto text-[#9AA8BA]" size={24} /><p className="mt-3 text-sm font-bold text-[#172B4D]">No matching records</p><button type="button" onClick={() => setGlobalSearch('')} className="mt-2 text-xs font-semibold text-[#155EEF]">Clear search</button></div>}</div>
                 </section>
 
@@ -341,6 +360,7 @@ export default function SalesMarketingPlatform({
               </div>
             </div>
           )}
+          </>}
         </main>
       </section>
 

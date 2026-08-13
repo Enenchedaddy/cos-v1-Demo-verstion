@@ -172,7 +172,7 @@ export default function ManagementPlatform({
   const q = searchQuery.toLowerCase().trim();
 
   return (
-    <div className="sales-platform-theme flex h-screen overflow-hidden bg-[#F7F9FC] font-sans relative">
+    <div className="management-platform sales-platform-theme flex h-screen overflow-hidden bg-[#F7F9FC] font-sans relative">
       
       {/* Standardized dual-rail navigation */}
       <aside
@@ -483,7 +483,7 @@ export default function ManagementPlatform({
       <section className="flex-1 flex flex-col overflow-hidden bg-[#F7F9FC]">
         
         {/* Top bar (56px) */}
-        <header className="h-[56px] border-b border-[#D9E0EA] bg-white px-4 sm:px-6 flex items-center justify-between shrink-0">
+        <header className="cos-global-topbar px-4 sm:px-6 flex items-center justify-between shrink-0">
           <div className="flex items-center space-x-1.5 sm:space-x-2 min-w-0">
             <span className="text-[10px] bg-[#EEF3FB] text-[#4065B3] font-bold px-2 py-0.5 rounded uppercase tracking-wider font-mono shrink-0 hidden xs:inline">Governed Command Node</span>
             <span className="text-slate-400 hidden xs:inline">/</span>
@@ -567,7 +567,7 @@ export default function ManagementPlatform({
         </header>
 
         {/* Viewport content */}
-        <div className="flex-1 overflow-y-auto p-6 relative isolate">
+        <div className="management-canvas flex-1 overflow-y-auto p-4 sm:p-6 relative isolate">
           <COSLogoWatermark />
           
           {/* Simulated view states */}
@@ -618,7 +618,7 @@ export default function ManagementPlatform({
                       <div className="space-y-6">
                         <div className="flex justify-between items-start">
                           <div>
-                            <h2 className="text-2xl font-bold text-slate-900 font-display">Functional Morning briefing</h2>
+                            <h1 className="text-2xl font-bold text-slate-900 font-display">Functional Morning briefing</h1>
                             <p className="text-xs text-slate-500 mt-1">Cross-company Sales & Marketing morning overview with explicit entity scope</p>
                           </div>
                           <span className="text-[11px] font-bold bg-[#EEF3FB] text-[#4065B3] px-2.5 py-1 rounded">Group Mode Active</span>
@@ -653,7 +653,7 @@ export default function ManagementPlatform({
                       <div className="space-y-6">
                         <div className="flex justify-between items-start">
                           <div>
-                            <h2 className="text-2xl font-bold text-slate-900 font-display">Advanced Gases MD Morning Briefing</h2>
+                            <h1 className="text-2xl font-bold text-slate-900 font-display">Advanced Gases MD Morning Briefing</h1>
                             <p className="text-xs text-slate-500 mt-1">Company-mode morning across all six Operating Group functions</p>
                           </div>
                           <span className="text-[11px] font-bold bg-[#EEF3FB] text-[#4065B3] px-2.5 py-1 rounded">Advanced Gases Ltd</span>
@@ -688,7 +688,7 @@ export default function ManagementPlatform({
                       <div className="space-y-6">
                         <div className="flex justify-between items-start">
                           <div>
-                            <h2 className="text-2xl font-bold text-slate-900 font-display">Executive Command Centre</h2>
+                            <h1 className="text-2xl font-bold text-slate-900 font-display">Executive Command Centre</h1>
                             <p className="text-xs text-slate-500 mt-1">Single action-oriented operating screen for revenue, margin, cash, and approvals</p>
                           </div>
                         </div>
@@ -735,7 +735,7 @@ export default function ManagementPlatform({
                       <div className="space-y-6">
                         <div className="flex justify-between items-start">
                           <div>
-                            <h2 className="text-2xl font-bold text-slate-900 font-display">Business Unit Matrix & Oversight</h2>
+                            <h1 className="text-2xl font-bold text-slate-900 font-display">Business Unit Matrix & Oversight</h1>
                             <p className="text-xs text-slate-500 mt-1">Comparative performance, consolidation, and variance overview per operating unit</p>
                           </div>
                         </div>
