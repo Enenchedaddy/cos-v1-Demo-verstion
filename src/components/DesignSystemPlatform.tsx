@@ -178,12 +178,20 @@ export default function DesignSystemPlatform({ onLogoutToGateway }: DesignSystem
             <Activity size={12} className="text-[#6C84B8] animate-pulse" />
             <span>v1.0.0 (Build-Ready Spec)</span>
           </div>
-          <button 
-            onClick={onLogoutToGateway}
-            className="bg-[#4065B3] hover:bg-[#6C84B8] transition text-white px-3 py-1.5 rounded-lg text-xs font-bold font-display cursor-pointer"
-          >
-            Exit Workspace
-          </button>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={onLogoutToGateway}
+              className="bg-[#4065B3] hover:bg-[#6C84B8] transition text-white px-3 py-1.5 rounded-lg text-xs font-bold font-display cursor-pointer"
+            >
+              Exit Workspace
+            </button>
+            <button
+              onClick={() => { window.location.pathname = '/login'; }}
+              className="bg-[#A33A3A] hover:bg-[#B94A4A] transition text-white px-3 py-1.5 rounded-lg text-xs font-bold font-display cursor-pointer"
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </div>
 

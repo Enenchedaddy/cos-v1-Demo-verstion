@@ -41,7 +41,12 @@ export default function App() {
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>(INITIAL_AUDIT_LOGS);
 
   const [showSimulatorLogs, setShowSimulatorLogs] = useState(false);
-  const [activePlatform, setActivePlatform] = useState<'gateway' | 'sales' | 'marketing' | 'management' | 'design-system'>('gateway');
+  const [activePlatform, setActivePlatform] = useState<'gateway' | 'sales' | 'marketing' | 'management' | 'design-system'>(() => {
+    const requestedWorkspace = new URLSearchParams(window.location.search).get('workspace');
+    return requestedWorkspace === 'sales' || requestedWorkspace === 'marketing' || requestedWorkspace === 'management'
+      ? requestedWorkspace
+      : 'gateway';
+  });
   const [isInitializing, setIsInitializing] = useState(() => {
     try {
       return sessionStorage.getItem('cos-portal-initialized') !== 'true';

@@ -526,6 +526,13 @@ export default function SalesPlatform({
               Exit Workspace
             </button>
           )}
+          {/* New explicit Logout button that navigates to the login page */}
+          <button
+            onClick={() => { window.location.pathname = '/login'; }}
+            className="w-full mt-2 bg-[#A33A3A] hover:bg-[#B94A4A] text-white text-[11px] font-bold py-1.5 px-3 rounded-md transition cursor-pointer text-center"
+          >
+            Logout
+          </button>
         </div>
       </aside>
 
