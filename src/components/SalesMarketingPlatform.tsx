@@ -16,6 +16,7 @@ import {
   Home,
   ListTodo,
   LockKeyhole,
+  LogOut,
   Megaphone,
   Plus,
   Radio,
@@ -288,6 +289,9 @@ export default function SalesMarketingPlatform({
         </nav>
         <div className="mt-2 grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#155EEF] text-[10px] font-bold text-white" aria-label="Aisha Bello, Marketing Lead">AB</div>
         {onLogoutToGateway && <button type="button" onClick={onLogoutToGateway} className="mt-2 grid h-10 w-10 shrink-0 place-items-center rounded-lg text-[#91A9D2] hover:bg-[#082B5B] hover:text-white" aria-label="Exit workspace"><X size={18} /></button>}
+        <button type="button" onClick={() => window.location.assign('/login')} className="mt-1 grid h-10 w-10 shrink-0 place-items-center rounded-lg text-[#91A9D2] hover:bg-[#082B5B] hover:text-white" aria-label="Log out">
+          <LogOut size={17} aria-hidden="true" />
+        </button>
       </aside>
 
       <aside className="hidden h-full w-64 shrink-0 flex-col border-r border-[#082B5B] bg-[#0B3672] text-white lg:flex" aria-label={`${activeArea.label} routes`}>

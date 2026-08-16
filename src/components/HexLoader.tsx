@@ -87,7 +87,7 @@ export default function HexLoader({
           <polygon className="hex-loader-facet hex-loader-f3" points="50,90 15.36,70 32.68,60 50,70" fill="#182A5C" />
           <polygon className="hex-loader-facet hex-loader-f4" points="15.36,70 15.36,30 32.68,40 32.68,60" fill="#6C84B8" />
           <polygon className="hex-loader-core" points="50,31 66.45,40.5 66.45,59.5 50,69 33.55,59.5 33.55,40.5" fill="#FFFFFF" stroke="#D7DEE8" strokeWidth="1" />
-          <text x="50" y="54" textAnchor="middle" fill="#182A5C" fontFamily="JetBrains Mono, ui-monospace, monospace" fontSize="11" fontWeight="500">
+          <text x="50" y="54" textAnchor="middle" fill="#182A5C" fontFamily="IBM Plex Mono, monospace" fontSize="11" fontWeight="500">
             {value}%
           </text>
         </svg>

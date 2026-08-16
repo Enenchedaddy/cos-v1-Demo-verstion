@@ -1,5 +1,4 @@
 import React from 'react';
-import { Building2 } from 'lucide-react';
 
 interface SidebarEntityScopeProps {
   workspaceName: string;
@@ -31,41 +30,38 @@ export default function SidebarEntityScope({
       >
         Entity scope
       </label>
-      <div className="workspace-entity-scope__row">
-        <Building2 size={15} className="workspace-entity-scope__icon" aria-hidden="true" />
-        <select
-          id={`${scopeId}-select`}
-          value={selectedScopes[scopeMode]}
-          onChange={(event) =>
-            setSelectedScopes((current) => ({
-              ...current,
-              [scopeMode]: event.target.value,
-            }))
-          }
-          className="workspace-entity-scope__select"
-          aria-label={`${workspaceName} ${scopeMode} entity scope`}
-        >
-          {availableScopes.map((scope) => (
-            <option key={scope} value={scope}>
-              {scope}
-            </option>
-          ))}
-        </select>
+      <select
+        id={`${scopeId}-select`}
+        value={selectedScopes[scopeMode]}
+        onChange={(event) =>
+          setSelectedScopes((current) => ({
+            ...current,
+            [scopeMode]: event.target.value,
+          }))
+        }
+        className="workspace-entity-scope__select"
+        aria-label={`${workspaceName} ${scopeMode} entity scope`}
+      >
+        {availableScopes.map((scope) => (
+          <option key={scope} value={scope}>
+            {scope}
+          </option>
+        ))}
+      </select>
 
-        <div className="workspace-entity-scope__modes" aria-label="Entity scope level">
-          {(['company', 'group'] as const).map((mode) => (
-            <button
-              key={mode}
-              type="button"
-              onClick={() => setScopeMode(mode)}
-              className="workspace-entity-scope__mode"
-              data-active={scopeMode === mode}
-              aria-pressed={scopeMode === mode}
-            >
-              {mode === 'company' ? 'Company' : 'Group'}
-            </button>
-          ))}
-        </div>
+      <div className="workspace-entity-scope__modes" aria-label="Entity scope level">
+        {(['company', 'group'] as const).map((mode) => (
+          <button
+            key={mode}
+            type="button"
+            onClick={() => setScopeMode(mode)}
+            className="workspace-entity-scope__mode"
+            data-active={scopeMode === mode}
+            aria-pressed={scopeMode === mode}
+          >
+            {mode === 'company' ? 'Company' : 'Group'}
+          </button>
+        ))}
       </div>
     </section>
   );

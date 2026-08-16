@@ -41,7 +41,18 @@ export default function App() {
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>(INITIAL_AUDIT_LOGS);
 
   const [showSimulatorLogs, setShowSimulatorLogs] = useState(false);
-  const [activePlatform, setActivePlatform] = useState<'gateway' | 'sales-marketing' | 'management' | 'design-system'>('gateway');
+  const [activePlatform, setActivePlatform] = useState<'gateway' | 'sales-marketing' | 'management' | 'design-system'>(() => {
+    const requestedWorkspace = new URLSearchParams(window.location.search).get('workspace');
+    if (requestedWorkspace === 'sales' || requestedWorkspace === 'marketing') return 'sales-marketing';
+    if (requestedWorkspace === 'management') return 'management';
+    return 'gateway';
+  });
+  const [salesMarketingInitialArea, setSalesMarketingInitialArea] = useState(() => {
+    const requestedWorkspace = new URLSearchParams(window.location.search).get('workspace');
+    if (requestedWorkspace === 'sales') return 'sales-execution';
+    if (requestedWorkspace === 'marketing') return 'campaigns';
+    return 'home';
+  });
   const [isInitializing, setIsInitializing] = useState(() => {
     try {
       return sessionStorage.getItem('cos-portal-initialized') !== 'true';
@@ -329,9 +340,16 @@ export default function App() {
           <IdentityGateway
             isSupabaseConfigured={isSupabaseConfigured}
             onOpenDesignSystem={() => beginPlatformTransition('design-system', 'Opening COS Design System…')}
-            onEnterSalesMarketing={() => {
-              beginPlatformTransition('sales-marketing', 'Authenticating & Launching Sales & Marketing Platform…', () => {
-                handleAddLog('Sales & Marketing Session Authorized', 'Permission', 'Commercial Workspace', 'S&M', 'Entered unified Sales & Marketing platform from governed gateway');
+            onEnterSales={() => {
+              setSalesMarketingInitialArea('sales-execution');
+              beginPlatformTransition('sales-marketing', 'Authenticating & Launching Sales Platform…', () => {
+                handleAddLog('Sales Session Authorized', 'Customer', 'Chris Allen', 'S&M', 'Entered Sales through the unified commercial platform');
+              });
+            }}
+            onEnterMarketing={() => {
+              setSalesMarketingInitialArea('campaigns');
+              beginPlatformTransition('sales-marketing', 'Authenticating & Launching Marketing Suite…', () => {
+                handleAddLog('Marketing Session Authorized', 'Customer', 'Aisha Bello', 'S&M', 'Entered Marketing through the unified commercial platform');
               });
             }}
             onEnterManagement={() => {
@@ -717,7 +735,7 @@ export default function App() {
             campaigns={campaigns}
             auditLogs={auditLogs}
             approvals={approvals}
-            initialArea="home"
+            initialArea={salesMarketingInitialArea}
             onAddLog={handleAddLog}
             onUpdateDeals={handleUpdateDeals}
             onLogoutToGateway={() => {
