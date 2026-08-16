@@ -12,13 +12,13 @@ import {
   INITIAL_CAMPAIGNS, INITIAL_APPROVALS, INITIAL_AUDIT_LOGS
 } from './data';
 
-import SalesPlatform from './components/SalesPlatform';
-import MarketingPlatform from './components/MarketingPlatform';
+import SalesMarketingPlatform from './components/SalesMarketingPlatform';
 import ManagementPlatform from './components/ManagementPlatform';
 import DesignSystemPlatform from './components/DesignSystemPlatform';
 import IdentityGateway from './components/IdentityGateway';
 import COSLogo from './components/COSLogo';
 import CardInteractionManager from './components/CardInteractionManager';
+import ClientApprovalPortal from './content-social/ClientApprovalPortal';
 import HexLoader from './components/HexLoader';
 import { 
   Database, Activity, Users, TrendingUp, Building2, ShieldAlert, KeyRound, ArrowRight,
@@ -41,11 +41,17 @@ export default function App() {
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>(INITIAL_AUDIT_LOGS);
 
   const [showSimulatorLogs, setShowSimulatorLogs] = useState(false);
-  const [activePlatform, setActivePlatform] = useState<'gateway' | 'sales' | 'marketing' | 'management' | 'design-system'>(() => {
+  const [activePlatform, setActivePlatform] = useState<'gateway' | 'sales-marketing' | 'management' | 'design-system'>(() => {
     const requestedWorkspace = new URLSearchParams(window.location.search).get('workspace');
-    return requestedWorkspace === 'sales' || requestedWorkspace === 'marketing' || requestedWorkspace === 'management'
-      ? requestedWorkspace
-      : 'gateway';
+    if (requestedWorkspace === 'sales' || requestedWorkspace === 'marketing') return 'sales-marketing';
+    if (requestedWorkspace === 'management') return 'management';
+    return 'gateway';
+  });
+  const [salesMarketingInitialArea, setSalesMarketingInitialArea] = useState(() => {
+    const requestedWorkspace = new URLSearchParams(window.location.search).get('workspace');
+    if (requestedWorkspace === 'sales') return 'sales-execution';
+    if (requestedWorkspace === 'marketing') return 'campaigns';
+    return 'home';
   });
   const [isInitializing, setIsInitializing] = useState(() => {
     try {
@@ -55,7 +61,7 @@ export default function App() {
     }
   });
   const [launchTransition, setLaunchTransition] = useState<{
-    target: 'gateway' | 'sales' | 'marketing' | 'management' | 'design-system';
+    target: 'gateway' | 'sales-marketing' | 'management' | 'design-system';
     label: string;
   } | null>(null);
   const transitionTimer = useRef<number | null>(null);
@@ -79,7 +85,7 @@ export default function App() {
   }, []);
 
   const beginPlatformTransition = (
-    target: 'gateway' | 'sales' | 'marketing' | 'management' | 'design-system',
+    target: 'gateway' | 'sales-marketing' | 'management' | 'design-system',
     label: string,
     onComplete?: () => void,
   ) => {
@@ -311,6 +317,9 @@ export default function App() {
     }
   };
 
+  const clientApprovalToken = new URLSearchParams(window.location.search).get('client_approval');
+  if (clientApprovalToken) return <ClientApprovalPortal token={clientApprovalToken} />;
+
   return (
     <div className="flex flex-col h-screen overflow-hidden font-sans text-slate-800 bg-[#F7F9FC]">
       <CardInteractionManager />
@@ -332,13 +341,15 @@ export default function App() {
             isSupabaseConfigured={isSupabaseConfigured}
             onOpenDesignSystem={() => beginPlatformTransition('design-system', 'Opening COS Design System…')}
             onEnterSales={() => {
-              beginPlatformTransition('sales', 'Authenticating & Launching Sales Platform…', () => {
-                handleAddLog('Sales Session Authorized', 'Customer', 'Chris Allen', 'S&M', 'Entered Sales from governed gateway');
+              setSalesMarketingInitialArea('sales-execution');
+              beginPlatformTransition('sales-marketing', 'Authenticating & Launching Sales Platform…', () => {
+                handleAddLog('Sales Session Authorized', 'Customer', 'Chris Allen', 'S&M', 'Entered Sales through the unified commercial platform');
               });
             }}
             onEnterMarketing={() => {
-              beginPlatformTransition('marketing', 'Authenticating & Launching Marketing Suite…', () => {
-                handleAddLog('Marketing Session Authorized', 'Customer', 'Aisha Bello', 'S&M', 'Entered Marketing from governed gateway');
+              setSalesMarketingInitialArea('campaigns');
+              beginPlatformTransition('sales-marketing', 'Authenticating & Launching Marketing Suite…', () => {
+                handleAddLog('Marketing Session Authorized', 'Customer', 'Aisha Bello', 'S&M', 'Entered Marketing through the unified commercial platform');
               });
             }}
             onEnterManagement={() => {
@@ -717,45 +728,16 @@ export default function App() {
           </div>
         )}
 
-        {activePlatform === 'sales' && (
-          <SalesPlatform
+        {activePlatform === 'sales-marketing' && (
+          <SalesMarketingPlatform
             companies={companies}
             deals={deals}
-            quotes={quotes}
-            orders={orders}
-            invoices={invoices}
-            cylinders={cylinders}
-            tickets={tickets}
             campaigns={campaigns}
             auditLogs={auditLogs}
             approvals={approvals}
-            products={products}
-            currentRole="Chris Allen (Sales Rep)"
+            initialArea={salesMarketingInitialArea}
             onAddLog={handleAddLog}
-            onUpdateQuotes={handleUpdateQuotes}
             onUpdateDeals={handleUpdateDeals}
-            onAddApproval={handleAddApproval}
-            onLogoutToGateway={() => {
-              beginPlatformTransition('gateway', 'Returning to the Identity Gateway…');
-            }}
-          />
-        )}
-
-        {activePlatform === 'marketing' && (
-          <MarketingPlatform
-            companies={companies}
-            deals={deals}
-            quotes={quotes}
-            orders={orders}
-            invoices={invoices}
-            cylinders={cylinders}
-            tickets={tickets}
-            campaigns={campaigns}
-            auditLogs={auditLogs}
-            approvals={approvals}
-            products={products}
-            currentRole="Aisha Bello (Marketing Lead)"
-            onAddLog={handleAddLog}
             onLogoutToGateway={() => {
               beginPlatformTransition('gateway', 'Returning to the Identity Gateway…');
             }}

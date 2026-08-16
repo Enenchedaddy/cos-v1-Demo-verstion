@@ -1,10 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-display: "Newsreader", Georgia, serif;
-  --font-sans: "IBM Plex Sans", Arial, sans-serif;
-  --font-mono: "IBM Plex Mono", Consolas, monospace;
+  --font-display: "Montserrat", sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
   --color-navy-900: #183153;
   --color-navy-800: #254663;
@@ -40,6 +39,41 @@
   --success: #246B4A;
   --warning: #8A5A12;
   --danger: #A63A32;
+
+  /* COS typography contract: explicit roles, not arbitrary component sizes. */
+  --cos-font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --cos-font-display: "Montserrat", "Inter", ui-sans-serif, sans-serif;
+  --cos-font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --cos-text-display: 2.25rem;
+  --cos-leading-display: 2.75rem;
+  --cos-text-page-title: 1.5rem;
+  --cos-leading-page-title: 2rem;
+  --cos-text-section-title: 1.125rem;
+  --cos-leading-section-title: 1.75rem;
+  --cos-text-subsection-title: 0.875rem;
+  --cos-leading-subsection-title: 1.25rem;
+  --cos-text-card-title: 0.8125rem;
+  --cos-leading-card-title: 1.125rem;
+  --cos-text-body: 0.875rem;
+  --cos-leading-body: 1.25rem;
+  --cos-text-compact: 0.75rem;
+  --cos-leading-compact: 1rem;
+  --cos-text-eyebrow: 0.625rem;
+  --cos-leading-eyebrow: 0.875rem;
+  --cos-weight-regular: 400;
+  --cos-weight-medium: 500;
+  --cos-weight-semibold: 600;
+  --cos-weight-bold: 700;
+  --cos-weight-extrabold: 800;
+  --cos-weight-black: 900;
+  --cos-text-highest: #0C111D;
+  --cos-text-primary: #101828;
+  --cos-text-secondary: #344054;
+  --cos-text-muted: #475467;
+  --cos-text-subtle: #98A2B3;
+  --cos-text-sidebar: #AFBFDA;
+  --cos-border-subtle: #EAECF0;
+  --cos-header-height: 64px;
 }
 
 * {
@@ -58,28 +92,25 @@ body,
 }
 
 body {
-  font-family: "IBM Plex Sans", Arial, sans-serif;
+  font-family: var(--cos-font-sans);
   background: var(--paper);
   color: var(--muted);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
 }
 
 h1,
-h2 {
-  font-family: "Newsreader", Georgia, serif !important;
-  color: var(--ink);
-  letter-spacing: -0.035em;
-  text-wrap: balance;
-}
-
+h2,
 h3,
 h4,
 h5,
 h6 {
-  font-family: "IBM Plex Sans", Arial, sans-serif !important;
+  font-family: var(--cos-font-display) !important;
   color: var(--ink);
-  letter-spacing: -0.012em;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
 }
 
 button,
@@ -109,17 +140,41 @@ textarea,
 }
 
 .font-display {
-  font-family: "Newsreader", Georgia, serif !important;
+  font-family: var(--cos-font-display) !important;
 }
 
 .font-sans {
-  font-family: "IBM Plex Sans", Arial, sans-serif !important;
+  font-family: var(--cos-font-sans) !important;
 }
 
 .font-mono,
 .font-tabular-nums {
-  font-family: "IBM Plex Mono", Consolas, monospace !important;
-  font-variant-numeric: tabular-nums;
+  font-family: var(--cos-font-mono) !important;
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Semantic titles and existing uppercase badge/status utilities use the display face. */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-display,
+.uppercase {
+  font-family: var(--cos-font-display) !important;
+}
+
+.font-display.font-black,
+.uppercase.font-black,
+h1.font-black,
+h2.font-black,
+h3.font-black,
+h4.font-black,
+h5.font-black,
+h6.font-black {
+  font-weight: 900 !important;
 }
 
 /* Legacy token bridge: existing workspaces inherit the V1.2 control-ledger palette. */
@@ -238,8 +293,8 @@ main > div > header {
   background: var(--signal-soft);
   border: 1px solid #E8B7A5;
   color: var(--signal-dark);
-  font-family: "IBM Plex Mono", Consolas, monospace;
-  font-weight: 500;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 700;
   text-transform: uppercase;
 }
 
@@ -376,7 +431,7 @@ main > div > header {
 .cos-workspace-sidebar {
   background-color: #1d356d !important;
   color: #ffffff;
-  font-family: "IBM Plex Sans", Arial, sans-serif !important;
+  font-family: "Inter", ui-sans-serif, system-ui, sans-serif !important;
 }
 
 .cos-workspace-sidebar h1,
@@ -387,7 +442,7 @@ main > div > header {
 .cos-workspace-sidebar h6,
 .cos-workspace-sidebar .font-display {
   color: inherit;
-  font-family: "IBM Plex Sans", Arial, sans-serif !important;
+  font-family: "Montserrat", sans-serif !important;
 }
 
 .cos-workspace-sidebar .bg-\[\#264288\] {
@@ -423,7 +478,7 @@ main > div > header {
 .workspace-entity-scope__label {
   color: #91a9d2;
   display: block;
-  font-family: "IBM Plex Mono", Consolas, monospace;
+  font-family: "Montserrat", sans-serif;
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.12em;
@@ -489,14 +544,233 @@ main > div > header {
   background: #e8edf5;
 }
 
-.gateway-workspace-card[data-workspace="sales"] {
-  --gateway-card-accent: #0a9b72;
+.gateway-workspace-card[data-workspace="sales-marketing"] {
+  --gateway-card-accent: #4065B3;
   --gateway-card-delay: -1.5s;
 }
 
-.gateway-workspace-card[data-workspace="marketing"] {
-  --gateway-card-accent: #3f67b5;
-  --gateway-card-delay: -4.5s;
+/* Reusable typography roles and two-level title-bar architecture. */
+.cos-type-display {
+  color: var(--cos-text-highest);
+  font-family: var(--cos-font-display);
+  font-size: var(--cos-text-display);
+  font-weight: var(--cos-weight-bold);
+  letter-spacing: -0.025em;
+  line-height: var(--cos-leading-display);
+}
+
+.cos-type-page-title {
+  color: var(--cos-text-highest);
+  font-family: var(--cos-font-display);
+  font-size: var(--cos-text-page-title);
+  font-weight: var(--cos-weight-black);
+  letter-spacing: -0.02em;
+  line-height: var(--cos-leading-page-title);
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+}
+
+.cos-type-section-title {
+  color: var(--cos-text-highest);
+  font-family: var(--cos-font-display);
+  font-size: var(--cos-text-section-title);
+  font-weight: var(--cos-weight-extrabold);
+  letter-spacing: -0.015em;
+  line-height: var(--cos-leading-section-title);
+}
+
+.cos-type-card-title {
+  color: var(--cos-text-primary);
+  font-family: var(--cos-font-sans);
+  font-size: var(--cos-text-card-title);
+  font-weight: var(--cos-weight-extrabold);
+  line-height: var(--cos-leading-card-title);
+}
+
+.cos-type-eyebrow {
+  color: var(--cos-text-muted);
+  font-family: var(--cos-font-display);
+  font-size: var(--cos-text-eyebrow);
+  font-weight: var(--cos-weight-black);
+  letter-spacing: 0.1em;
+  line-height: var(--cos-leading-eyebrow);
+  text-transform: uppercase;
+}
+
+.cos-type-supporting {
+  color: var(--cos-text-muted);
+  font-family: var(--cos-font-sans);
+  font-size: var(--cos-text-compact);
+  font-weight: var(--cos-weight-regular);
+  line-height: var(--cos-leading-body);
+}
+
+.cos-global-topbar {
+  min-height: var(--cos-header-height);
+  border-bottom: 1px solid var(--cos-border-subtle);
+  background: #FFFFFF;
+}
+
+.cos-page-titlebar {
+  align-items: flex-start;
+  border-bottom: 1px solid var(--cos-border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+}
+
+.cos-page-titlebar__copy {
+  min-width: 0;
+}
+
+.cos-page-titlebar__title {
+  margin-top: 0.25rem;
+}
+
+.cos-page-titlebar__subtitle {
+  margin-top: 0.25rem;
+  max-width: 42rem;
+}
+
+.cos-page-titlebar__actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.cos-section-titlebar {
+  align-items: flex-start;
+  border-bottom: 1px solid var(--cos-border-subtle);
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+}
+
+.cos-section-titlebar__detail {
+  color: var(--cos-text-muted);
+  font-size: 0.6875rem;
+  line-height: 1rem;
+  margin-top: 0.25rem;
+}
+
+@media (min-width: 1024px) {
+  .cos-page-titlebar {
+    align-items: center;
+    flex-direction: row;
+    justify-content: space-between;
+    min-height: 72px;
+    padding: 1.25rem 1.5rem;
+  }
+
+  .cos-page-titlebar__actions {
+    flex-shrink: 0;
+    justify-content: flex-end;
+    width: auto;
+  }
+}
+
+@media (max-width: 767px) {
+  .cos-type-page-title {
+    font-size: 1.125rem;
+    line-height: 1.5rem;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 1rem !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .cos-type-page-title {
+    font-size: 1.25rem;
+    line-height: 1.625rem;
+  }
+
+  .cos-page-titlebar__actions {
+    width: 100%;
+  }
+}
+
+/* Existing shells consume the semantic roles without changing their layouts. */
+.cos-workspace-sidebar nav button,
+.cos-workspace-sidebar input,
+.cos-workspace-sidebar select {
+  font-family: var(--cos-font-sans) !important;
+}
+
+.cos-workspace-sidebar nav button {
+  font-weight: var(--cos-weight-semibold);
+  line-height: 1.25rem;
+}
+
+.cos-workspace-sidebar nav > div > p,
+.cos-workspace-sidebar [class*="tracking-"][class*="uppercase"] {
+  font-family: var(--cos-font-display) !important;
+  font-weight: var(--cos-weight-extrabold);
+}
+
+.management-canvas h1.text-2xl {
+  color: var(--cos-text-highest) !important;
+  font-family: var(--cos-font-display) !important;
+  font-size: var(--cos-text-page-title) !important;
+  font-weight: var(--cos-weight-black) !important;
+  letter-spacing: -0.02em !important;
+  line-height: var(--cos-leading-page-title) !important;
+  text-transform: uppercase;
+}
+
+.management-canvas h3.text-xs.font-black.uppercase {
+  color: var(--cos-text-highest) !important;
+  font-family: var(--cos-font-display) !important;
+  font-size: var(--cos-text-subsection-title) !important;
+  font-weight: var(--cos-weight-extrabold) !important;
+  letter-spacing: 0.05em !important;
+  line-height: var(--cos-leading-subsection-title) !important;
+}
+
+.design-system-platform h1.font-black {
+  color: var(--cos-text-highest) !important;
+  font-size: var(--cos-text-page-title) !important;
+  font-weight: var(--cos-weight-black) !important;
+  letter-spacing: -0.02em !important;
+  line-height: var(--cos-leading-page-title) !important;
+  text-transform: uppercase;
+}
+
+.management-canvas h4:not([class*="text-lg"]),
+.content-social-module article h3,
+.sm-platform-v11 article h3 {
+  font-size: var(--cos-text-card-title);
+  line-height: var(--cos-leading-card-title);
+}
+
+.content-social-module label,
+.sm-platform-v11 label,
+.management-platform label {
+  color: var(--cos-text-secondary);
+  font-weight: var(--cos-weight-bold);
+  letter-spacing: 0.015em;
+}
+
+.content-social-module th,
+.sm-platform-v11 th,
+.management-platform th {
+  font-family: var(--cos-font-sans);
+  font-weight: var(--cos-weight-semibold);
+  letter-spacing: 0.05em;
+}
+
+.content-social-module td,
+.sm-platform-v11 td,
+.management-platform td {
+  font-family: var(--cos-font-sans);
+  font-weight: var(--cos-weight-medium);
 }
 
 .gateway-workspace-card[data-workspace="management"] {
@@ -578,6 +852,7 @@ main > div > header {
 }
 
 .workspace-logo-watermark {
+  opacity: 0.085;
   z-index: 0;
 }
 
@@ -586,15 +861,20 @@ main > div > header {
   z-index: 1;
 }
 
-/* Shared feedback for genuinely interactive card surfaces. */
+/* Shared enterprise card surface and restrained lift feedback. */
 [data-card-surface],
 [data-interactive-card],
 .gateway-workspace-card {
+  background-color: #ffffff !important;
+  border: 1px solid #D9E0EA !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 1px 2px rgba(15, 31, 65, 0.045) !important;
+  cursor: pointer;
   transition:
     background-color 180ms ease,
-    border-color 180ms ease,
-    box-shadow 180ms ease,
-    transform 180ms ease !important;
+    border-color 200ms ease,
+    box-shadow 200ms ease,
+    transform 200ms ease !important;
 }
 
 :is(
@@ -613,13 +893,96 @@ main > div > header {
   .gateway-workspace-card
 ):focus-within,
 .card-interaction-selected {
-  transition-duration: 180ms !important;
-  border-color: #4065B3 !important;
+  border-color: rgba(21, 94, 239, 0.6) !important;
+  box-shadow: 0 10px 24px rgba(15, 31, 65, 0.12) !important;
+  transform: translateY(-2px);
+}
+
+/* Shared Sales, Marketing, and Management sidebar navigation states. */
+.cos-workspace-sidebar nav > button,
+.cos-workspace-sidebar nav > div > button {
+  border-left: 4px solid transparent;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease,
+    color 180ms ease !important;
+}
+
+.cos-workspace-sidebar nav > button svg,
+.cos-workspace-sidebar nav > div > button svg {
+  transform-origin: center;
+  transition: transform 180ms ease, color 180ms ease;
+}
+
+.cos-workspace-sidebar nav > button:hover,
+.cos-workspace-sidebar nav > button:focus-visible,
+.cos-workspace-sidebar nav > div > button:hover,
+.cos-workspace-sidebar nav > div > button:focus-visible {
+  transform: translateX(0.25rem);
+  border-left-color: #38BDF8 !important;
+  background-color: rgba(37, 70, 99, 0.92) !important;
+  color: #FFFFFF !important;
+}
+
+.cos-workspace-sidebar nav > button:hover svg,
+.cos-workspace-sidebar nav > button:focus-visible svg,
+.cos-workspace-sidebar nav > div > button:hover svg,
+.cos-workspace-sidebar nav > div > button:focus-visible svg {
+  color: #7DD3FC !important;
+  transform: scale(1.16);
+}
+
+.cos-workspace-sidebar nav > button[class~="bg-[#264288]"],
+.cos-workspace-sidebar nav > div > button[class~="bg-[#264288]"] {
+  border-left: 4px solid #FBBF24 !important;
+  background: linear-gradient(90deg, #355D7E 0%, #203F61 100%) !important;
   box-shadow:
-    inset 0 0 0 9999px rgba(238, 243, 251, 0.32),
-    0 0 0 4px rgba(64, 101, 179, 0.14),
-    0 14px 30px rgba(24, 42, 92, 0.13) !important;
-  transform: translateY(-1px);
+    0 0 0 1px rgba(251, 191, 36, 0.2),
+    0 0 16px rgba(251, 191, 36, 0.12) !important;
+  color: #FFFFFF !important;
+}
+
+.cos-workspace-sidebar nav > button[class~="bg-[#264288]"] svg,
+.cos-workspace-sidebar nav > div > button[class~="bg-[#264288]"] svg {
+  color: #FBBF24 !important;
+  filter: drop-shadow(0 0 5px rgba(251, 191, 36, 0.28));
+}
+
+.cos-workspace-sidebar nav > div > div > button {
+  min-height: 30px;
+  border-left: 2px solid transparent;
+  border-radius: 4px;
+  padding: 0.35rem 0.55rem;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease !important;
+}
+
+.cos-workspace-sidebar nav > div > div > button:hover,
+.cos-workspace-sidebar nav > div > div > button:focus-visible {
+  transform: translateX(0.25rem);
+  border-left-color: #38BDF8;
+  background-color: rgba(56, 189, 248, 0.12);
+  color: #FFFFFF !important;
+}
+
+.cos-workspace-sidebar nav > div > div > button[class~="text-white"][class~="font-bold"] {
+  transform: translateX(0.125rem);
+  border-left-color: #FBBF24;
+  background-color: rgba(251, 191, 36, 0.13);
+  color: #FEF3C7 !important;
+  font-weight: 700;
+}
+
+.cos-workspace-sidebar nav > div > div > button[class~="text-white"][class~="font-bold"]:hover,
+.cos-workspace-sidebar nav > div > div > button[class~="text-white"][class~="font-bold"]:focus-visible {
+  transform: translateX(0.35rem);
+  border-left-color: #FBBF24;
+  background-color: rgba(251, 191, 36, 0.18);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -630,6 +993,17 @@ main > div > header {
   }
 
   .card-interaction-selected {
+    transform: none;
+  }
+
+  .cos-workspace-sidebar nav button,
+  .cos-workspace-sidebar nav button svg {
+    transition: none !important;
+  }
+
+  .cos-workspace-sidebar nav button:hover,
+  .cos-workspace-sidebar nav button:focus-visible,
+  .cos-workspace-sidebar nav button[class~="text-white"][class~="font-bold"] {
     transform: none;
   }
 }
@@ -643,7 +1017,7 @@ main > div > header {
 .evidence-rail dt {
   margin-bottom: 2px;
   color: #7A838C;
-  font: 500 10px/1.4 "IBM Plex Mono", Consolas, monospace;
+  font: 500 10px/1.4 "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
   letter-spacing: .06em;
   text-transform: uppercase;
 }
@@ -652,7 +1026,7 @@ main > div > header {
   margin: 0;
   overflow: hidden;
   color: var(--ink);
-  font: 400 11px/1.45 "IBM Plex Mono", Consolas, monospace;
+  font: 400 11px/1.45 "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -660,6 +1034,295 @@ main > div > header {
 @media (max-width: 767px) {
   .evidence-rail {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* COS dual-rail navigation contract. */
+.dual-rail-sidebar {
+  background: #061B3A !important;
+  isolation: isolate;
+  position: relative;
+  z-index: 30;
+}
+
+.dual-rail-sidebar .contextual-rail {
+  background: #0B3672;
+  border-right: 1px solid #082B5B;
+}
+
+.dual-rail-sidebar .workspace-entity-scope {
+  background: #0B3672;
+  border-bottom-color: #082B5B;
+  padding: 12px 16px;
+}
+
+/* Content & Social: approved COS v1.1 operational surface. */
+.sm-platform-v11,
+.sm-platform-v11 .bg-\[\#F7F9FC\] {
+  background-color: #F7F9FC !important;
+}
+
+.content-social-module .rounded-2xl {
+  border-radius: 1rem !important;
+}
+
+.content-social-module .rounded-xl {
+  border-radius: 0.75rem !important;
+}
+
+.content-social-module article,
+.content-social-module section,
+.content-social-module [data-card-ignore] {
+  cursor: default;
+}
+
+.cs-button-primary,
+.cs-button-secondary,
+.cs-button-small,
+.cs-button-small-muted,
+.cs-link,
+.cs-icon-button {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+  transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.cs-button-primary,
+.cs-button-secondary {
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.cs-button-primary {
+  background: #155EEF;
+  border-color: #155EEF;
+  color: #fff;
+}
+
+.cs-button-primary:hover {
+  background: #004EEB;
+  border-color: #004EEB;
+}
+
+.cs-button-secondary {
+  background: #fff;
+  border-color: #CBD5E2;
+  color: #34445E;
+}
+
+.cs-button-secondary:hover {
+  border-color: #155EEF;
+  color: #155EEF;
+}
+
+.cs-button-small,
+.cs-button-small-muted {
+  border: 1px solid #CBD5E2;
+  border-radius: 0.45rem;
+  gap: 0.35rem;
+  min-height: 2.25rem;
+  padding: 0 0.7rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.cs-button-small {
+  background: #155EEF;
+  border-color: #155EEF;
+  color: #fff;
+}
+
+.cs-button-small:hover {
+  background: #004EEB;
+}
+
+.cs-button-small-muted {
+  background: #fff;
+  color: #52617A;
+}
+
+.cs-link {
+  color: #155EEF;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.cs-link:hover {
+  color: #004EEB;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.cs-icon-button {
+  border-radius: 0.5rem;
+  color: #52617A;
+  height: 2.5rem;
+  width: 2.5rem;
+}
+
+.cs-icon-button:hover {
+  background: #F1F4F8;
+  color: #155EEF;
+}
+
+.cs-input {
+  background: #fff;
+  border: 1px solid #CBD5E2;
+  border-radius: 0.5rem;
+  color: #172B4D;
+  display: block;
+  font-size: 0.78rem;
+  min-height: 2.75rem;
+  padding: 0.65rem 0.75rem;
+  width: 100%;
+}
+
+.cs-input:focus {
+  border-color: #155EEF;
+  box-shadow: 0 0 0 3px rgba(21, 94, 239, 0.12);
+  outline: none;
+}
+
+.cs-record-row {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  min-height: 4.5rem;
+  padding: 0.85rem 1.25rem;
+  text-align: left;
+  width: 100%;
+}
+
+.cs-record-row:hover {
+  background: #F4F7FC;
+}
+
+@media (max-width: 640px) {
+  .content-social-module .cs-record-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .content-social-module table {
+    font-size: 0.72rem;
+  }
+}
+
+.dual-rail-sidebar .workspace-entity-scope__label {
+  display: none;
+}
+
+.dual-rail-sidebar .workspace-entity-scope__row {
+  align-items: center;
+  display: flex;
+  gap: 7px;
+  min-width: 0;
+}
+
+.dual-rail-sidebar .workspace-entity-scope__icon {
+  color: #2F7BFF;
+  flex: 0 0 auto;
+}
+
+.dual-rail-sidebar .workspace-entity-scope__select {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  flex: 1 1 auto;
+  font-size: 12px;
+  min-height: 30px;
+  min-width: 0;
+  padding: 0;
+}
+
+.dual-rail-sidebar .workspace-entity-scope__modes {
+  background: rgba(6, 27, 58, 0.72);
+  border-color: #31558B;
+  border-radius: 8px;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0;
+  margin-top: 0;
+  padding: 2px;
+}
+
+.dual-rail-sidebar .workspace-entity-scope__mode {
+  min-height: 24px;
+  padding: 0 10px;
+}
+
+.dual-rail-sidebar .workspace-entity-scope__mode[data-active="true"] {
+  background: #155EEF;
+}
+
+#management-context-routes > div > button {
+  display: none;
+}
+
+#management-context-routes > div > div:last-child {
+  border-left: 0;
+  margin: 0;
+  padding: 0;
+}
+
+#management-context-routes > div > div:last-child button {
+  border-left: 4px solid transparent;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1rem;
+  min-height: 44px;
+  padding: 0 12px;
+}
+
+.dual-rail-context-nav button {
+  border-left: 1px solid transparent;
+  min-height: 34px;
+  position: relative;
+  transition: all 200ms ease !important;
+}
+
+.dual-rail-context-nav button:hover,
+.dual-rail-context-nav button:focus-visible {
+  background: rgba(8, 43, 91, 0.72) !important;
+  border-left: 4px solid #38BDF8 !important;
+  color: #ffffff !important;
+  transform: translateX(0.25rem);
+}
+
+.dual-rail-context-nav button[class*="bg-[#264288]"],
+.dual-rail-context-nav button.text-white.font-bold {
+  background-image: linear-gradient(135deg, #155EEF, #2970FF) !important;
+  border-left: 4px solid #FCD34D !important;
+  color: #ffffff !important;
+  font-weight: 700;
+  padding-right: 1.75rem;
+}
+
+.dual-rail-context-nav button[class*="bg-[#264288]"]::after,
+.dual-rail-context-nav button.text-white.font-bold::after {
+  background: #FCD34D;
+  border-radius: 999px;
+  content: "";
+  height: 6px;
+  position: absolute;
+  right: 0.7rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+}
+
+@media (max-width: 767px) {
+  .dual-rail-sidebar {
+    width: 4rem !important;
   }
 }
 
