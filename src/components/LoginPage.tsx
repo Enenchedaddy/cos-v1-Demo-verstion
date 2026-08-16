@@ -17,7 +17,7 @@ export default function LoginPage() {
     else if (!EMAIL_PATTERN.test(email)) nextErrors.email = 'Enter a valid email address.';
     if (!password) nextErrors.password = 'Password is required.';
     else if (password.length < MIN_PASSWORD_LENGTH) nextErrors.password = `Password must be at least ${MIN_PASSWORD_LENGTH} characters.`;
-    if (!workspace) nextErrors.workspace = 'Choose an operating workspace.';
+    if (!workspace) nextErrors.workspace = 'Choose a destination.';
     setErrors(nextErrors);
 
     if (Object.keys(nextErrors).length === 0) {
@@ -28,14 +28,12 @@ export default function LoginPage() {
 
   return (
     <AuthLayout
-      eyebrow="Secure access"
       title="Welcome back"
-      description="Sign in with your COS identity and choose the workspace you need today."
-      footer={<>New to COS? <a className="font-semibold text-[#335AA8] hover:underline" href="/signup">Create an account</a></>}
+      footer={<>New to COS? <a className="font-semibold text-[#335AA8] hover:underline" href="/signup">Create account</a></>}
     >
-      <form className="space-y-5" onSubmit={handleSubmit} noValidate>
-        <AuthField id="login-email" label="Work email" type="email" autoComplete="email" placeholder="name@company.com" value={email} onChange={(event) => setEmail(event.target.value)} error={errors.email} required />
-        <AuthField id="login-password" label="Password" type="password" autoComplete="current-password" placeholder="Enter your password" value={password} onChange={(event) => setPassword(event.target.value)} error={errors.password} required minLength={MIN_PASSWORD_LENGTH} />
+      <form className="space-y-6" onSubmit={handleSubmit} noValidate>
+        <AuthField id="login-email" label="Work email" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} error={errors.email} required />
+        <AuthField id="login-password" label="Password" type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} error={errors.password} required minLength={MIN_PASSWORD_LENGTH} />
         <WorkspaceField value={workspace} onChange={setWorkspace} error={errors.workspace} />
         <AuthSubmitButton>Sign in to workspace</AuthSubmitButton>
       </form>

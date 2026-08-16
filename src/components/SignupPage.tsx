@@ -22,7 +22,7 @@ export default function SignupPage() {
     else if (password.length < MIN_PASSWORD_LENGTH) nextErrors.password = `Password must be at least ${MIN_PASSWORD_LENGTH} characters.`;
     if (!confirmPassword) nextErrors.confirmPassword = 'Confirm your password.';
     else if (confirmPassword !== password) nextErrors.confirmPassword = 'Passwords do not match.';
-    if (!workspace) nextErrors.workspace = 'Choose an operating workspace.';
+    if (!workspace) nextErrors.workspace = 'Choose a destination.';
     setErrors(nextErrors);
 
     if (Object.keys(nextErrors).length === 0) {
@@ -33,18 +33,14 @@ export default function SignupPage() {
 
   return (
     <AuthLayout
-      eyebrow="Identity registration"
       title="Create your account"
-      description="Set up your COS identity and select the operating workspace you will use first."
       footer={<>Already registered? <a className="font-semibold text-[#335AA8] hover:underline" href="/login">Sign in</a></>}
     >
-      <form className="space-y-4" onSubmit={handleSubmit} noValidate>
-        <AuthField id="signup-name" label="Full name" type="text" autoComplete="name" placeholder="Your full name" value={name} onChange={(event) => setName(event.target.value)} error={errors.name} required />
-        <AuthField id="signup-email" label="Work email" type="email" autoComplete="email" placeholder="name@company.com" value={email} onChange={(event) => setEmail(event.target.value)} error={errors.email} required />
-        <div className="grid gap-4 sm:grid-cols-2">
-          <AuthField id="signup-password" label="Password" type="password" autoComplete="new-password" placeholder="8+ characters" value={password} onChange={(event) => setPassword(event.target.value)} error={errors.password} required minLength={MIN_PASSWORD_LENGTH} />
-          <AuthField id="signup-confirm-password" label="Confirm password" type="password" autoComplete="new-password" placeholder="Repeat password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} error={errors.confirmPassword} required minLength={MIN_PASSWORD_LENGTH} />
-        </div>
+      <form className="space-y-6" onSubmit={handleSubmit} noValidate>
+        <AuthField id="signup-name" label="Full name" type="text" autoComplete="name" value={name} onChange={(event) => setName(event.target.value)} error={errors.name} required />
+        <AuthField id="signup-email" label="Work email" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} error={errors.email} required />
+        <AuthField id="signup-password" label="Password" type="password" autoComplete="new-password" value={password} onChange={(event) => setPassword(event.target.value)} error={errors.password} required minLength={MIN_PASSWORD_LENGTH} />
+        <AuthField id="signup-confirm-password" label="Confirm password" type="password" autoComplete="new-password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} error={errors.confirmPassword} required minLength={MIN_PASSWORD_LENGTH} />
         <WorkspaceField value={workspace} onChange={setWorkspace} error={errors.workspace} />
         <AuthSubmitButton>Create account</AuthSubmitButton>
       </form>
