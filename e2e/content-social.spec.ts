@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 const browserErrors = new WeakMap<object, string[]>();
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page }, testInfo) => {
   const errors: string[] = [];
   browserErrors.set(page, errors);
   page.on('pageerror', (error) => errors.push(error.message));
@@ -12,8 +12,11 @@ test.beforeEach(async ({ page }) => {
   });
   await page.goto('/');
   await page.getByRole('button', { name: 'Authenticate and enter Sales & Marketing Platform' }).click();
-  await page.getByRole('button', { name: 'Content & Social' }).waitFor();
-  await page.getByRole('button', { name: 'Content & Social' }).click();
+  const contentArea = testInfo.project.name === 'mobile-chromium'
+    ? page.getByLabel('Content & Social')
+    : page.getByLabel('Sales and Marketing modules').getByRole('button', { name: 'Content & Social', exact: true });
+  await contentArea.waitFor();
+  await contentArea.click();
 });
 
 test('opens the unified Content & Social workspace and creates a governed idea', async ({ page }, testInfo) => {

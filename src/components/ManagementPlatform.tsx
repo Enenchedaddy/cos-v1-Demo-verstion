@@ -7,7 +7,9 @@ import React, { useState } from 'react';
 import COSLogoWatermark from './COSLogoWatermark';
 import HexLoader from './HexLoader';
 import SidebarEntityScope from './SidebarEntityScope';
-import { ContextRailHeader, ContextRailSearch, GlobalIconRail, type RailArea } from './DualRailNavigation';
+import { MANAGEMENT_RAIL_AREAS } from '../navigation/management';
+import ManagementSidebar from './ManagementSidebar';
+import { ContextRailHeader, ContextRailSearch, ExpandedSidebarNavigation, GlobalIconRail } from './DualRailNavigation';
 import { Company, Deal, Quote, Order, Invoice, CylinderBalance, SupportTicket, Campaign, AuditLog, ApprovalRequest, Product } from '../types';
 import { 
   Users, TrendingUp, Percent, FileText, Activity, MessageSquare, ArrowRight, Plus, Check, AlertTriangle, 
@@ -38,17 +40,6 @@ interface ManagementPlatformProps {
   onLogoutToGateway?: () => void;
 }
 
-const MANAGEMENT_RAIL_AREAS: readonly RailArea[] = [
-  { id: 'home', label: 'Command Home', icon: Activity },
-  { id: 'performance', label: 'Performance & Business Units', icon: BarChart2 },
-  { id: 'governance', label: 'Governance & Audit', icon: Shield },
-  { id: 'strategy', label: 'Strategy & Planning', icon: Sliders },
-  { id: 'organisation', label: 'Organisation & Headcount', icon: Users },
-  { id: 'acquisitions', label: 'M&A Acquisitions', icon: Briefcase },
-  { id: 'alerts', label: 'Alerts & Policies', icon: AlertCircle },
-  { id: 'group-admin', label: 'Entity Registry', icon: Settings },
-];
-
 export default function ManagementPlatform({
   companies,
   deals,
@@ -78,10 +69,44 @@ export default function ManagementPlatform({
   const [acquisitionsSubTab, setAcquisitionsSubTab] = useState<'pipeline' | 'day-100'>('pipeline');
   const [alertsSubTab, setAlertsSubTab] = useState<'rules' | 'knowledge' | 'feed'>('rules');
   const [groupAdminSubTab, setGroupAdminSubTab] = useState<'registry' | 'profile' | 'evidence' | 'offtake' | 'hub'>('registry');
+  const [sidebarSearch, setSidebarSearch] = useState('');
+  const [sidebarMode, setSidebarMode] = useState<'global' | 'contextual'>('global');
 
   // Simulated view state overrides ('loaded' | 'empty' | 'loading' | 'error' | 'restricted')
   const [simulatedState, setSimulatedState] = useState<'loaded' | 'empty' | 'loading' | 'error' | 'restricted'>('loaded');
   const activeRailArea = MANAGEMENT_RAIL_AREAS.find((area) => area.id === activeTab) ?? MANAGEMENT_RAIL_AREAS[0];
+  const activeManagementChild = activeTab === 'home' ? homeSubTab
+    : activeTab === 'performance' ? performanceSubTab
+      : activeTab === 'governance' ? governanceSubTab
+        : activeTab === 'strategy' ? strategySubTab
+          : activeTab === 'organisation' ? organisationSubTab
+            : activeTab === 'acquisitions' ? acquisitionsSubTab
+              : activeTab === 'alerts' ? alertsSubTab
+                : groupAdminSubTab;
+
+  const selectManagementArea = (id: string) => {
+    if (!MANAGEMENT_RAIL_AREAS.some((area) => area.id === id)) return;
+    setActiveTab(id as typeof activeTab);
+    setSimulatedState('loaded');
+    setSidebarSearch('');
+    setSidebarMode('contextual');
+  };
+
+  const selectManagementChild = (parentId: string, childId: string) => {
+    const parent = MANAGEMENT_RAIL_AREAS.find((area) => area.id === parentId);
+    if (!parent?.children?.some((child) => child.id === childId)) return;
+    setActiveTab(parentId as typeof activeTab);
+    setSimulatedState('loaded');
+    setSidebarSearch('');
+    if (parentId === 'home') setHomeSubTab(childId as typeof homeSubTab);
+    if (parentId === 'performance') setPerformanceSubTab(childId as typeof performanceSubTab);
+    if (parentId === 'governance') setGovernanceSubTab(childId as typeof governanceSubTab);
+    if (parentId === 'strategy') setStrategySubTab(childId as typeof strategySubTab);
+    if (parentId === 'organisation') setOrganisationSubTab(childId as typeof organisationSubTab);
+    if (parentId === 'acquisitions') setAcquisitionsSubTab(childId as typeof acquisitionsSubTab);
+    if (parentId === 'alerts') setAlertsSubTab(childId as typeof alertsSubTab);
+    if (parentId === 'group-admin') setGroupAdminSubTab(childId as typeof groupAdminSubTab);
+  };
 
   // Search query state
   const [searchQuery, setSearchQuery] = useState('');
@@ -175,16 +200,27 @@ export default function ManagementPlatform({
     <div className="management-platform sales-platform-theme flex h-screen overflow-hidden bg-[#F7F9FC] font-sans relative">
       
       {/* Standardized dual-rail navigation */}
+      <ManagementSidebar
+        activeArea={activeRailArea}
+        activeChildId={activeManagementChild}
+        mode={sidebarMode}
+        onAreaSelect={selectManagementArea}
+        onChildSelect={selectManagementChild}
+        onBackToMain={() => setSidebarMode('global')}
+        onClose={onLogoutToGateway}
+      />
       <aside
         id="management-sidebar"
         aria-label="Management navigation"
-        className="dual-rail-sidebar cos-workspace-sidebar flex h-full w-[66px] shrink-0 overflow-visible border-r border-[#082B5B] text-white md:w-[382px]"
+        className="dual-rail-sidebar cos-workspace-sidebar h-full w-[66px] shrink-0 overflow-visible border-r border-[#082B5B] text-white md:w-[382px]"
+        aria-hidden="true"
+        style={{ display: 'none' }}
       >
         <GlobalIconRail
           areas={MANAGEMENT_RAIL_AREAS}
           activeId={activeTab}
           initials="OR"
-          onSelect={(id) => { setActiveTab(id as typeof activeTab); setSimulatedState('loaded'); }}
+          onSelect={selectManagementArea}
           onExit={onLogoutToGateway}
         />
         <div className="contextual-rail hidden min-h-0 w-[316px] flex-1 flex-col bg-[#0B3672] md:flex">
@@ -201,10 +237,20 @@ export default function ManagementPlatform({
             groupScopes={['OG • Operating Group', 'COS • Consolidated Group']}
           />
 
-          <ContextRailSearch navId="management-context-routes" />
+          <ContextRailSearch value={sidebarSearch} onChange={setSidebarSearch} />
+
+          <ExpandedSidebarNavigation
+            items={MANAGEMENT_RAIL_AREAS}
+            activeParentId={activeTab}
+            activeChildId={activeManagementChild}
+            query={sidebarSearch}
+            ariaLabel="Management modules and views"
+            onParentSelect={selectManagementArea}
+            onChildSelect={selectManagementChild}
+          />
 
           {/* Navigation Items */}
-          <nav id="management-context-routes" className="dual-rail-context-nav flex-1 p-4">
+          {false && <nav id="management-context-routes" className="dual-rail-context-nav flex-1 p-4">
             
             {/* HOME CATEGORY */}
             <div className={activeTab === 'home' ? '' : 'hidden'}>
@@ -459,7 +505,7 @@ export default function ManagementPlatform({
               )}
             </div>
 
-          </nav>
+          </nav>}
         </div>
 
         {/* Bottom profile info */}

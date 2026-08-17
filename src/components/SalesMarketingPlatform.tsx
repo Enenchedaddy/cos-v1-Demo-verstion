@@ -2,7 +2,6 @@ import React, { useMemo, useState } from 'react';
 import {
   Activity,
   AlertTriangle,
-  BarChart3,
   Bell,
   BriefcaseBusiness,
   CalendarDays,
@@ -10,45 +9,28 @@ import {
   ChevronRight,
   CircleDollarSign,
   ClipboardCheck,
-  FileText,
-  Handshake,
-  HeartHandshake,
-  Home,
   ListTodo,
   LockKeyhole,
   Megaphone,
   Plus,
-  Radio,
   RefreshCw,
   Search,
-  Settings,
   ShieldCheck,
-  ShoppingCart,
   Sparkles,
-  Target,
   TrendingUp,
   UserPlus,
-  Users,
-  Workflow,
   X,
   type LucideIcon,
 } from 'lucide-react';
 import COSLogoWatermark from './COSLogoWatermark';
 import ContentSocialModule from '../content-social/ContentSocialModule';
-import { ContextRailHeader, GlobalRailBrand } from './DualRailNavigation';
+import { SALES_MARKETING_NAVIGATION_AREAS, type SalesMarketingNavigationArea } from '../navigation/salesMarketing';
+import SalesMarketingSidebar from './SalesMarketingSidebar';
 import { PageTitleBar, SectionTitleBar } from './Typography';
 import type { ApprovalRequest, AuditLog, Campaign, Company, Deal } from '../types';
 
 type WorkspaceState = 'loaded' | 'empty' | 'loading' | 'error' | 'restricted';
 type CreationType = 'deal' | 'task' | 'lead';
-
-interface NavigationArea {
-  id: string;
-  label: string;
-  shortLabel: string;
-  icon: LucideIcon;
-  routes: readonly string[];
-}
 
 interface TaskRecord {
   id: string;
@@ -96,22 +78,6 @@ interface SalesMarketingPlatformProps {
   onLogoutToGateway?: () => void;
 }
 
-const NAVIGATION_AREAS: readonly NavigationArea[] = [
-  { id: 'home', label: 'Home', shortLabel: 'Home', icon: Home, routes: ['My Work', 'Team View', 'Client View', 'Alerts', 'Approvals', 'Master Calendar'] },
-  { id: 'strategy', label: 'Strategy & Planning', shortLabel: 'Strategy', icon: Target, routes: ['Research', 'ICPs & Personas', 'Positioning', 'Product/Offer Strategy', 'Annual & Quarterly Plans', 'GTM Plans', 'Targets', 'KPIs', 'Budgets'] },
-  { id: 'crm', label: 'CRM & Accounts', shortLabel: 'CRM', icon: Users, routes: ['Leads', 'Contacts', 'Accounts', 'Lead Capture', 'Scoring', 'Routing', 'Enrichment', 'Lists', 'Segments', 'Activity History'] },
-  { id: 'sales-execution', label: 'Sales Execution', shortLabel: 'Sales', icon: BriefcaseBusiness, routes: ['Prospecting', 'Inbox', 'Sequences', 'Calls', 'Meetings', 'Pipeline', 'Opportunities', 'Account Plans', 'Pricing', 'Quotes', 'Proposals', 'Tenders', 'Contracts', 'E-signature', 'Forecasts', 'Quotas', 'Commissions', 'Handoffs'] },
-  { id: 'campaigns', label: 'Campaigns', shortLabel: 'Campaigns', icon: Megaphone, routes: ['Campaign Portfolio', 'Briefs', 'Calendar', 'Audiences', 'Offers', 'Channels', 'Timelines', 'Dependencies', 'Budgets', 'Experiments', 'Retrospectives'] },
-  { id: 'content-social', label: 'Content & Social', shortLabel: 'Content', icon: FileText, routes: ['Overview', 'Planning & Briefs', 'Production Pipeline', 'Content Calendar', 'Approvals', 'Asset Library', 'Social Publisher', 'Community Inbox', 'Social Listening', 'Performance', 'Module Settings'] },
-  { id: 'paid-media', label: 'Paid Media', shortLabel: 'Paid Media', icon: Radio, routes: ['Media Plans', 'Campaigns', 'Audiences', 'Ads', 'Creative Testing', 'Budgets', 'Pacing', 'Optimisation', 'Conversion Tracking', 'Performance'] },
-  { id: 'lifecycle', label: 'Lifecycle & Customer Growth', shortLabel: 'Lifecycle', icon: HeartHandshake, routes: ['Customer Profiles', 'Email', 'SMS', 'WhatsApp', 'Journeys', 'Automation', 'Consent', 'Deliverability', 'Onboarding', 'Support', 'Reviews', 'Loyalty', 'Referrals', 'Customer Health', 'Renewals', 'Upselling'] },
-  { id: 'commerce', label: 'Commerce & Conversion', shortLabel: 'Commerce', icon: ShoppingCart, routes: ['Products', 'Catalogue', 'Offers', 'Promotions', 'Landing Pages', 'Forms', 'Funnels', 'Storefronts', 'Merchandising', 'Marketplaces', 'Feed Health', 'SEO/GEO', 'CRO', 'Order Signals'] },
-  { id: 'partnerships', label: 'Creators & Partnerships', shortLabel: 'Partners', icon: Handshake, routes: ['Creator Discovery', 'Outreach', 'Negotiation', 'Influencers', 'UGC', 'Sponsorships', 'Affiliates', 'Channel Partners', 'PR & Media', 'Events', 'Agreements', 'Rights', 'Deliverables', 'Commissions', 'Payouts', 'Performance'] },
-  { id: 'analytics', label: 'Analytics & Intelligence', shortLabel: 'Analytics', icon: BarChart3, routes: ['Sales Analytics', 'Marketing Analytics', 'Campaign Analytics', 'Content Analytics', 'Paid Media Analytics', 'Partnership Analytics', 'Customer Analytics', 'Attribution', 'ROI', 'LTV', 'Cohorts', 'Profitability', 'Competitor Intelligence', 'Forecasts', 'Reports', 'Tracking Health'] },
-  { id: 'commercial-ops', label: 'Commercial Operations', shortLabel: 'Operations', icon: Workflow, routes: ['Clients & Brands', 'Onboarding', 'Service Scopes', 'Requests', 'Projects', 'Tasks', 'Workload', 'Deliverables', 'SLAs', 'QA', 'Central Approvals', 'Time', 'Costs', 'Client Reporting', 'Profitability', 'SOPs'] },
-  { id: 'settings', label: 'Settings & Governance', shortLabel: 'Settings', icon: Settings, routes: ['Users', 'Roles', 'Permissions', 'Integrations', 'Workflow Automation', 'Fields', 'Taxonomies', 'Claims Rules', 'Consent', 'Privacy', 'Notifications', 'Audit', 'Security'] },
-] as const;
-
 const INITIAL_TASKS: TaskRecord[] = [
   { id: 'task-01', title: 'Approve Q3 pricing exception', owner: 'Aisha Bello', dueDate: '2026-08-12', status: 'Open' },
   { id: 'task-02', title: 'Review DELabs renewal sequence', owner: 'Marcus Hale', dueDate: '2026-08-14', status: 'In Progress' },
@@ -127,12 +93,6 @@ const INITIAL_LEADS: LeadRecord[] = [
 const formatMoney = (value: number) =>
   new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', notation: 'compact', maximumFractionDigits: 1 }).format(value);
 
-const groupRoutes = (routes: readonly string[]) => {
-  const size = Math.ceil(routes.length / 3);
-  const labels = ['Core workflows', 'Execution & delivery', 'Controls & reporting'];
-  return labels.map((label, index) => ({ label, routes: routes.slice(index * size, (index + 1) * size) })).filter((group) => group.routes.length > 0);
-};
-
 export default function SalesMarketingPlatform({
   companies,
   deals,
@@ -144,9 +104,10 @@ export default function SalesMarketingPlatform({
   onAddLog,
   onLogoutToGateway,
 }: SalesMarketingPlatformProps) {
-  const initial = NAVIGATION_AREAS.find((area) => area.id === initialArea) ?? NAVIGATION_AREAS[0];
+  const initial = SALES_MARKETING_NAVIGATION_AREAS.find((area) => area.id === initialArea) ?? SALES_MARKETING_NAVIGATION_AREAS[0];
   const [activeAreaId, setActiveAreaId] = useState(initial.id);
   const [activeRoute, setActiveRoute] = useState(initial.routes[0]);
+  const [sidebarMode, setSidebarMode] = useState<'global' | 'contextual'>('global');
   const [scopeMode, setScopeMode] = useState<'company' | 'group'>('company');
   const [workspaceState, setWorkspaceState] = useState<WorkspaceState>('loaded');
   const [areaSearch, setAreaSearch] = useState('');
@@ -158,12 +119,8 @@ export default function SalesMarketingPlatform({
   const [contentNotificationsOpen, setContentNotificationsOpen] = useState(false);
   const [creationForm, setCreationForm] = useState({ title: '', company: companies[0]?.name ?? '', owner: 'Aisha Bello', value: '', dueDate: '2026-08-31' });
 
-  const activeArea = NAVIGATION_AREAS.find((area) => area.id === activeAreaId) ?? NAVIGATION_AREAS[0];
+  const activeArea = SALES_MARKETING_NAVIGATION_AREAS.find((area) => area.id === activeAreaId) ?? SALES_MARKETING_NAVIGATION_AREAS[0];
   const ActiveAreaIcon = activeArea.icon;
-  const routeGroups = groupRoutes(activeArea.routes).map((group) => ({
-    ...group,
-    routes: group.routes.filter((route) => route.toLowerCase().includes(areaSearch.trim().toLowerCase())),
-  })).filter((group) => group.routes.length > 0);
 
   const allRecords = useMemo<InspectableRecord[]>(() => {
     const accountRecords = companies.map((company) => ({
@@ -238,9 +195,18 @@ export default function SalesMarketingPlatform({
   const visibleRecords = allRecords.filter((record) => areaKinds[activeAreaId]?.includes(record.kind))
     .filter((record) => `${record.title} ${record.subtitle} ${record.owner} ${record.status}`.toLowerCase().includes(globalSearch.trim().toLowerCase()));
 
-  const selectArea = (area: NavigationArea) => {
+  const selectArea = (area: SalesMarketingNavigationArea) => {
     setActiveAreaId(area.id);
     setActiveRoute(area.routes[0]);
+    setAreaSearch('');
+    setSidebarMode('contextual');
+  };
+
+  const selectRoute = (areaId: string, route: string) => {
+    const area = SALES_MARKETING_NAVIGATION_AREAS.find((item) => item.id === areaId);
+    if (!area || !area.routes.includes(route)) return;
+    if (area.id !== activeAreaId) selectArea(area);
+    setActiveRoute(route);
     setAreaSearch('');
   };
 
@@ -271,39 +237,7 @@ export default function SalesMarketingPlatform({
 
   return (
     <div className="sm-platform-v11 relative flex h-screen overflow-hidden bg-[#F7F9FC] font-sans text-[#172B4D]">
-      <aside className="relative z-40 flex h-full w-16 shrink-0 flex-col items-center border-r border-[#082B5B] bg-[#061B3A] py-3" aria-label="Global Sales and Marketing navigation">
-        <GlobalRailBrand onActivate={() => selectArea(NAVIGATION_AREAS[0])} label="Go to Sales and Marketing home" />
-        <nav className="mt-4 flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto px-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Authoritative areas">
-          {NAVIGATION_AREAS.map((area) => {
-            const Icon = area.icon;
-            const active = area.id === activeAreaId;
-            return (
-              <button key={area.id} type="button" onClick={() => selectArea(area)} className={`group relative grid h-10 w-10 shrink-0 place-items-center rounded-lg transition-all ${active ? 'bg-[#155EEF] text-white shadow-[0_0_16px_rgba(21,94,239,0.38)]' : 'text-[#91A9D2] hover:bg-[#082B5B] hover:text-sky-300'}`} aria-label={area.label} aria-current={active ? 'page' : undefined}>
-                {active && <span className="absolute -left-2 h-5 w-1 rounded-r bg-amber-300" />}
-                <Icon size={17} aria-hidden="true" />
-                <span className="pointer-events-none absolute left-full z-50 ml-3 hidden whitespace-nowrap rounded-md bg-[#061B3A] px-2.5 py-1.5 text-[10px] font-semibold text-white shadow-lg group-hover:block">{area.label}</span>
-              </button>
-            );
-          })}
-        </nav>
-        <div className="mt-2 grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#155EEF] text-[10px] font-bold text-white" aria-label="Aisha Bello, Marketing Lead">AB</div>
-        {onLogoutToGateway && <button type="button" onClick={onLogoutToGateway} className="mt-2 grid h-10 w-10 shrink-0 place-items-center rounded-lg text-[#91A9D2] hover:bg-[#082B5B] hover:text-white" aria-label="Exit workspace"><X size={18} /></button>}
-      </aside>
-
-      <aside className="hidden h-full w-64 shrink-0 flex-col border-r border-[#082B5B] bg-[#0B3672] text-white lg:flex" aria-label={`${activeArea.label} routes`}>
-        <ContextRailHeader area={activeArea} />
-        <div className="border-b border-[#244D80] p-3">
-          <div className="flex items-center justify-between"><div><p className="text-[9px] uppercase tracking-[0.1em] text-[#91A9D2]">Entity scope</p><p className="mt-1 text-[11px] font-semibold">DL · DELabs Ltd (UK Hub)</p></div><ShieldCheck size={16} className="text-sky-300" /></div>
-          <div className="mt-3 grid grid-cols-2 rounded-lg border border-[#31558B] bg-[#061B3A]/45 p-1">
-            {(['company', 'group'] as const).map((mode) => <button key={mode} type="button" onClick={() => setScopeMode(mode)} className={`min-h-9 rounded-md text-[10px] font-bold capitalize ${scopeMode === mode ? 'bg-[#155EEF] text-white' : 'text-[#91A9D2] hover:text-white'}`}>{mode}</button>)}
-          </div>
-        </div>
-        <div className="border-b border-[#244D80] p-3"><label className="relative block"><span className="sr-only">Search this area</span><Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#91A9D2]" /><input value={areaSearch} onChange={(event) => setAreaSearch(event.target.value)} placeholder="Search this area" className="min-h-10 w-full rounded-lg border border-[#31558B] bg-[#061B3A]/45 pl-9 pr-8 text-xs text-white placeholder:text-[#91A9D2] focus:border-[#155EEF]" />{areaSearch && <button type="button" onClick={() => setAreaSearch('')} className="absolute right-1 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center text-[#91A9D2] hover:text-white" aria-label="Clear area search"><X size={13} /></button>}</label></div>
-        <nav className="min-h-0 flex-1 overflow-y-auto p-3" aria-label={`${activeArea.label} submenu`}>
-          {routeGroups.length === 0 ? <p className="p-4 text-center text-xs text-[#91A9D2]">No routes match this search.</p> : routeGroups.map((group) => <div key={group.label} className="mb-5"><p className="mb-2 px-2 text-[9px] font-bold uppercase tracking-[0.12em] text-[#7E9AC2]">{group.label}</p><div className="space-y-1">{group.routes.map((route) => <button key={route} type="button" onClick={() => setActiveRoute(route)} className={`relative flex min-h-10 w-full items-center rounded-lg border-l-4 px-3 text-left text-[11px] transition ${activeRoute === route ? 'border-amber-300 bg-gradient-to-r from-[#155EEF] to-[#2970FF] font-bold text-white' : 'border-transparent text-[#C0D0E7] hover:translate-x-1 hover:border-sky-400 hover:bg-[#082B5B] hover:text-white'}`}>{route}{activeRoute === route && <span className="absolute right-3 h-1.5 w-1.5 rounded-full bg-amber-300" />}</button>)}</div></div>)}
-        </nav>
-        <div className="border-t border-[#244D80] p-3"><div className="rounded-xl bg-[#061B3A]/55 p-3"><div className="flex items-center gap-3"><span className="grid h-9 w-9 place-items-center rounded-full bg-[#155EEF] text-[10px] font-bold">AB</span><div><p className="text-[11px] font-bold text-white">Aisha Bello</p><p className="mt-0.5 text-[9px] text-[#91A9D2]">Marketing Lead</p></div></div></div></div>
-      </aside>
+      <SalesMarketingSidebar activeArea={activeArea} activeRoute={activeRoute} mode={sidebarMode} scopeMode={scopeMode} onScopeModeChange={setScopeMode} onAreaSelect={selectArea} onRouteSelect={selectRoute} onBackToMain={() => { setSidebarMode('global'); setAreaSearch(''); }} onClose={onLogoutToGateway} />
 
       <section className="relative flex min-w-0 flex-1 flex-col overflow-hidden bg-[#F7F9FC]">
         <COSLogoWatermark />

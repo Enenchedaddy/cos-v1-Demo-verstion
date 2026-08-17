@@ -1320,6 +1320,251 @@ main > div > header {
   width: 6px;
 }
 
+/* Shared expanded workspace navigation: icon + label parents with inline submenus. */
+.cos-expanded-navigation__drill-header {
+  border-bottom: 1px solid #31558B;
+  margin: -3px -3px 9px;
+  padding: 0 3px 12px;
+}
+
+.cos-expanded-navigation__back {
+  align-items: center;
+  background: transparent;
+  border: 0 !important;
+  border-radius: 6px;
+  color: #BFD0E8;
+  display: inline-flex;
+  font-family: var(--cos-font-sans) !important;
+  font-size: 12px;
+  font-weight: 600;
+  gap: 7px;
+  min-height: 38px;
+  padding: 6px 8px;
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+.cos-expanded-navigation__back:hover,
+.cos-expanded-navigation__back:focus-visible {
+  background: #123F78 !important;
+  color: #FFFFFF;
+  outline: none;
+  transform: none !important;
+}
+
+.cos-expanded-navigation__back:focus-visible,
+.cos-expanded-navigation__parent:focus-visible {
+  box-shadow: inset 0 0 0 2px #7DD3FC;
+}
+
+.cos-expanded-navigation__drill-title {
+  align-items: center;
+  color: #FFFFFF;
+  display: flex;
+  font-family: var(--cos-font-display) !important;
+  font-size: 15px;
+  font-weight: 800;
+  gap: 9px;
+  line-height: 1.2rem;
+  margin-top: 7px;
+  min-height: 30px;
+  padding: 0 8px;
+  text-transform: uppercase;
+}
+
+.cos-expanded-navigation__drill-title svg {
+  color: #2F7BFF;
+  flex: 0 0 auto;
+}
+
+.cos-expanded-navigation__section[data-level="1"] .cos-expanded-navigation__parent[data-active="true"] {
+  background: #155EEF !important;
+}
+
+.cos-expanded-navigation__chevron {
+  color: #A9BFDF !important;
+  margin-left: auto;
+}
+
+.cos-expanded-navigation {
+  scrollbar-color: #31558B transparent;
+  scrollbar-width: thin;
+}
+
+.cos-expanded-navigation__section + .cos-expanded-navigation__section {
+  margin-top: 2px;
+}
+
+.cos-expanded-navigation__parent {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  color: #D7E3F4;
+  display: flex;
+  font-family: var(--cos-font-sans) !important;
+  font-size: 13px;
+  font-weight: 600 !important;
+  gap: 11px;
+  line-height: 1.05rem !important;
+  min-height: 44px;
+  padding: 8px 10px 8px 13px;
+  position: relative;
+  transition: background-color 220ms ease, color 220ms ease;
+  width: 100%;
+}
+
+.cos-expanded-navigation__parent:hover,
+.cos-expanded-navigation__parent:focus-visible {
+  background: #123F78;
+  color: #FFFFFF;
+  outline: none;
+}
+
+.cos-expanded-navigation__parent:focus-visible {
+  box-shadow: inset 0 0 0 2px #7DD3FC;
+}
+
+.cos-expanded-navigation__parent[data-active="true"] {
+  background: #154C95;
+  color: #FFFFFF;
+}
+
+.cos-expanded-navigation__accent {
+  background: transparent;
+  border-radius: 0 3px 3px 0;
+  bottom: 7px;
+  left: 0;
+  position: absolute;
+  top: 7px;
+  width: 3px;
+}
+
+.cos-expanded-navigation__parent[data-active="true"] .cos-expanded-navigation__accent {
+  background: #FBBF24;
+}
+
+.cos-expanded-navigation__parent svg {
+  color: #A9BFDF;
+  flex: 0 0 auto;
+  transition: color 220ms ease, transform 220ms ease;
+}
+
+.cos-expanded-navigation__parent[data-active="true"] > svg:not(.cos-expanded-navigation__chevron),
+.cos-expanded-navigation__parent:hover > svg:not(.cos-expanded-navigation__chevron) {
+  color: #FFFFFF;
+}
+
+/* Sales & Marketing two-state navigation. Scoped to avoid changing other workspaces. */
+.sm-sidebar {
+  align-self: stretch;
+  background: #061B3A;
+  color: #fff;
+  flex: 0 0 auto;
+  height: 100%;
+  position: relative;
+  z-index: 40;
+}
+
+.sm-sidebar__global,
+.sm-sidebar__panel {
+  background: #0B3672;
+  border-right: 1px solid #082B5B;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 320px;
+}
+
+.sm-sidebar__contextual { display: flex; height: 100%; }
+.sm-sidebar__contextual .dual-rail-global { background: #061B3A; }
+
+.sm-sidebar__header {
+  align-items: center;
+  border-bottom: 1px solid #244D80;
+  display: flex;
+  gap: 12px;
+  min-height: 72px;
+  padding: 12px 14px 12px 18px;
+}
+
+.sm-sidebar__header p,
+.sm-sidebar__header h2 { font-family: var(--cos-font-display); margin: 0; }
+.sm-sidebar__header p { color: #AFC8F2; font-size: 9px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+.sm-sidebar__header h2 { color: #fff; font-size: 13px; font-weight: 800; letter-spacing: .01em; line-height: 1.25; text-transform: uppercase; }
+.sm-sidebar__header button,
+.sm-sidebar__search button { align-items: center; border-radius: 4px; color: #dbe7f5; display: inline-flex; justify-content: center; min-height: 44px; min-width: 44px; }
+.sm-sidebar__header button:hover,
+.sm-sidebar__header button:focus-visible { background: #082B5B; outline: 2px solid #7DD3FC; outline-offset: -2px; }
+
+.sm-sidebar__scope { border-bottom: 1px solid #244D80; padding: 12px; }
+.sm-sidebar__scope > label,
+.sm-sidebar__search > label { color: #91A9D2; display: block; font-family: var(--cos-font-display); font-size: 9px; font-weight: 700; letter-spacing: .1em; margin-bottom: 7px; text-transform: uppercase; }
+.sm-sidebar__scope-select { align-items: center; background: rgba(6,27,58,.72); border: 1px solid #31558B; border-radius: 8px; display: flex; min-height: 36px; padding: 0 9px; }
+.sm-sidebar__scope-select svg { color: #7DD3FC; flex: 0 0 auto; }
+.sm-sidebar__scope-select select { appearance: none; background: transparent; border: 0; color: #fff; flex: 1; font: 600 11px var(--cos-font-sans); min-width: 0; padding: 0 8px; }
+.sm-sidebar__scope-select select:focus-visible { outline: 2px solid #7DD3FC; outline-offset: 4px; }
+.sm-sidebar__segments { border: 1px solid #31558B; border-radius: 8px; display: grid; grid-template-columns: 1fr 1fr; margin-top: 8px; overflow: hidden; }
+.sm-sidebar__segments button { color: #dbe7f5; font-size: 11px; font-weight: 600; min-height: 36px; }
+.sm-sidebar__segments button + button { border-left: 1px solid #31558B; }
+.sm-sidebar__segments button[data-active="true"] { background: #155EEF; color: #fff; }
+.sm-sidebar__segments button:focus-visible { outline: 2px solid #7DD3FC; outline-offset: -2px; }
+
+.sm-sidebar__global-nav,
+.sm-sidebar__submenu { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 10px 12px; scrollbar-color: #31558B transparent; scrollbar-width: thin; }
+.sm-sidebar__global-nav { flex: 1; }
+.sm-sidebar__global-nav > button,
+.sm-sidebar__submenu section > button { align-items: center; border-radius: 8px; color: #C0D0E7; display: flex; font: 500 13px var(--font-sans); gap: 12px; min-height: 44px; padding: 7px 10px 7px 12px; position: relative; text-align: left; transition: background-color 200ms ease, color 200ms ease, transform 200ms ease; width: 100%; }
+.sm-sidebar__global-nav > button:hover,
+.sm-sidebar__global-nav > button:focus-visible,
+.sm-sidebar__submenu section > button:hover,
+.sm-sidebar__submenu section > button:focus-visible { background: #082B5B; color: #fff; outline: none; transform: translateX(2px); }
+.sm-sidebar__global-nav > button:focus-visible,
+.sm-sidebar__submenu section > button:focus-visible { box-shadow: inset 0 0 0 2px #7DD3FC; }
+.sm-sidebar__global-nav > button[data-active="true"],
+.sm-sidebar__submenu section > button[data-active="true"] { background: linear-gradient(90deg, #155EEF, #2970FF); color: #fff; font-weight: 700; }
+.sm-sidebar__active-rule { background: transparent; bottom: 7px; left: 0; position: absolute; top: 7px; width: 3px; }
+[data-active="true"] > .sm-sidebar__active-rule { background: #FCD34D; }
+
+.sm-sidebar__main-menu { align-items: center; border-bottom: 1px solid #244D80; color: #fff; display: flex; font-family: var(--font-sans); font-size: 12px; font-weight: 600; gap: 8px; min-height: 46px; padding: 0 16px; text-align: left; width: 100%; }
+.sm-sidebar__main-menu:hover,
+.sm-sidebar__main-menu:focus-visible { background: #082B5B; outline: 2px solid #7DD3FC; outline-offset: -2px; }
+.sm-sidebar__search { border-bottom: 1px solid #244D80; padding: 12px; }
+.sm-sidebar__search > div { align-items: center; background: rgba(6,27,58,.72); border: 1px solid #31558B; border-radius: 8px; display: flex; padding-left: 10px; }
+.sm-sidebar__search svg { color: #91A9D2; flex: 0 0 auto; }
+.sm-sidebar__search input { background: transparent; border: 0; color: #fff; flex: 1; font-size: 12px; min-height: 42px; min-width: 0; padding: 0 8px; }
+.sm-sidebar__search input::placeholder { color: #91A9D2; }
+.sm-sidebar__search > div:focus-within { border-color: #155EEF; box-shadow: 0 0 0 2px rgba(21,94,239,.25); }
+.sm-sidebar__search input:focus { outline: none; }
+.sm-sidebar__submenu { flex: 1; }
+.sm-sidebar__submenu section + section { margin-top: 18px; }
+.sm-sidebar__submenu h3 { color: #7E9AC2; font: 700 10px var(--cos-font-display); letter-spacing: .1em; margin: 7px 10px; text-transform: uppercase; }
+.sm-sidebar__submenu section > button { font-size: 12px; min-height: 40px; }
+.sm-sidebar__empty { color: #91A9D2; font-size: 12px; line-height: 1.5; padding: 24px 12px; text-align: center; }
+
+.sm-sidebar__user { align-items: center; background: rgba(6,27,58,.72); border-top: 1px solid #244D80; display: flex; font-family: var(--font-sans); gap: 10px; min-height: 68px; padding: 10px 12px; }
+.sm-sidebar__user > span { align-items: center; background: #155EEF; border-radius: 50%; color: #fff; display: flex; font-size: 11px; font-weight: 700; height: 36px; justify-content: center; width: 36px; }
+.sm-sidebar__user div { display: flex; flex: 1; flex-direction: column; min-width: 0; }
+.sm-sidebar__user strong { font-size: 11px; }
+.sm-sidebar__user small { color: #91A9D2; font-size: 10px; }
+.sm-sidebar__user button { color: #dbe7f5; font-size: 10px; min-height: 44px; padding: 0 6px; }
+.sm-sidebar__user button:hover,
+.sm-sidebar__user button:focus-visible { color: #fff; outline: 2px solid #7DD3FC; }
+.sm-sidebar__backdrop { display: none; }
+
+@media (max-width: 1023px) {
+  .sm-sidebar { bottom: 0; left: 0; position: fixed; top: 0; }
+  .sm-sidebar__backdrop { background: rgba(21,32,43,.62); border: 0; bottom: 0; display: block; left: 0; position: fixed; right: 0; top: 0; z-index: 39; }
+  .sm-sidebar__global,
+  .sm-sidebar__panel { width: min(320px, calc(100vw - 52px)); }
+  .sm-sidebar__contextual .dual-rail-global { width: 58px; }
+  .sm-sidebar__contextual .sm-sidebar__panel { width: min(300px, calc(100vw - 58px)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sm-sidebar__global-nav > button,
+  .sm-sidebar__submenu section > button { transition: none; }
+}
+
 @media (max-width: 767px) {
   .dual-rail-sidebar {
     width: 4rem !important;

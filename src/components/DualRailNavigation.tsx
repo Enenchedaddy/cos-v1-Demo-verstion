@@ -1,12 +1,9 @@
 import React from 'react';
-import { Search, X, type LucideIcon } from 'lucide-react';
+import { ArrowLeft, ChevronRight, CircleDot, Search, X } from 'lucide-react';
 import COSLogo from './COSLogo';
+import type { ExpandedRailChild, ExpandedRailItem, RailArea } from '../navigation/types';
 
-export interface RailArea {
-  id: string;
-  label: string;
-  icon: LucideIcon;
-}
+export type { ExpandedRailChild, ExpandedRailItem, RailArea } from '../navigation/types';
 
 interface GlobalIconRailProps {
   areas: readonly RailArea[];
@@ -111,11 +108,24 @@ export function ContextRailHeader({ area }: { area: RailArea }) {
   );
 }
 
-export function ContextRailSearch({ navId }: { navId: string }) {
-  const [query, setQuery] = React.useState('');
+interface ContextRailSearchProps {
+  navId?: string;
+  value?: string;
+  onChange?: (value: string) => void;
+  placeholder?: string;
+}
+
+export function ContextRailSearch({ navId, value, onChange, placeholder = 'Search navigation...' }: ContextRailSearchProps) {
+  const [internalQuery, setInternalQuery] = React.useState('');
+  const query = value ?? internalQuery;
 
   const filterRoutes = (value: string) => {
-    setQuery(value);
+    if (onChange) {
+      onChange(value);
+      return;
+    }
+    setInternalQuery(value);
+    if (!navId) return;
     const normalized = value.trim().toLowerCase();
     document.querySelectorAll<HTMLButtonElement>(`#${navId} button`).forEach((button) => {
       const isFiltered = normalized.length > 0 && !button.textContent?.toLowerCase().includes(normalized);
@@ -126,9 +136,9 @@ export function ContextRailSearch({ navId }: { navId: string }) {
   return (
     <div className="border-b border-[#2A4E82] px-4 py-4">
       <label className="relative block">
-        <span className="sr-only">Search this area</span>
+        <span className="sr-only">Search navigation</span>
         <Search size={14} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#8EABD2]" />
-        <input value={query} onChange={(event) => filterRoutes(event.target.value)} placeholder="Search this area..." className="min-h-10 w-full rounded-xl border border-[#31558B] bg-[#061B3A]/80 pl-9 pr-9 text-sm text-white placeholder:text-[#8EABD2] focus:border-[#2F7BFF] focus:outline-none" />
+        <input value={query} onChange={(event) => filterRoutes(event.target.value)} placeholder={placeholder} className="min-h-11 w-full rounded-lg border border-[#31558B] bg-[#061B3A]/80 pl-9 pr-9 text-sm text-white placeholder:text-[#8EABD2] focus:border-[#2F7BFF] focus:outline-none focus:ring-2 focus:ring-[#2F7BFF]/25" />
         {query && (
           <button type="button" onClick={() => filterRoutes('')} className="absolute right-1 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-md text-[#8EABD2] hover:bg-[#082B5B] hover:text-white" aria-label="Clear area search">
             <X size={13} aria-hidden="true" />
@@ -136,5 +146,109 @@ export function ContextRailSearch({ navId }: { navId: string }) {
         )}
       </label>
     </div>
+  );
+}
+
+interface ExpandedSidebarNavigationProps {
+  items: readonly ExpandedRailItem[];
+  activeParentId: string;
+  activeChildId?: string;
+  query?: string;
+  ariaLabel: string;
+  onParentSelect: (id: string) => void;
+  onChildSelect: (parentId: string, childId: string) => void;
+}
+
+export function ExpandedSidebarNavigation({
+  items,
+  activeParentId,
+  activeChildId,
+  query = '',
+  ariaLabel,
+  onParentSelect,
+  onChildSelect,
+}: ExpandedSidebarNavigationProps) {
+  const [drillPath, setDrillPath] = React.useState<string[]>([]);
+  const normalizedQuery = query.trim().toLowerCase();
+
+  React.useEffect(() => {
+    if (drillPath.length > 0 && drillPath[0] !== activeParentId) setDrillPath([]);
+  }, [activeParentId, drillPath]);
+
+  const findNode = React.useCallback((path: readonly string[]) => {
+    let nodes: readonly ExpandedRailItem[] | readonly ExpandedRailChild[] = items;
+    let node: ExpandedRailItem | ExpandedRailChild | undefined;
+    for (const id of path) {
+      node = nodes.find((candidate) => candidate.id === id);
+      if (!node) return undefined;
+      nodes = node.children ?? [];
+    }
+    return node;
+  }, [items]);
+
+  const drillNode = findNode(drillPath);
+  const levelItems: readonly ExpandedRailItem[] | readonly ExpandedRailChild[] = drillNode?.children ?? items;
+
+  const visibleItems = React.useMemo(() => levelItems.filter((item) => !normalizedQuery || item.label.toLowerCase().includes(normalizedQuery)), [levelItems, normalizedQuery]);
+
+  const handleItem = (item: ExpandedRailItem | ExpandedRailChild) => {
+    const hasChildren = Boolean(item.children?.length);
+    if (hasChildren) {
+      if (drillPath.length === 0) onParentSelect(item.id);
+      setDrillPath((current) => [...current, item.id]);
+      return;
+    }
+    if (drillPath.length > 0) onChildSelect(drillPath[0], item.id);
+    else onParentSelect(item.id);
+  };
+
+  const handleBack = () => setDrillPath((current) => current.slice(0, -1));
+  const parentNode = drillPath.length > 1 ? findNode(drillPath.slice(0, -1)) : undefined;
+  const backLabel = drillPath.length > 1 ? parentNode?.label ?? 'Previous menu' : 'Main Menu';
+
+  return (
+    <nav className="cos-expanded-navigation min-h-0 flex-1 overflow-y-auto px-3 py-3" aria-label={ariaLabel}>
+      {drillPath.length > 0 && (
+        <div className="cos-expanded-navigation__drill-header">
+          <button type="button" className="cos-expanded-navigation__back" onClick={handleBack} aria-label={`Back to ${backLabel}`}>
+            <ArrowLeft size={15} aria-hidden="true" />
+            <span>Back to {backLabel}</span>
+          </button>
+          <div className="cos-expanded-navigation__drill-title" data-testid="cos-drill-title">
+            {drillNode && (() => {
+              const Icon = drillNode.icon ?? CircleDot;
+              return <Icon size={18} strokeWidth={1.8} aria-hidden="true" />;
+            })()}
+            <span>{drillNode?.label}</span>
+          </div>
+        </div>
+      )}
+      {visibleItems.length === 0 && (
+        <p className="px-3 py-8 text-center text-xs leading-5 text-[#91A9D2]">No navigation items match this search.</p>
+      )}
+      {visibleItems.map((item) => {
+        const Icon = item.icon ?? CircleDot;
+        const hasChildren = Boolean(item.children?.length);
+        const isRootItem = drillPath.length === 0;
+        const isActive = isRootItem ? item.id === activeParentId : drillPath.length === 1 && item.id === activeChildId;
+        return (
+          <div key={item.id} className="cos-expanded-navigation__section" data-level={drillPath.length}>
+            <button
+              type="button"
+              className="cos-expanded-navigation__parent"
+              data-active={isActive || undefined}
+              onClick={() => handleItem(item)}
+              aria-current={isActive ? 'page' : undefined}
+              aria-haspopup={hasChildren ? 'menu' : undefined}
+            >
+              <span className="cos-expanded-navigation__accent" aria-hidden="true" />
+              <Icon size={19} strokeWidth={1.8} aria-hidden="true" />
+              <span className="min-w-0 flex-1 text-left">{item.label}</span>
+              {hasChildren && <ChevronRight size={15} className="cos-expanded-navigation__chevron" aria-hidden="true" />}
+            </button>
+          </div>
+        );
+      })}
+    </nav>
   );
 }

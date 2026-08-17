@@ -1,41 +1,36 @@
-## Run Locally
+# Brand Circuit Central Operating System
 
-**Prerequisites:** Node.js
+## Local development
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+Prerequisite: Node.js 18 or newer.
 
-## Supabase Setup
-
-1. Copy `.env.local.example` to `.env.local` and fill the values:
-
+```bash
+npm install
+npm run dev
 ```
+
+The application runs with typed in-memory demo data by default. To enable Supabase persistence, create `.env.local` with:
+
+```bash
 VITE_SUPABASE_URL=https://your-project-ref.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-public-key
 SUPABASE_URL=https://your-project-ref.supabase.co
 SUPABASE_KEY=your-service-role-key
 ```
 
-2. In your Supabase project, open the SQL Editor and run `supabase_schema.sql` (provided in the repo) to create the tables the app expects.
+`SUPABASE_KEY` is only for `npm run seed`; it must never be exposed with a `VITE_` prefix or committed.
 
-3. Seed the demo data (optional but recommended) with:
+## Commands
 
-```
-npm run seed
-```
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Run the Vite development server on port 3000. |
+| `npm run build` | Create a production build. |
+| `npm run lint` | Run the TypeScript type check. |
+| `npm run test:run` | Run the Vitest suite once. |
+| `npm run test:e2e` | Run Playwright browser tests. |
+| `npm run seed` | Seed Supabase when the required server-side variables are present. |
 
-4. If you have Row Level Security enabled, apply the policy in `supabase_rls.sql` before seeding or runtime writes.
+## Architecture and deployment
 
-5. Start the dev server:
-
-```
-npm run dev
-```
-
-Notes:
-
-- Ensure your Supabase project's allowed origins include your dev host (e.g. `http://localhost:3000`).
-- Do not commit real keys; keep them in `.env.local` which should be ignored by git.
+Read [ARCHITECTURE.md](ARCHITECTURE.md) for ownership boundaries, the directory map, data flow, and contribution guidance. Read [SUPABASE_SETUP.md](SUPABASE_SETUP.md) and [CONTENT_SOCIAL_DEPLOYMENT.md](CONTENT_SOCIAL_DEPLOYMENT.md) before connecting or deploying Supabase.
