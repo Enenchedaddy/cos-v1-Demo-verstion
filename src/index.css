@@ -1551,6 +1551,24 @@ main > div > header {
 .sm-sidebar__user button:focus-visible { color: #fff; outline: 2px solid #7DD3FC; }
 .sm-sidebar__backdrop { display: none; }
 
+/* Workspace overlays must escape the navigation stacking context. The sidebar
+   stays above page content by default, but yields to any active dialog/popover. */
+.sm-platform-v11 > .sm-sidebar,
+.management-platform > .sm-sidebar { z-index: 40; }
+
+.sm-platform-v11:has([role="dialog"]) > .sm-sidebar,
+.management-platform:has([role="dialog"]) > .sm-sidebar,
+.management-platform:has(.absolute.z-50) > .sm-sidebar {
+  z-index: 10;
+}
+
+.sm-platform-v11:has([role="dialog"]) > section,
+.management-platform:has([role="dialog"]) > section,
+.management-platform:has(.absolute.z-50) > section {
+  position: relative;
+  z-index: 50;
+}
+
 @media (max-width: 1023px) {
   .sm-sidebar { bottom: 0; left: 0; position: fixed; top: 0; }
   .sm-sidebar__backdrop { background: rgba(21,32,43,.62); border: 0; bottom: 0; display: block; left: 0; position: fixed; right: 0; top: 0; z-index: 39; }
