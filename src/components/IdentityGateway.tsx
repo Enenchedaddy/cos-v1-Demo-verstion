@@ -1,6 +1,7 @@
 import {
   ArrowRight,
   Building2,
+  MessageSquare,
   ShieldCheck,
   Sliders,
   TrendingUp,
@@ -11,29 +12,45 @@ import COSLogoWatermark from './COSLogoWatermark';
 interface IdentityGatewayProps {
   isSupabaseConfigured: boolean;
   onOpenDesignSystem: () => void;
-  onEnterSalesMarketing: () => void;
+  onEnterSales: () => void;
+  onEnterMarketing: () => void;
   onEnterManagement: () => void;
 }
 
 const workspaces = [
   {
-    id: 'sales-marketing',
-    volume: 'Volume 2 · Sales & Marketing',
-    title: 'Sales & Marketing Platform',
+    id: 'sales',
+    volume: 'Volume 2 · Sales',
+    title: 'Sales Platform',
     description:
-      'Plan growth, manage CRM and pipeline, execute campaigns, govern content, and measure commercial performance in one workspace.',
-    fieldLabel: 'Commercial profile',
+      'Manage accounts, pipeline, governed quotes, customer signals, and commercial controls.',
+    fieldLabel: 'Sales profile',
     options: [
       'Chris Allen · Senior Sales Representative',
       'Emily Johnson · Regional Accounts Manager',
+    ],
+    contextLabel: 'Region oversight',
+    context: 'EMEA / UK regional hub',
+    icon: TrendingUp,
+    accent: '#0A9B72',
+    tint: '#EAF8F3',
+  },
+  {
+    id: 'marketing',
+    volume: 'Volume 3 · Marketing',
+    title: 'Marketing Platform',
+    description:
+      'Govern campaign planning, consent-aware audiences, creative production, and measured growth.',
+    fieldLabel: 'Marketer profile',
+    options: [
       'Aisha Bello · Marketing Director',
       'Daniel Kerr · Ad Campaigns Lead',
     ],
-    contextLabel: 'Operating context',
-    context: 'UK Hub · GDPR / PECR · CO-10',
-    icon: TrendingUp,
-    accent: '#4065B3',
-    tint: 'rgba(64, 101, 179, 0.10)',
+    contextLabel: 'Consent scope',
+    context: 'GDPR / PECR policy enforced',
+    icon: MessageSquare,
+    accent: '#3F67B5',
+    tint: '#EEF3FC',
   },
   {
     id: 'management',
@@ -57,11 +74,13 @@ const workspaces = [
 export default function IdentityGateway({
   isSupabaseConfigured,
   onOpenDesignSystem,
-  onEnterSalesMarketing,
+  onEnterSales,
+  onEnterMarketing,
   onEnterManagement,
 }: IdentityGatewayProps) {
   const actions = {
-    'sales-marketing': onEnterSalesMarketing,
+    sales: onEnterSales,
+    marketing: onEnterMarketing,
     management: onEnterManagement,
   };
 
@@ -73,7 +92,7 @@ export default function IdentityGateway({
   ];
 
   return (
-    <div className="relative isolate flex-1 overflow-y-auto bg-[#F7F9FC]">
+    <div className="relative isolate flex-1 overflow-y-auto bg-[#F3F6FA]">
       <COSLogoWatermark />
       <div className="mx-auto min-h-full w-full max-w-[1540px] px-4 pb-10 sm:px-7 lg:px-10">
         <header className="flex min-h-[76px] items-center justify-between border-b border-[#D7DEE8]">
@@ -182,14 +201,14 @@ export default function IdentityGateway({
             </p>
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="grid gap-4 lg:grid-cols-3">
             {workspaces.map((workspace) => {
               const Icon = workspace.icon;
               return (
                 <article
                   key={workspace.id}
                   data-workspace={workspace.id}
-                  className="gateway-workspace-card group flex min-h-[410px] flex-col rounded-2xl border border-[#D9E0EA] bg-white p-5 shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:border-[#155EEF]/60 hover:shadow-md sm:p-6"
+                  className="gateway-workspace-card group flex min-h-[410px] flex-col rounded-2xl border border-[#C9D3E2] p-5 shadow-[0_7px_18px_rgba(20,36,64,0.06)] transition duration-200 hover:-translate-y-0.5 hover:border-[#9BAAC0] hover:shadow-[0_12px_28px_rgba(20,36,64,0.1)] sm:p-6"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <span
