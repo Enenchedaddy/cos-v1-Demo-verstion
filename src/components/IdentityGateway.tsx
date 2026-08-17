@@ -1,7 +1,6 @@
 import {
   ArrowRight,
   Building2,
-  MessageSquare,
   ShieldCheck,
   Sliders,
   TrendingUp,
@@ -12,56 +11,38 @@ import COSLogoWatermark from './COSLogoWatermark';
 interface IdentityGatewayProps {
   isSupabaseConfigured: boolean;
   onOpenDesignSystem: () => void;
-  onEnterSales: () => void;
-  onEnterMarketing: () => void;
+  onEnterSalesMarketing: () => void;
   onEnterManagement: () => void;
 }
 
 const workspaces = [
   {
-    id: 'sales',
-    volume: 'Volume 2 · Sales',
-    title: 'Sales Platform',
+    id: 'sales-marketing',
+    volume: 'Volume 2 & 3 · Unified',
+    title: 'Sales & Marketing Platform',
     description:
-      'Manage accounts, pipeline, governed quotes, customer signals, and commercial controls.',
-    fieldLabel: 'Sales profile',
+      'Unified commercial execution and growth platform. Manage client deals, CPQ margin quotes, consent-aware campaigns, content briefs, and cross-channel media ROI analysis.',
+    fieldLabel: 'User identity profile',
     options: [
-      'Chris Allen · Senior Sales Representative',
-      'Emily Johnson · Regional Accounts Manager',
+      'Chris Allen (Senior Sales Representative)',
+      'Aisha Bello (Marketing Director)',
     ],
-    contextLabel: 'Region oversight',
-    context: 'EMEA / UK regional hub',
+    contextLabel: 'Commercial & campaign scope',
+    context: 'Sales + Marketing controls unified',
     icon: TrendingUp,
-    accent: '#0A9B72',
-    tint: '#EAF8F3',
-  },
-  {
-    id: 'marketing',
-    volume: 'Volume 3 · Marketing',
-    title: 'Marketing Platform',
-    description:
-      'Govern campaign planning, consent-aware audiences, creative production, and measured growth.',
-    fieldLabel: 'Marketer profile',
-    options: [
-      'Aisha Bello · Marketing Director',
-      'Daniel Kerr · Ad Campaigns Lead',
-    ],
-    contextLabel: 'Consent scope',
-    context: 'GDPR / PECR policy enforced',
-    icon: MessageSquare,
-    accent: '#3F67B5',
-    tint: '#EEF3FC',
+    accent: '#335AA8',
+    tint: '#EEF3FB',
   },
   {
     id: 'management',
     volume: 'Volume 1 · Management',
     title: 'CEO & Management Suite',
     description:
-      'Review group performance, material exceptions, approvals, policy, and entity governance.',
+      'Command Centre oversight for group executives. Monitor business performance matrices, OKR strategy mapping, policy overrides, and entity registries.',
     fieldLabel: 'Executive role profile',
     options: [
-      'Olivia Reed · Group CEO & Executive Director',
-      'Clara Evans · Chief Financial Officer',
+      'Olivia Reed (Group CEO & Executive Director)',
+      'Clara Evans (Chief Financial Officer)',
     ],
     contextLabel: 'Authorisation clearance',
     context: 'Level 5 · Global executive',
@@ -74,21 +55,18 @@ const workspaces = [
 export default function IdentityGateway({
   isSupabaseConfigured,
   onOpenDesignSystem,
-  onEnterSales,
-  onEnterMarketing,
+  onEnterSalesMarketing,
   onEnterManagement,
 }: IdentityGatewayProps) {
   const actions = {
-    sales: onEnterSales,
-    marketing: onEnterMarketing,
+    'sales-marketing': onEnterSalesMarketing,
     management: onEnterManagement,
   };
 
   const systemNodes = [
-    ['Identity provider', 'Verified'],
-    ['Policy engine', 'Enforced'],
-    ['Database spine', isSupabaseConfigured ? 'Connected' : 'Demo active'],
-    ['Audit ledger', 'Recording'],
+    ['Database Spine', isSupabaseConfigured ? 'ONLINE' : 'DEMO ACTIVE'],
+    ['SOX Audit Ledger', 'SECURED'],
+    ['GPS Logistics', 'ACTIVE'],
   ];
 
   return (
@@ -201,7 +179,7 @@ export default function IdentityGateway({
             </p>
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-3">
+          <div className="grid gap-5 lg:grid-cols-2">
             {workspaces.map((workspace) => {
               const Icon = workspace.icon;
               return (

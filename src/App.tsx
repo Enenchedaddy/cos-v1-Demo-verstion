@@ -43,7 +43,7 @@ export default function App() {
   const [showSimulatorLogs, setShowSimulatorLogs] = useState(false);
   const [activePlatform, setActivePlatform] = useState<'gateway' | 'sales-marketing' | 'management' | 'design-system'>(() => {
     const requestedWorkspace = new URLSearchParams(window.location.search).get('workspace');
-    if (requestedWorkspace === 'sales' || requestedWorkspace === 'marketing') return 'sales-marketing';
+    if (requestedWorkspace === 'sales' || requestedWorkspace === 'marketing' || requestedWorkspace === 'sales-marketing') return 'sales-marketing';
     if (requestedWorkspace === 'management') return 'management';
     return 'gateway';
   });
@@ -340,16 +340,10 @@ export default function App() {
           <IdentityGateway
             isSupabaseConfigured={isSupabaseConfigured}
             onOpenDesignSystem={() => beginPlatformTransition('design-system', 'Opening COS Design System…')}
-            onEnterSales={() => {
-              setSalesMarketingInitialArea('sales-execution');
-              beginPlatformTransition('sales-marketing', 'Authenticating & Launching Sales Platform…', () => {
-                handleAddLog('Sales Session Authorized', 'Customer', 'Chris Allen', 'S&M', 'Entered Sales through the unified commercial platform');
-              });
-            }}
-            onEnterMarketing={() => {
-              setSalesMarketingInitialArea('campaigns');
-              beginPlatformTransition('sales-marketing', 'Authenticating & Launching Marketing Suite…', () => {
-                handleAddLog('Marketing Session Authorized', 'Customer', 'Aisha Bello', 'S&M', 'Entered Marketing through the unified commercial platform');
+            onEnterSalesMarketing={() => {
+              setSalesMarketingInitialArea('home');
+              beginPlatformTransition('sales-marketing', 'Authenticating & Launching Sales & Marketing Platform…', () => {
+                handleAddLog('Sales & Marketing Session Authorized', 'Permission', 'Commercial Workspace', 'S&M', 'Entered the unified Sales & Marketing platform through the governed gateway');
               });
             }}
             onEnterManagement={() => {
@@ -544,7 +538,7 @@ export default function App() {
             {/* Selection Grid */}
             <div className="max-w-6xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch my-6">
               
-              {/* Option A: Sales Platform */}
+              {/* Legacy design-system preview: unified Sales & Marketing workspace */}
               <div className="bg-white rounded-2xl p-6 border border-[#D9E0EA] shadow-md shadow-slate-200/50 flex flex-col justify-between transition-all hover:border-emerald-500/50 hover:shadow-xl hover:-translate-y-0.5 duration-200">
                 <div>
                   <div className="flex justify-between items-start mb-4">
@@ -552,11 +546,11 @@ export default function App() {
                       <TrendingUp size={22} className="text-emerald-600" />
                     </div>
                     <span className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200/50 rounded-md font-bold px-2 py-0.5 tracking-wider uppercase">
-                      Volume 2 • Sales
+                      Volume 2 • Sales & Marketing
                     </span>
                   </div>
                   
-                  <h3 className="text-lg font-extrabold text-slate-900">Sales Platform</h3>
+                  <h3 className="text-lg font-extrabold text-slate-900">Sales &amp; Marketing Platform</h3>
                   <p className="text-xs text-slate-500 mt-2.5 leading-relaxed">
                     Track the commercial pipeline, manage client deals, issue pricing quotes with margin analyses, and enforce pre-agreed pricing rules.
                   </p>
@@ -596,7 +590,7 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Option B: Marketing Platform */}
+              {/* Marketing capabilities are intentionally part of the same workspace. */}
               <div className="bg-white rounded-2xl p-6 border border-[#D9E0EA] shadow-md shadow-slate-200/50 flex flex-col justify-between transition-all hover:border-purple-500/50 hover:shadow-xl hover:-translate-y-0.5 duration-200">
                 <div>
                   <div className="flex justify-between items-start mb-4">
@@ -604,11 +598,11 @@ export default function App() {
                       <MessageSquare size={22} className="text-purple-600" />
                     </div>
                     <span className="text-[10px] bg-purple-50 text-purple-700 border border-purple-200/50 rounded-md font-bold px-2 py-0.5 tracking-wider uppercase">
-                      Volume 3 • Marketing
+                      Volume 2 • Sales & Marketing
                     </span>
                   </div>
                   
-                  <h3 className="text-lg font-extrabold text-slate-900">Marketing Platform</h3>
+                  <h3 className="text-lg font-extrabold text-slate-900">Sales &amp; Marketing Platform</h3>
                   <p className="text-xs text-slate-500 mt-2.5 leading-relaxed">
                     Govern cross-channel media planning, campaign calendars, segmented privacy consents, AI creative briefs, and media spend ROI analysis.
                   </p>
