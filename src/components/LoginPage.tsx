@@ -22,14 +22,14 @@ export default function LoginPage() {
 
     if (Object.keys(nextErrors).length === 0) {
       console.log('Login form submitted:', { email: email.trim(), password, workspace });
-      window.location.assign(`/app?workspace=${encodeURIComponent(workspace)}`);
+      window.location.assign(`/?view=app&workspace=${encodeURIComponent(workspace)}`);
     }
   };
 
   return (
     <AuthLayout
       title="Welcome back"
-      footer={<>New to COS? <a className="font-semibold text-[#335AA8] hover:underline" href="/signup">Create account</a></>}
+      footer={<>New to COS? <a className="font-semibold text-[#335AA8] hover:underline" href="/?auth=signup">Create account</a></>}
     >
       <form className="space-y-6" onSubmit={handleSubmit} noValidate>
         <AuthField id="login-email" label="Work email" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} error={errors.email} required />

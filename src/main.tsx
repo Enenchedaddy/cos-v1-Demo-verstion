@@ -13,7 +13,15 @@ const routes: Record<string, ComponentType> = {
   '/app': App,
 };
 
-const RoutedApp = routes[window.location.pathname] ?? LoginPage;
+const params = new URLSearchParams(window.location.search);
+const queryRoute = params.get('view') === 'app'
+  ? App
+  : params.get('auth') === 'signup'
+    ? SignupPage
+    : params.get('auth') === 'login'
+      ? LoginPage
+      : null;
+const RoutedApp = queryRoute ?? routes[window.location.pathname] ?? LoginPage;
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

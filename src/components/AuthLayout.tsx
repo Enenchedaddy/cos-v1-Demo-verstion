@@ -12,7 +12,7 @@ export function AuthLayout({ title, children, footer }: AuthLayoutProps) {
   return (
     <main className="min-h-screen bg-[#F3F6FA] text-[#111C33] lg:grid lg:grid-cols-[minmax(320px,38%)_1fr]">
       <aside className="relative hidden min-h-screen overflow-hidden bg-[#183153] lg:flex lg:flex-col lg:justify-between lg:p-8" aria-label="Central Operating System">
-        <a href="/app" className="relative z-10 w-fit text-[11px] font-bold uppercase tracking-[0.16em] text-white">
+        <a href="/?view=app" className="relative z-10 w-fit text-[11px] font-bold uppercase tracking-[0.16em] text-white">
           Central Operating System
         </a>
 
@@ -28,11 +28,11 @@ export function AuthLayout({ title, children, footer }: AuthLayoutProps) {
 
       <div className="flex min-h-screen flex-col px-4 py-6 sm:px-8 sm:py-8 lg:px-16">
         <header className="mx-auto flex w-full max-w-[600px] items-center justify-between border-b border-[#D7DEE8] pb-4">
-          <a href="/app" className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#335AA8] lg:hidden">
+          <a href="/?view=app" className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#335AA8] lg:hidden">
             Central Operating System
           </a>
           <span aria-hidden="true" />
-          <a href="/app" className="inline-flex min-h-12 items-center gap-2 text-xs font-semibold text-[#52617A] transition hover:text-[#335AA8]">
+          <a href="/?view=app" className="inline-flex min-h-12 items-center gap-2 text-xs font-semibold text-[#52617A] transition hover:text-[#335AA8]">
             <ArrowLeft size={15} />
             <span className="hidden sm:inline">Back to gateway</span>
           </a>

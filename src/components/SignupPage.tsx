@@ -27,14 +27,14 @@ export default function SignupPage() {
 
     if (Object.keys(nextErrors).length === 0) {
       console.log('Signup form submitted:', { name: name.trim(), email: email.trim(), password, confirmPassword, workspace });
-      window.location.assign(`/app?workspace=${encodeURIComponent(workspace)}`);
+      window.location.assign(`/?view=app&workspace=${encodeURIComponent(workspace)}`);
     }
   };
 
   return (
     <AuthLayout
       title="Create your account"
-      footer={<>Already registered? <a className="font-semibold text-[#335AA8] hover:underline" href="/login">Sign in</a></>}
+      footer={<>Already registered? <a className="font-semibold text-[#335AA8] hover:underline" href="/?auth=login">Sign in</a></>}
     >
       <form className="space-y-6" onSubmit={handleSubmit} noValidate>
         <AuthField id="signup-name" label="Full name" type="text" autoComplete="name" value={name} onChange={(event) => setName(event.target.value)} error={errors.name} required />
