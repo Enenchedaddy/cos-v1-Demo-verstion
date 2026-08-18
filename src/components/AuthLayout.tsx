@@ -91,8 +91,8 @@ export function WorkspaceField({ value, onChange, error }: { value: string; onCh
           className={`min-h-12 w-full appearance-none rounded-[12px] border bg-[#F9FBFD] px-4 pr-12 text-sm font-medium text-[#18243A] outline-none transition focus:ring-2 ${error ? 'border-[#A63A32] focus:ring-[#A63A32]/10' : 'border-[#CBD5E2] focus:border-[#335AA8] focus:ring-[#335AA8]/15'}`}
         >
           <option value="">Select workspace</option>
-          <option value="sales-marketing">Sales &amp; Marketing Platform</option>
           <option value="management">CEO &amp; Management Suite</option>
+          <option value="sales-marketing">Sales and Marketing platform</option>
         </select>
         <span className="pointer-events-none absolute right-4 top-1/2 h-2 w-2 -translate-y-2 rotate-45 border-b-2 border-r-2 border-[#52617A]" aria-hidden="true" />
       </div>
