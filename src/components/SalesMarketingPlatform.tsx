@@ -236,7 +236,7 @@ export default function SalesMarketingPlatform({
   };
 
   return (
-    <div className="sm-platform-v11 relative flex h-screen overflow-hidden bg-[#F7F9FC] font-sans text-[#172B4D]">
+    <div className="sm-platform-v11 relative flex h-[100dvh] min-w-0 overflow-hidden bg-[#F7F9FC] font-sans text-[#172B4D]">
       <SalesMarketingSidebar activeArea={activeArea} activeRoute={activeRoute} mode={sidebarMode} scopeMode={scopeMode} onScopeModeChange={setScopeMode} onAreaSelect={selectArea} onRouteSelect={selectRoute} onBackToMain={() => { setSidebarMode('global'); setAreaSearch(''); }} onClose={onLogoutToGateway} />
 
       <section className="relative flex min-w-0 flex-1 flex-col overflow-hidden bg-[#F7F9FC]">

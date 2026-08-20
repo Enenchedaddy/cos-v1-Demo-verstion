@@ -73,14 +73,14 @@ export default function IdentityGateway({
     <div className="relative isolate flex-1 overflow-y-auto bg-[#F3F6FA]">
       <COSLogoWatermark />
       <div className="mx-auto min-h-full w-full max-w-[1540px] px-4 pb-10 sm:px-7 lg:px-10">
-        <header className="flex min-h-[76px] items-center justify-between border-b border-[#D7DEE8]">
-          <div className="flex items-center gap-3">
+        <header className="flex min-h-[76px] items-center justify-between gap-3 border-b border-[#D7DEE8]">
+          <div className="flex min-w-0 items-center gap-3">
             <COSLogo className="h-9 w-9" variant="full" />
-            <div>
+            <div className="min-w-0">
               <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#335AA8]">
                 Central Operating System
               </p>
-              <p className="text-sm font-semibold text-[#111C33]">Identity gateway</p>
+              <p className="truncate text-sm font-semibold text-[#111C33]">Identity gateway</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -114,7 +114,7 @@ export default function IdentityGateway({
           </div>
           <h1
             id="gateway-title"
-            className="mt-7 text-[42px] font-bold leading-[0.98] tracking-[-0.045em] text-[#10192D] sm:text-[58px] lg:text-[68px]"
+            className="mt-7 text-[36px] font-bold leading-[1.02] tracking-[-0.04em] text-[#10192D] sm:text-[58px] sm:leading-[0.98] lg:text-[68px]"
           >
             Central Operating System
           </h1>
@@ -186,7 +186,7 @@ export default function IdentityGateway({
                 <article
                   key={workspace.id}
                   data-workspace={workspace.id}
-                  className="gateway-workspace-card group flex min-h-[410px] flex-col rounded-2xl border border-[#C9D3E2] p-5 shadow-[0_7px_18px_rgba(20,36,64,0.06)] transition duration-200 hover:-translate-y-0.5 hover:border-[#9BAAC0] hover:shadow-[0_12px_28px_rgba(20,36,64,0.1)] sm:p-6"
+                  className="gateway-workspace-card group flex flex-col rounded-2xl border border-[#C9D3E2] p-5 shadow-[0_7px_18px_rgba(20,36,64,0.06)] transition duration-200 hover:-translate-y-0.5 hover:border-[#9BAAC0] hover:shadow-[0_12px_28px_rgba(20,36,64,0.1)] sm:p-6 lg:min-h-[410px]"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <span

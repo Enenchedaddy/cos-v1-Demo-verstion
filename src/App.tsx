@@ -321,7 +321,7 @@ export default function App() {
   if (clientApprovalToken) return <ClientApprovalPortal token={clientApprovalToken} />;
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden font-sans text-slate-800 bg-[#F7F9FC]">
+    <div className="flex h-[100dvh] min-w-0 flex-col overflow-hidden bg-[#F7F9FC] font-sans text-slate-800">
       <CardInteractionManager />
       {isInitializing && (
         <HexLoader
