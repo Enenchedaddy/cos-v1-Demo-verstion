@@ -684,6 +684,14 @@ main > div > header {
   textarea {
     font-size: 1rem !important;
   }
+
+  .cos-section-titlebar {
+    flex-direction: column;
+  }
+
+  .cos-section-titlebar > :last-child {
+    max-width: 100%;
+  }
 }
 
 @media (min-width: 768px) and (max-width: 1023px) {

@@ -5,13 +5,13 @@ import COSLogo from './COSLogo';
 interface AuthLayoutProps {
   title: string;
   children: ReactNode;
-  footer: ReactNode;
+  footer?: ReactNode;
 }
 
 export function AuthLayout({ title, children, footer }: AuthLayoutProps) {
   return (
-    <main className="min-h-screen bg-[#F3F6FA] text-[#111C33] lg:grid lg:grid-cols-[minmax(320px,38%)_1fr]">
-      <aside className="relative hidden min-h-screen overflow-hidden bg-[#183153] lg:flex lg:flex-col lg:justify-between lg:p-8" aria-label="Central Operating System">
+    <main className="min-h-[100dvh] bg-[#F3F6FA] text-[#111C33] lg:grid lg:grid-cols-[minmax(320px,38%)_1fr]">
+      <aside className="relative hidden min-h-[100dvh] overflow-hidden bg-[#183153] lg:flex lg:flex-col lg:justify-between lg:p-8" aria-label="Central Operating System">
         <a href="/app" className="relative z-10 w-fit text-[11px] font-bold uppercase tracking-[0.16em] text-white">
           Central Operating System
         </a>
@@ -26,7 +26,7 @@ export function AuthLayout({ title, children, footer }: AuthLayoutProps) {
         <span aria-hidden="true" />
       </aside>
 
-      <div className="flex min-h-screen flex-col px-4 py-6 sm:px-8 sm:py-8 lg:px-16">
+      <div className="flex min-h-[100dvh] min-w-0 flex-col px-3 py-4 sm:px-8 sm:py-8 lg:px-16">
         <header className="mx-auto flex w-full max-w-[600px] items-center justify-between border-b border-[#D7DEE8] pb-4">
           <a href="/app" className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#335AA8] lg:hidden">
             Central Operating System
@@ -38,17 +38,17 @@ export function AuthLayout({ title, children, footer }: AuthLayoutProps) {
           </a>
         </header>
 
-        <section className="mx-auto flex w-full max-w-[520px] flex-1 flex-col justify-center py-12 sm:py-16">
-          <div className="rounded-[24px] border border-[#CAD4E1] bg-white p-6 shadow-[0_12px_32px_rgba(20,36,64,0.08)] sm:p-8">
-            <div className="mb-8 flex items-start justify-between gap-8">
-              <h1 className="text-[40px] font-semibold leading-none sm:text-[48px]">{title}</h1>
+        <section className="mx-auto flex w-full max-w-[520px] flex-1 flex-col justify-center py-8 sm:py-16">
+          <div className="rounded-[20px] border border-[#CAD4E1] bg-white p-5 shadow-[0_12px_32px_rgba(20,36,64,0.08)] sm:rounded-[24px] sm:p-8">
+            <div className="mb-7 flex items-start justify-between gap-4 sm:mb-8 sm:gap-8">
+              <h1 className="min-w-0 text-[32px] font-semibold leading-[1.05] sm:text-[48px] sm:leading-none">{title}</h1>
               <span className="mt-2 h-3 w-3 shrink-0 rounded-full bg-[#335AA8]" aria-hidden="true" />
             </div>
             <div>
               {children}
             </div>
           </div>
-          <div className="mt-6 text-center text-sm text-[#66758D]">{footer}</div>
+          {footer && <div className="mt-6 text-center text-sm text-[#66758D]">{footer}</div>}
         </section>
       </div>
     </main>

@@ -197,7 +197,7 @@ export default function ManagementPlatform({
   const q = searchQuery.toLowerCase().trim();
 
   return (
-    <div className="management-platform sales-platform-theme flex h-screen overflow-hidden bg-[#F7F9FC] font-sans relative">
+    <div className="management-platform sales-platform-theme relative flex h-[100dvh] min-w-0 overflow-hidden bg-[#F7F9FC] font-sans">
       
       {/* Standardized dual-rail navigation */}
       <ManagementSidebar
