@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Activity,
   AlertTriangle,
@@ -12,6 +12,7 @@ import {
   ListTodo,
   LockKeyhole,
   Megaphone,
+  Menu,
   Plus,
   RefreshCw,
   Search,
@@ -108,6 +109,7 @@ export default function SalesMarketingPlatform({
   const [activeAreaId, setActiveAreaId] = useState(initial.id);
   const [activeRoute, setActiveRoute] = useState(initial.routes[0]);
   const [sidebarMode, setSidebarMode] = useState<'global' | 'contextual'>('global');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => typeof window === 'undefined' || window.matchMedia('(min-width: 1024px)').matches);
   const [scopeMode, setScopeMode] = useState<'company' | 'group'>('company');
   const [workspaceState, setWorkspaceState] = useState<WorkspaceState>('loaded');
   const [areaSearch, setAreaSearch] = useState('');
@@ -121,6 +123,13 @@ export default function SalesMarketingPlatform({
 
   const activeArea = SALES_MARKETING_NAVIGATION_AREAS.find((area) => area.id === activeAreaId) ?? SALES_MARKETING_NAVIGATION_AREAS[0];
   const ActiveAreaIcon = activeArea.icon;
+
+  useEffect(() => {
+    if (!isSidebarOpen || typeof window === 'undefined' || !window.matchMedia('(max-width: 1023px)').matches) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = previousOverflow; };
+  }, [isSidebarOpen]);
 
   const allRecords = useMemo<InspectableRecord[]>(() => {
     const accountRecords = companies.map((company) => ({
@@ -237,12 +246,12 @@ export default function SalesMarketingPlatform({
 
   return (
     <div className="sm-platform-v11 relative flex h-[100dvh] min-w-0 overflow-hidden bg-[#F7F9FC] font-sans text-[#172B4D]">
-      <SalesMarketingSidebar activeArea={activeArea} activeRoute={activeRoute} mode={sidebarMode} scopeMode={scopeMode} onScopeModeChange={setScopeMode} onAreaSelect={selectArea} onRouteSelect={selectRoute} onBackToMain={() => { setSidebarMode('global'); setAreaSearch(''); }} onClose={onLogoutToGateway} />
+      <SalesMarketingSidebar activeArea={activeArea} activeRoute={activeRoute} mode={sidebarMode} scopeMode={scopeMode} onScopeModeChange={setScopeMode} onAreaSelect={selectArea} onRouteSelect={selectRoute} onBackToMain={() => { setSidebarMode('global'); setAreaSearch(''); }} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} onExit={onLogoutToGateway} />
 
       <section className="relative flex min-w-0 flex-1 flex-col overflow-hidden bg-[#F7F9FC]">
         <COSLogoWatermark />
         <header className="cos-global-topbar relative z-10 flex shrink-0 items-center justify-between gap-3 px-3 sm:px-5">
-          <div className="relative min-w-0 flex-1 sm:max-w-md"><Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6B7A90]" /><input value={globalSearch} onChange={(event) => setGlobalSearch(event.target.value)} placeholder="Search accounts, deals, tasks, campaigns..." className="min-h-10 w-full rounded-lg border border-[#D9E0EA] bg-[#F7F9FC] pl-9 pr-3 text-xs focus:border-[#155EEF]" /></div>
+          <button type="button" className="workspace-sidebar-toggle" aria-controls="sales-marketing-sidebar" aria-expanded={isSidebarOpen} aria-label={isSidebarOpen ? 'Close navigation' : 'Open navigation'} onClick={() => setIsSidebarOpen((open) => !open)}><Menu size={20} aria-hidden="true" /></button><div className="relative min-w-0 flex-1 sm:max-w-md"><Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6B7A90]" /><input value={globalSearch} onChange={(event) => setGlobalSearch(event.target.value)} placeholder="Search accounts, deals, tasks, campaigns..." className="min-h-10 w-full rounded-lg border border-[#D9E0EA] bg-[#F7F9FC] pl-9 pr-3 text-xs focus:border-[#155EEF]" /></div>
           <div className="hidden items-center gap-2 xl:flex"><span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" /><span className="text-[10px] font-bold text-emerald-700">Audit Stream Live</span></div>
           <div className="hidden items-center gap-1 rounded-lg border border-[#D9E0EA] bg-[#F7F9FC] p-1 md:flex" aria-label="Workspace state simulator">{(['loaded', 'empty', 'loading', 'error', 'restricted'] as const).map((state) => <button key={state} type="button" onClick={() => setWorkspaceState(state)} className={`min-h-8 rounded-md px-2 text-[9px] font-bold uppercase ${workspaceState === state ? 'bg-[#155EEF] text-white' : 'text-[#65758B] hover:bg-white'}`}>{state}</button>)}</div>
           <button type="button" onClick={() => activeAreaId === 'content-social' ? setContentNotificationsOpen(true) : setInspectedRecord(allRecords.find((record) => record.kind === 'Audit') ?? null)} className="relative grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-[#D9E0EA] text-[#52617A] hover:border-[#155EEF] hover:text-[#155EEF]" aria-label="Notifications"><Bell size={16} /><span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-amber-400" /></button>

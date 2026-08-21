@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import COSLogoWatermark from './COSLogoWatermark';
 import HexLoader from './HexLoader';
 import SidebarEntityScope from './SidebarEntityScope';
@@ -16,7 +16,7 @@ import {
   Search, ShieldAlert, Phone, Mail, MapPin, DollarSign, Award, Clock, FileCheck, CheckCircle2, RefreshCw, 
   Layers, Sliders, Calendar, BookOpen, AlertCircle, PlayCircle, ShieldCheck, Database, HelpCircle, HardDrive, 
   UserCheck, Shield, Sparkles, Network, Clipboard, Compass, Info, ChevronRight, Minimize2, CheckSquare, XCircle, Ban,
-  FolderOpen, Settings, UserPlus, Building, BarChart2, Briefcase, Zap, GitPullRequest, Globe, Users2,
+  FolderOpen, Settings, UserPlus, Building, BarChart2, Briefcase, Zap, GitPullRequest, Globe, Users2, Menu,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -71,6 +71,14 @@ export default function ManagementPlatform({
   const [groupAdminSubTab, setGroupAdminSubTab] = useState<'registry' | 'profile' | 'evidence' | 'offtake' | 'hub'>('registry');
   const [sidebarSearch, setSidebarSearch] = useState('');
   const [sidebarMode, setSidebarMode] = useState<'global' | 'contextual'>('global');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => typeof window === 'undefined' || window.matchMedia('(min-width: 1024px)').matches);
+
+  useEffect(() => {
+    if (!isSidebarOpen || typeof window === 'undefined' || !window.matchMedia('(max-width: 1023px)').matches) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = previousOverflow; };
+  }, [isSidebarOpen]);
 
   // Simulated view state overrides ('loaded' | 'empty' | 'loading' | 'error' | 'restricted')
   const [simulatedState, setSimulatedState] = useState<'loaded' | 'empty' | 'loading' | 'error' | 'restricted'>('loaded');
@@ -207,10 +215,12 @@ export default function ManagementPlatform({
         onAreaSelect={selectManagementArea}
         onChildSelect={selectManagementChild}
         onBackToMain={() => setSidebarMode('global')}
-        onClose={onLogoutToGateway}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        onExit={onLogoutToGateway}
       />
       <aside
-        id="management-sidebar"
+        id="management-legacy-sidebar"
         aria-label="Management navigation"
         className="dual-rail-sidebar cos-workspace-sidebar h-full w-[66px] shrink-0 overflow-visible border-r border-[#082B5B] text-white md:w-[382px]"
         aria-hidden="true"
@@ -531,6 +541,7 @@ export default function ManagementPlatform({
         {/* Top bar (56px) */}
         <header className="cos-global-topbar px-4 sm:px-6 flex items-center justify-between shrink-0">
           <div className="flex items-center space-x-1.5 sm:space-x-2 min-w-0">
+            <button type="button" className="workspace-sidebar-toggle" aria-controls="management-sidebar" aria-expanded={isSidebarOpen} aria-label={isSidebarOpen ? 'Close navigation' : 'Open navigation'} onClick={() => setIsSidebarOpen((open) => !open)}><Menu size={20} aria-hidden="true" /></button>
             <span className="text-[10px] bg-[#EEF3FB] text-[#4065B3] font-bold px-2 py-0.5 rounded uppercase tracking-wider font-mono shrink-0 hidden xs:inline">Governed Command Node</span>
             <span className="text-slate-400 hidden xs:inline">/</span>
             <span className="text-xs font-bold text-slate-700 capitalize font-display truncate">

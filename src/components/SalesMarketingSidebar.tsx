@@ -14,9 +14,15 @@ interface SalesMarketingSidebarProps {
   onRouteSelect: (areaId: string, route: string) => void;
   onBackToMain: () => void;
   onClose?: () => void;
+  onExit?: () => void;
+  isOpen?: boolean;
 }
 
-function SidebarHeader({ title, onClose }: { title: string; onClose?: () => void }) {
+function SidebarHeader({ title, onClose, onExit }: { title: string; onClose?: () => void; onExit?: () => void }) {
+  const handleHeaderAction = () => {
+    const isSmallViewport = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(max-width: 1023px)').matches;
+    (isSmallViewport ? onClose : (onExit ?? onClose))?.();
+  };
   return (
     <header className="sm-sidebar__header">
       <COSLogo className="h-8 w-8 shrink-0" variant="white" />
@@ -24,7 +30,7 @@ function SidebarHeader({ title, onClose }: { title: string; onClose?: () => void
         <p>Central Operating System</p>
         <h2 title={title}>{title}</h2>
       </div>
-      {onClose && <button type="button" onClick={onClose} aria-label="Close Sales and Marketing sidebar"><X size={20} /></button>}
+      {(onClose || onExit) && <button type="button" onClick={handleHeaderAction} aria-label="Close Sales and Marketing sidebar"><X size={20} /></button>}
     </header>
   );
 }
@@ -44,7 +50,7 @@ function EntityScope({ mode, onChange }: { mode: 'company' | 'group'; onChange: 
   );
 }
 
-export default function SalesMarketingSidebar({ activeArea, activeRoute, mode, scopeMode, onScopeModeChange, onAreaSelect, onRouteSelect, onBackToMain, onClose }: SalesMarketingSidebarProps) {
+export default function SalesMarketingSidebar({ activeArea, activeRoute, mode, scopeMode, onScopeModeChange, onAreaSelect, onRouteSelect, onBackToMain, onClose, onExit, isOpen = true }: SalesMarketingSidebarProps) {
   const [query, setQuery] = React.useState('');
   const searchRef = React.useRef<HTMLInputElement>(null);
 
@@ -62,11 +68,11 @@ export default function SalesMarketingSidebar({ activeArea, activeRoute, mode, s
 
   return (
     <>
-      <button type="button" className="sm-sidebar__backdrop" aria-label="Close navigation" onClick={onClose} />
-      <div className="sm-sidebar" data-mode={mode}>
+      <button type="button" className="sm-sidebar__backdrop" data-open={isOpen} aria-label="Close navigation" onClick={onClose} />
+      <div id="sales-marketing-sidebar" className="sm-sidebar" data-mode={mode} data-open={isOpen}>
         {mode === 'global' ? (
           <aside className="sm-sidebar__global" aria-label="Sales and Marketing main menu">
-            <SidebarHeader title="Sales & Marketing" onClose={onClose} />
+            <SidebarHeader title="Sales & Marketing" onClose={onClose} onExit={onExit} />
             <EntityScope mode={scopeMode} onChange={onScopeModeChange} />
             <nav className="sm-sidebar__global-nav" aria-label="Sales and Marketing areas">
               {SALES_MARKETING_NAVIGATION_AREAS.map((area) => {
@@ -74,13 +80,13 @@ export default function SalesMarketingSidebar({ activeArea, activeRoute, mode, s
                 return <button key={area.id} type="button" onClick={() => onAreaSelect(area)} data-active={area.id === activeArea.id} aria-current={area.id === activeArea.id ? 'page' : undefined}><span className="sm-sidebar__active-rule" /><Icon size={20} strokeWidth={1.75} aria-hidden="true" /><span>{area.label}</span><ChevronRight size={16} className="ml-auto" aria-hidden="true" /></button>;
               })}
             </nav>
-            <footer className="sm-sidebar__user"><span>AB</span><div><strong>Aisha Bello</strong><small>Marketing Lead</small></div>{onClose && <button type="button" onClick={onClose}>Exit workspace</button>}</footer>
+            <footer className="sm-sidebar__user"><span>AB</span><div><strong>Aisha Bello</strong><small>Marketing Lead</small></div>{(onExit || onClose) && <button type="button" onClick={onExit ?? onClose}>Exit workspace</button>}</footer>
           </aside>
         ) : (
           <div className="sm-sidebar__contextual">
-            <aside aria-label="Sales and Marketing area rail"><GlobalIconRail areas={SALES_MARKETING_NAVIGATION_AREAS} activeId={activeArea.id} initials="AB" onSelect={(id) => { const area = SALES_MARKETING_NAVIGATION_AREAS.find((candidate) => candidate.id === id); if (area) onAreaSelect(area); }} onExit={onClose} /></aside>
+            <aside aria-label="Sales and Marketing area rail"><GlobalIconRail areas={SALES_MARKETING_NAVIGATION_AREAS} activeId={activeArea.id} initials="AB" onSelect={(id) => { const area = SALES_MARKETING_NAVIGATION_AREAS.find((candidate) => candidate.id === id); if (area) onAreaSelect(area); }} onExit={onExit ?? onClose} /></aside>
             <aside className="sm-sidebar__panel" aria-label={`${activeArea.label} submenu`}>
-              <SidebarHeader title={activeArea.label} onClose={onClose} />
+              <SidebarHeader title={activeArea.label} onClose={onClose} onExit={onExit} />
               <EntityScope mode={scopeMode} onChange={onScopeModeChange} />
               <button type="button" className="sm-sidebar__main-menu" onClick={onBackToMain}><ArrowLeft size={16} aria-hidden="true" />Back to main menu</button>
               <div className="sm-sidebar__search"><label htmlFor="sm-area-search">Search this area</label><div><Search size={15} aria-hidden="true" /><input ref={searchRef} id="sm-area-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search this area" />{query && <button type="button" onClick={() => { setQuery(''); searchRef.current?.focus(); }} aria-label="Clear area search"><X size={14} /></button>}</div></div>
