@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from 'react';
-import { getUserRoles } from '../auth/mockRoles';
-import { getPostLoginDestination } from '../auth/postLoginRouting';
 import { AuthField, AuthLayout, AuthSubmitButton } from './AuthLayout';
+import { isSupabaseConfigured, supabase } from '../supabaseClient';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_PASSWORD_LENGTH = 8;
@@ -21,15 +20,22 @@ export default function LoginPage() {
     setErrors(nextErrors);
 
     if (Object.keys(nextErrors).length === 0) {
-      const roles = await getUserRoles(email);
-      const destination = getPostLoginDestination(roles);
-
-      if (destination.type === 'no-access') {
-        setErrors({ access: 'No platform access assigned yet. Contact your administrator.' });
+      if (!isSupabaseConfigured) {
+        setErrors({ access: 'Authentication is not configured for this environment. Contact your administrator.' });
         return;
       }
 
-      window.location.assign(destination.href);
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password,
+      });
+
+      if (error) {
+        setErrors({ access: 'Unable to sign in with those credentials. Check your email and password.' });
+        return;
+      }
+
+      window.location.assign('/app');
     }
   };
 
