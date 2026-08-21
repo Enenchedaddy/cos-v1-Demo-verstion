@@ -18,14 +18,14 @@ interface SalesMarketingSidebarProps {
   isOpen?: boolean;
 }
 
-function SidebarHeader({ title, onClose, onExit }: { title: string; onClose?: () => void; onExit?: () => void }) {
+function SidebarHeader({ title, onClose, onExit, showLogo = true }: { title: string; onClose?: () => void; onExit?: () => void; showLogo?: boolean }) {
   const handleHeaderAction = () => {
     const isSmallViewport = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(max-width: 1023px)').matches;
     (isSmallViewport ? onClose : (onExit ?? onClose))?.();
   };
   return (
     <header className="sm-sidebar__header">
-      <COSLogo className="h-8 w-8 shrink-0" variant="white" />
+      {showLogo && <COSLogo className="h-8 w-8 shrink-0" variant="white" />}
       <div className="min-w-0 flex-1">
         <p>Central Operating System</p>
         <h2 title={title}>{title}</h2>
@@ -86,7 +86,7 @@ export default function SalesMarketingSidebar({ activeArea, activeRoute, mode, s
           <div className="sm-sidebar__contextual">
             <aside aria-label="Sales and Marketing area rail"><GlobalIconRail areas={SALES_MARKETING_NAVIGATION_AREAS} activeId={activeArea.id} initials="AB" onSelect={(id) => { const area = SALES_MARKETING_NAVIGATION_AREAS.find((candidate) => candidate.id === id); if (area) onAreaSelect(area); }} onExit={onExit ?? onClose} /></aside>
             <aside className="sm-sidebar__panel" aria-label={`${activeArea.label} submenu`}>
-              <SidebarHeader title={activeArea.label} onClose={onClose} onExit={onExit} />
+              <SidebarHeader title={activeArea.label} onClose={onClose} onExit={onExit} showLogo={false} />
               <EntityScope mode={scopeMode} onChange={onScopeModeChange} />
               <button type="button" className="sm-sidebar__main-menu" onClick={onBackToMain}><ArrowLeft size={16} aria-hidden="true" />Back to main menu</button>
               <div className="sm-sidebar__search"><label htmlFor="sm-area-search">Search this area</label><div><Search size={15} aria-hidden="true" /><input ref={searchRef} id="sm-area-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search this area" />{query && <button type="button" onClick={() => { setQuery(''); searchRef.current?.focus(); }} aria-label="Clear area search"><X size={14} /></button>}</div></div>
