@@ -27,6 +27,11 @@ import {
 import { supabase, isSupabaseConfigured } from './supabaseClient';
 
 export default function App() {
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    window.location.assign('/login');
+  };
+
   // Shared Database States (The Spine)
   const [companies, setCompanies] = useState<Company[]>(INITIAL_COMPANIES);
   const [orders, setOrders] = useState<Order[]>(INITIAL_ORDERS);
@@ -732,9 +737,7 @@ export default function App() {
             initialArea={salesMarketingInitialArea}
             onAddLog={handleAddLog}
             onUpdateDeals={handleUpdateDeals}
-            onLogoutToGateway={() => {
-              beginPlatformTransition('gateway', 'Returning to the Identity Gateway…');
-            }}
+            onLogoutToGateway={handleLogout}
           />
         )}
 
@@ -756,17 +759,13 @@ export default function App() {
             onUpdateQuotes={handleUpdateQuotes}
             onUpdateCompanies={handleUpdateCompanies}
             onUpdateApprovals={handleUpdateApprovals}
-            onLogoutToGateway={() => {
-              beginPlatformTransition('gateway', 'Returning to the Identity Gateway…');
-            }}
+            onLogoutToGateway={handleLogout}
           />
         )}
 
         {activePlatform === 'design-system' && (
           <DesignSystemPlatform
-            onLogoutToGateway={() => {
-              beginPlatformTransition('gateway', 'Returning to the Identity Gateway…');
-            }}
+            onLogoutToGateway={handleLogout}
           />
         )}
       </main>
