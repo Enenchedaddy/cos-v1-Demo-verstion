@@ -1,55 +1,39 @@
-import {StrictMode, useEffect, useState} from 'react';
-import type {ComponentType} from 'react';
-import {createRoot} from 'react-dom/client';
+import { StrictMode, type ComponentType } from 'react';
+import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import LoginPage from './components/LoginPage.tsx';
-import { isSupabaseConfigured, supabase } from './supabaseClient';
+import PasswordRecoveryPage from './components/PasswordRecoveryPage.tsx';
+import PasswordSetupPage from './components/PasswordSetupPage.tsx';
+import UserProvisioningPage from './components/UserProvisioningPage.tsx';
+import { AuthorizationProvider } from './auth/AuthorizationProvider';
+import { LegacyWorkspaceRedirect, ProtectedRoute, PublicLoginRoute } from './auth/RouteGuards';
+import { normalizeLegacyWorkspace } from './auth/authorization';
 import './index.css';
 
-const routes: Record<string, ComponentType> = {
-  '/': LoginPage,
-  '/login': LoginPage,
-  '/app': App,
-};
-
-function AuthenticatedRoute() {
-  const [status, setStatus] = useState<'checking' | 'authenticated' | 'unauthenticated' | 'unconfigured'>('checking');
-
-  useEffect(() => {
-    if (!isSupabaseConfigured) {
-      setStatus('unconfigured');
-      return;
-    }
-
-    let active = true;
-    void supabase.auth.getSession().then(({ data }) => {
-      if (active) setStatus(data.session ? 'authenticated' : 'unauthenticated');
-    });
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (active) setStatus(session ? 'authenticated' : 'unauthenticated');
-    });
-
-    return () => {
-      active = false;
-      listener.subscription.unsubscribe();
-    };
-  }, []);
-
-  if (status === 'checking') return <div className="grid min-h-screen place-items-center bg-[#F5F7FA] text-sm text-slate-500">Checking workspace session…</div>;
-  if (status === 'unauthenticated') {
-    window.location.replace('/login');
-    return null;
-  }
-  if (status === 'unconfigured') return <div className="grid min-h-screen place-items-center bg-[#F5F7FA] px-6 text-center text-sm text-slate-600">Supabase authentication is not configured for this environment.</div>;
-  return <App />;
+function AppEntryRoute() {
+  const legacyWorkspace = normalizeLegacyWorkspace(new URLSearchParams(window.location.search).get('workspace'));
+  if (legacyWorkspace) return <LegacyWorkspaceRedirect workspace={legacyWorkspace} />;
+  return <ProtectedRoute><App initialPlatform="gateway" /></ProtectedRoute>;
 }
 
-const RoutedApp: ComponentType = window.location.pathname === '/app'
-  ? AuthenticatedRoute
-  : routes[window.location.pathname] ?? LoginPage;
+const routes: Record<string, ComponentType> = {
+  '/': () => <PublicLoginRoute><LoginPage /></PublicLoginRoute>,
+  '/login': () => <PublicLoginRoute><LoginPage /></PublicLoginRoute>,
+  '/password-recovery': () => <PublicLoginRoute><PasswordRecoveryPage /></PublicLoginRoute>,
+  '/password-update': PasswordSetupPage,
+  '/auth/complete': PasswordSetupPage,
+  '/app': AppEntryRoute,
+  '/app/sales-marketing': () => <ProtectedRoute workspace="sales-marketing"><App initialPlatform="sales-marketing" /></ProtectedRoute>,
+  '/app/management': () => <ProtectedRoute workspace="management"><App initialPlatform="management" /></ProtectedRoute>,
+  '/app/users': () => <ProtectedRoute permission="users.view"><UserProvisioningPage /></ProtectedRoute>,
+};
+
+const RoutedApp: ComponentType = routes[window.location.pathname] ?? (() => <PublicLoginRoute><LoginPage /></PublicLoginRoute>);
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RoutedApp />
+    <AuthorizationProvider>
+      <RoutedApp />
+    </AuthorizationProvider>
   </StrictMode>,
 );

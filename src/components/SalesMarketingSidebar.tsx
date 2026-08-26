@@ -5,6 +5,7 @@ import { GlobalIconRail } from './DualRailNavigation';
 import { SALES_MARKETING_NAVIGATION_AREAS, type SalesMarketingNavigationArea } from '../navigation/salesMarketing';
 
 interface SalesMarketingSidebarProps {
+  areas: readonly SalesMarketingNavigationArea[];
   activeArea: SalesMarketingNavigationArea;
   activeRoute: string;
   mode: 'global' | 'contextual';
@@ -16,6 +17,8 @@ interface SalesMarketingSidebarProps {
   onClose?: () => void;
   onExit?: () => void;
   isOpen?: boolean;
+  userName: string;
+  userRole: string;
 }
 
 function SidebarHeader({ title, onClose, onExit, showLogo = true }: { title: string; onClose?: () => void; onExit?: () => void; showLogo?: boolean }) {
@@ -50,7 +53,7 @@ function EntityScope({ mode, onChange }: { mode: 'company' | 'group'; onChange: 
   );
 }
 
-export default function SalesMarketingSidebar({ activeArea, activeRoute, mode, scopeMode, onScopeModeChange, onAreaSelect, onRouteSelect, onBackToMain, onClose, onExit, isOpen = true }: SalesMarketingSidebarProps) {
+export default function SalesMarketingSidebar({ areas, activeArea, activeRoute, mode, scopeMode, onScopeModeChange, onAreaSelect, onRouteSelect, onBackToMain, onClose, onExit, isOpen = true, userName, userRole }: SalesMarketingSidebarProps) {
   const [query, setQuery] = React.useState('');
   const searchRef = React.useRef<HTMLInputElement>(null);
 
@@ -75,16 +78,16 @@ export default function SalesMarketingSidebar({ activeArea, activeRoute, mode, s
             <SidebarHeader title="Sales & Marketing" onClose={onClose} onExit={onExit} />
             <EntityScope mode={scopeMode} onChange={onScopeModeChange} />
             <nav className="sm-sidebar__global-nav" aria-label="Sales and Marketing areas">
-              {SALES_MARKETING_NAVIGATION_AREAS.map((area) => {
+              {areas.map((area) => {
                 const Icon = area.icon;
                 return <button key={area.id} type="button" onClick={() => onAreaSelect(area)} data-active={area.id === activeArea.id} aria-current={area.id === activeArea.id ? 'page' : undefined}><span className="sm-sidebar__active-rule" /><Icon size={20} strokeWidth={1.75} aria-hidden="true" /><span>{area.label}</span><ChevronRight size={16} className="ml-auto" aria-hidden="true" /></button>;
               })}
             </nav>
-            <footer className="sm-sidebar__user"><span>AB</span><div><strong>Aisha Bello</strong><small>Marketing Lead</small></div>{(onExit || onClose) && <button type="button" onClick={onExit ?? onClose}>Exit workspace</button>}</footer>
+            <footer className="sm-sidebar__user"><span>{userName.slice(0, 2).toUpperCase()}</span><div><strong>{userName}</strong><small>{userRole}</small></div>{(onExit || onClose) && <button type="button" onClick={onExit ?? onClose}>Exit workspace</button>}</footer>
           </aside>
         ) : (
           <div className="sm-sidebar__contextual">
-            <aside aria-label="Sales and Marketing area rail"><GlobalIconRail areas={SALES_MARKETING_NAVIGATION_AREAS} activeId={activeArea.id} initials="AB" onSelect={(id) => { const area = SALES_MARKETING_NAVIGATION_AREAS.find((candidate) => candidate.id === id); if (area) onAreaSelect(area); }} onExit={onExit ?? onClose} /></aside>
+            <aside aria-label="Sales and Marketing area rail"><GlobalIconRail areas={areas} activeId={activeArea.id} initials={userName.slice(0, 2).toUpperCase()} onSelect={(id) => { const area = areas.find((candidate) => candidate.id === id); if (area) onAreaSelect(area); }} onExit={onExit ?? onClose} /></aside>
             <aside className="sm-sidebar__panel" aria-label={`${activeArea.label} submenu`}>
               <SidebarHeader title={activeArea.label} onClose={onClose} onExit={onExit} showLogo={false} />
               <EntityScope mode={scopeMode} onChange={onScopeModeChange} />
@@ -94,7 +97,7 @@ export default function SalesMarketingSidebar({ activeArea, activeRoute, mode, s
                 {filteredGroups.map((group) => <section key={group.label}><h3>{group.label}</h3>{group.routes.map((route) => <button key={route} type="button" onClick={() => onRouteSelect(activeArea.id, route)} data-active={route === activeRoute} aria-current={route === activeRoute ? 'page' : undefined}><span className="sm-sidebar__active-rule" />{route}</button>)}</section>)}
                 {filteredGroups.length === 0 && <p className="sm-sidebar__empty">No routes match “{query}”.</p>}
               </nav>
-              <footer className="sm-sidebar__user"><span>AB</span><div><strong>Aisha Bello</strong><small>Marketing Lead</small></div></footer>
+              <footer className="sm-sidebar__user"><span>{userName.slice(0, 2).toUpperCase()}</span><div><strong>{userName}</strong><small>{userRole}</small></div></footer>
             </aside>
           </div>
         )}

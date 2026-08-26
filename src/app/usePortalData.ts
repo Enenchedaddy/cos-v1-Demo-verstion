@@ -56,6 +56,13 @@ interface PortalDataActions {
   addApproval: (approval: ApprovalRequest) => Promise<void>;
 }
 
+const portalEnvironment = (import.meta as any).env ?? {};
+const isControlledDemoMode = Boolean(portalEnvironment.DEV && portalEnvironment.VITE_COS_ALLOW_DEMO === 'true');
+
+function initialRecords<T>(records: T[]): T[] {
+  return isControlledDemoMode ? records : [];
+}
+
 export interface PortalData extends PortalDataActions {
   companies: Company[];
   orders: Order[];
@@ -91,30 +98,29 @@ async function loadCollection<T>(table: PortalTable, setRecords: Dispatch<SetSta
   if (orderBy) query = query.order(orderBy, { ascending: false });
   const { data, error } = await query;
   if (error) throw error;
-  if (data && data.length > 0) setRecords(data as T[]);
+  setRecords((data ?? []) as T[]);
 }
 
 /**
- * The portal's only data boundary. It keeps local demo data usable when
- * Supabase is not configured, while preserving the existing cloud sync and
- * optimistic update behaviour when it is available.
+ * Legacy portal-data utility. Development fixtures are opt-in and never used
+ * by a production build; failed Supabase reads leave explicit empty state for
+ * the consuming UI instead of retaining demo records.
  */
 export function usePortalData(): PortalData {
-  const [companies, setCompanies] = useState<Company[]>(INITIAL_COMPANIES);
-  const [orders, setOrders] = useState<Order[]>(INITIAL_ORDERS);
-  const [invoices, setInvoices] = useState<Invoice[]>(INITIAL_INVOICES);
-  const [cylinders, setCylinders] = useState<CylinderBalance[]>(INITIAL_CYLINDERS);
-  const [tickets, setTickets] = useState<SupportTicket[]>(INITIAL_SUPPORT_TICKETS);
-  const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
-  const [deals, setDeals] = useState<Deal[]>(INITIAL_DEALS);
-  const [quotes, setQuotes] = useState<Quote[]>(INITIAL_QUOTES);
-  const [campaigns, setCampaigns] = useState<Campaign[]>(INITIAL_CAMPAIGNS);
-  const [approvals, setApprovals] = useState<ApprovalRequest[]>(INITIAL_APPROVALS);
-  const [auditLogs, setAuditLogs] = useState<AuditLog[]>(INITIAL_AUDIT_LOGS);
+  const [companies, setCompanies] = useState<Company[]>(() => initialRecords(INITIAL_COMPANIES));
+  const [orders, setOrders] = useState<Order[]>(() => initialRecords(INITIAL_ORDERS));
+  const [invoices, setInvoices] = useState<Invoice[]>(() => initialRecords(INITIAL_INVOICES));
+  const [cylinders, setCylinders] = useState<CylinderBalance[]>(() => initialRecords(INITIAL_CYLINDERS));
+  const [tickets, setTickets] = useState<SupportTicket[]>(() => initialRecords(INITIAL_SUPPORT_TICKETS));
+  const [products, setProducts] = useState<Product[]>(() => initialRecords(INITIAL_PRODUCTS));
+  const [deals, setDeals] = useState<Deal[]>(() => initialRecords(INITIAL_DEALS));
+  const [quotes, setQuotes] = useState<Quote[]>(() => initialRecords(INITIAL_QUOTES));
+  const [campaigns, setCampaigns] = useState<Campaign[]>(() => initialRecords(INITIAL_CAMPAIGNS));
+  const [approvals, setApprovals] = useState<ApprovalRequest[]>(() => initialRecords(INITIAL_APPROVALS));
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>(() => initialRecords(INITIAL_AUDIT_LOGS));
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
-      console.info('Using local memory demo data because Supabase is not configured.');
       return;
     }
 
@@ -131,9 +137,8 @@ export function usePortalData(): PortalData {
         await loadCollection<Campaign>('campaigns', setCampaigns);
         await loadCollection<ApprovalRequest>('approvals', setApprovals);
         await loadCollection<AuditLog>('audit_logs', setAuditLogs, 'timestamp');
-        console.info('Portal state synchronised with Supabase.');
       } catch (error) {
-        console.error('Failed to sync tables from Supabase; retaining local state:', error);
+        if (portalEnvironment.DEV) console.error('Portal data synchronisation failed; no fixture fallback is used in production.', error);
       }
     };
 

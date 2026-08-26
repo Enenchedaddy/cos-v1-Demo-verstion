@@ -67,6 +67,9 @@ interface SalesMarketingPlatformProps {
   campaigns: Campaign[];
   approvals: ApprovalRequest[];
   auditLogs: AuditLog[];
+  permissions: readonly string[];
+  userName: string;
+  userRole: string;
   initialArea?: string;
   onUpdateDeals: (deals: Deal[]) => void;
   onAddLog: (
@@ -100,12 +103,26 @@ export default function SalesMarketingPlatform({
   campaigns,
   approvals,
   auditLogs,
+  permissions,
+  userName,
+  userRole,
   initialArea = 'home',
   onUpdateDeals,
   onAddLog,
   onLogoutToGateway,
 }: SalesMarketingPlatformProps) {
-  const initial = SALES_MARKETING_NAVIGATION_AREAS.find((area) => area.id === initialArea) ?? SALES_MARKETING_NAVIGATION_AREAS[0];
+  const canViewSales = permissions.includes('sales.view');
+  const canViewMarketing = permissions.includes('marketing.view');
+  const canCreateSales = permissions.includes('sales.create');
+  const salesOnlyAreas = new Set(['crm', 'sales-execution', 'commerce']);
+  const marketingOnlyAreas = new Set(['campaigns', 'paid-media', 'lifecycle', 'partnerships']);
+  const visibleAreas = useMemo(() => SALES_MARKETING_NAVIGATION_AREAS.filter((area) => {
+    if (area.id === 'content-social' || area.id === 'settings') return false;
+    if (salesOnlyAreas.has(area.id)) return canViewSales;
+    if (marketingOnlyAreas.has(area.id)) return canViewMarketing;
+    return canViewSales || canViewMarketing;
+  }), [canViewMarketing, canViewSales]);
+  const initial = visibleAreas.find((area) => area.id === initialArea) ?? visibleAreas[0] ?? SALES_MARKETING_NAVIGATION_AREAS[0];
   const [activeAreaId, setActiveAreaId] = useState(initial.id);
   const [activeRoute, setActiveRoute] = useState(initial.routes[0]);
   const [sidebarMode, setSidebarMode] = useState<'global' | 'contextual'>('global');
@@ -121,8 +138,16 @@ export default function SalesMarketingPlatform({
   const [contentNotificationsOpen, setContentNotificationsOpen] = useState(false);
   const [creationForm, setCreationForm] = useState({ title: '', company: companies[0]?.name ?? '', owner: 'Aisha Bello', value: '', dueDate: '2026-08-31' });
 
-  const activeArea = SALES_MARKETING_NAVIGATION_AREAS.find((area) => area.id === activeAreaId) ?? SALES_MARKETING_NAVIGATION_AREAS[0];
+  const activeArea = visibleAreas.find((area) => area.id === activeAreaId) ?? visibleAreas[0] ?? SALES_MARKETING_NAVIGATION_AREAS[0];
   const ActiveAreaIcon = activeArea.icon;
+
+  useEffect(() => {
+    if (!visibleAreas.some((area) => area.id === activeAreaId)) {
+      setActiveAreaId(visibleAreas[0]?.id ?? 'home');
+      setActiveRoute(visibleAreas[0]?.routes[0] ?? 'My Work');
+      setSidebarMode('global');
+    }
+  }, [activeAreaId, visibleAreas]);
 
   useEffect(() => {
     if (!isSidebarOpen || typeof window === 'undefined' || !window.matchMedia('(max-width: 1023px)').matches) return;
@@ -212,7 +237,7 @@ export default function SalesMarketingPlatform({
   };
 
   const selectRoute = (areaId: string, route: string) => {
-    const area = SALES_MARKETING_NAVIGATION_AREAS.find((item) => item.id === areaId);
+    const area = visibleAreas.find((item) => item.id === areaId);
     if (!area || !area.routes.includes(route)) return;
     if (area.id !== activeAreaId) selectArea(area);
     setActiveRoute(route);
@@ -221,7 +246,7 @@ export default function SalesMarketingPlatform({
 
   const submitCreation = (event: React.FormEvent) => {
     event.preventDefault();
-    if (!creationType || !creationForm.title.trim()) return;
+    if (!canCreateSales || !creationType || !creationForm.title.trim()) return;
     const createdAt = Date.now();
     if (creationType === 'deal') {
       const company = companies.find((item) => item.name === creationForm.company) ?? companies[0];
@@ -246,7 +271,7 @@ export default function SalesMarketingPlatform({
 
   return (
     <div className="sm-platform-v11 relative flex h-[100dvh] min-w-0 overflow-hidden bg-[#F7F9FC] font-sans text-[#172B4D]">
-      <SalesMarketingSidebar activeArea={activeArea} activeRoute={activeRoute} mode={sidebarMode} scopeMode={scopeMode} onScopeModeChange={setScopeMode} onAreaSelect={selectArea} onRouteSelect={selectRoute} onBackToMain={() => { setSidebarMode('global'); setAreaSearch(''); }} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} onExit={onLogoutToGateway} />
+      <SalesMarketingSidebar areas={visibleAreas} activeArea={activeArea} activeRoute={activeRoute} mode={sidebarMode} scopeMode={scopeMode} onScopeModeChange={setScopeMode} onAreaSelect={selectArea} onRouteSelect={selectRoute} onBackToMain={() => { setSidebarMode('global'); setAreaSearch(''); }} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} onExit={onLogoutToGateway} userName={userName} userRole={userRole} />
 
       <section className="relative flex min-w-0 flex-1 flex-col overflow-hidden bg-[#F7F9FC]">
         <COSLogoWatermark />
@@ -271,7 +296,7 @@ export default function SalesMarketingPlatform({
           )}
           {activeAreaId !== 'content-social' && <>
           {workspaceState === 'loading' && <StatePanel icon={RefreshCw} title="Loading governed workspace" detail="Synchronising entity records, permissions, and audit context." spinning />}
-          {workspaceState === 'empty' && <StatePanel icon={Sparkles} title="No records in this view" detail={`Create the first record for ${activeArea.label} · ${activeRoute}.`} action={() => setCreationType('task')} actionLabel="Create a task" />}
+          {workspaceState === 'empty' && <StatePanel icon={Sparkles} title="No records in this view" detail={`Create the first record for ${activeArea.label} · ${activeRoute}.`} action={canCreateSales ? () => setCreationType('task') : undefined} actionLabel={canCreateSales ? 'Create a task' : undefined} />}
           {workspaceState === 'error' && <StatePanel icon={AlertTriangle} title="Workspace data could not be reconciled" detail="Trace COS-SM-11F2 · No records were changed. Retry the governed query." action={() => setWorkspaceState('loaded')} actionLabel="Retry" danger />}
           {workspaceState === 'restricted' && <StatePanel icon={LockKeyhole} title="Restricted commercial view" detail="Your current DELabs scope masks this dataset. Request elevated access from Settings & Governance." action={() => { setActiveAreaId('settings'); setActiveRoute('Permissions'); setWorkspaceState('loaded'); }} actionLabel="Open permissions" />}
           {workspaceState === 'loaded' && (
@@ -280,7 +305,7 @@ export default function SalesMarketingPlatform({
                 eyebrow={<span className="flex items-center gap-2"><ActiveAreaIcon size={14} />{activeArea.label}<ChevronRight size={12} /><span>{activeRoute}</span></span>}
                 title={activeRoute}
                 subtitle={<>DELabs Ltd · {scopeMode === 'company' ? 'Company' : 'Group'} scope · governed commercial workspace</>}
-                actions={<><CreateButton icon={BriefcaseBusiness} label="New deal" onClick={() => setCreationType('deal')} /><CreateButton icon={ListTodo} label="New task" onClick={() => setCreationType('task')} /><CreateButton icon={UserPlus} label="New lead" primary onClick={() => setCreationType('lead')} /></>}
+                actions={canCreateSales ? <><CreateButton icon={BriefcaseBusiness} label="New deal" onClick={() => setCreationType('deal')} /><CreateButton icon={ListTodo} label="New task" onClick={() => setCreationType('task')} /><CreateButton icon={UserPlus} label="New lead" primary onClick={() => setCreationType('lead')} /></> : undefined}
               />
 
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">

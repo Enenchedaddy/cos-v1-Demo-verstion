@@ -25,39 +25,46 @@ import {
   ShieldCheck, HelpCircle, Sparkles, Sliders, Globe, MessageSquare
 } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from './supabaseClient';
+import { useAuthorization } from './auth/AuthorizationProvider';
 
-export default function App() {
+type AppPlatform = 'gateway' | 'sales-marketing' | 'management' | 'design-system';
+type PortalDataStatus = 'loading' | 'ready' | 'demo' | 'empty' | 'unauthorized' | 'error' | 'unavailable';
+
+const appEnvironment = (import.meta as any).env ?? {};
+// Fixtures are intentionally opt-in and can never be enabled in a production build.
+const isControlledDemoMode = Boolean(appEnvironment.DEV && appEnvironment.VITE_COS_ALLOW_DEMO === 'true');
+
+function initialRecords<T>(records: T[]): T[] {
+  return isControlledDemoMode ? records : [];
+}
+
+export default function App({ initialPlatform = 'gateway' }: { initialPlatform?: AppPlatform }) {
+  const { canAccessWorkspace, hasPermission, permissions, profile, role, signOut } = useAuthorization();
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    window.location.assign('/login');
+    try {
+      await signOut();
+    } finally {
+      window.location.assign('/login');
+    }
   };
 
   // Shared Database States (The Spine)
-  const [companies, setCompanies] = useState<Company[]>(INITIAL_COMPANIES);
-  const [orders, setOrders] = useState<Order[]>(INITIAL_ORDERS);
-  const [invoices, setInvoices] = useState<Invoice[]>(INITIAL_INVOICES);
-  const [cylinders, setCylinders] = useState<CylinderBalance[]>(INITIAL_CYLINDERS);
-  const [tickets, setTickets] = useState<SupportTicket[]>(INITIAL_SUPPORT_TICKETS);
-  const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
-  const [deals, setDeals] = useState<Deal[]>(INITIAL_DEALS);
-  const [quotes, setQuotes] = useState<Quote[]>(INITIAL_QUOTES);
-  const [campaigns, setCampaigns] = useState<Campaign[]>(INITIAL_CAMPAIGNS);
-  const [approvals, setApprovals] = useState<ApprovalRequest[]>(INITIAL_APPROVALS);
-  const [auditLogs, setAuditLogs] = useState<AuditLog[]>(INITIAL_AUDIT_LOGS);
+  const [companies, setCompanies] = useState<Company[]>(() => initialRecords(INITIAL_COMPANIES));
+  const [orders, setOrders] = useState<Order[]>(() => initialRecords(INITIAL_ORDERS));
+  const [invoices, setInvoices] = useState<Invoice[]>(() => initialRecords(INITIAL_INVOICES));
+  const [cylinders, setCylinders] = useState<CylinderBalance[]>(() => initialRecords(INITIAL_CYLINDERS));
+  const [tickets, setTickets] = useState<SupportTicket[]>(() => initialRecords(INITIAL_SUPPORT_TICKETS));
+  const [products, setProducts] = useState<Product[]>(() => initialRecords(INITIAL_PRODUCTS));
+  const [deals, setDeals] = useState<Deal[]>(() => initialRecords(INITIAL_DEALS));
+  const [quotes, setQuotes] = useState<Quote[]>(() => initialRecords(INITIAL_QUOTES));
+  const [campaigns, setCampaigns] = useState<Campaign[]>(() => initialRecords(INITIAL_CAMPAIGNS));
+  const [approvals, setApprovals] = useState<ApprovalRequest[]>(() => initialRecords(INITIAL_APPROVALS));
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>(() => initialRecords(INITIAL_AUDIT_LOGS));
+  const [portalDataStatus, setPortalDataStatus] = useState<PortalDataStatus>(() => isControlledDemoMode ? 'demo' : 'loading');
 
   const [showSimulatorLogs, setShowSimulatorLogs] = useState(false);
-  const [activePlatform, setActivePlatform] = useState<'gateway' | 'sales-marketing' | 'management' | 'design-system'>(() => {
-    const requestedWorkspace = new URLSearchParams(window.location.search).get('workspace');
-    if (requestedWorkspace === 'sales' || requestedWorkspace === 'marketing' || requestedWorkspace === 'sales-marketing') return 'sales-marketing';
-    if (requestedWorkspace === 'management') return 'management';
-    return 'gateway';
-  });
-  const [salesMarketingInitialArea, setSalesMarketingInitialArea] = useState(() => {
-    const requestedWorkspace = new URLSearchParams(window.location.search).get('workspace');
-    if (requestedWorkspace === 'sales') return 'sales-execution';
-    if (requestedWorkspace === 'marketing') return 'campaigns';
-    return 'home';
-  });
+  const [activePlatform, setActivePlatform] = useState<AppPlatform>(initialPlatform);
+  const [salesMarketingInitialArea, setSalesMarketingInitialArea] = useState('home');
   const [isInitializing, setIsInitializing] = useState(() => {
     try {
       return sessionStorage.getItem('cos-portal-initialized') !== 'true';
@@ -89,8 +96,12 @@ export default function App() {
     if (transitionTimer.current) window.clearTimeout(transitionTimer.current);
   }, []);
 
+  useEffect(() => {
+    setActivePlatform(initialPlatform);
+  }, [initialPlatform]);
+
   const beginPlatformTransition = (
-    target: 'gateway' | 'sales-marketing' | 'management' | 'design-system',
+    target: AppPlatform,
     label: string,
     onComplete?: () => void,
   ) => {
@@ -107,7 +118,7 @@ export default function App() {
   // Fetch real-time data from Supabase if configured
   useEffect(() => {
     if (!isSupabaseConfigured) {
-      console.log('Using local memory mock database (Supabase is not configured in .env)');
+      setPortalDataStatus(isControlledDemoMode ? 'demo' : 'unavailable');
       return;
     }
 
@@ -116,61 +127,65 @@ export default function App() {
         // 1. Fetch Companies
         const { data: companiesData, error: companiesError } = await supabase.from('companies').select('*');
         if (companiesError) throw companiesError;
-        if (companiesData && companiesData.length > 0) setCompanies(companiesData as Company[]);
+        setCompanies((companiesData ?? []) as Company[]);
 
         // 2. Fetch Products
         const { data: productsData, error: productsError } = await supabase.from('products').select('*');
         if (productsError) throw productsError;
-        if (productsData && productsData.length > 0) setProducts(productsData as Product[]);
+        setProducts((productsData ?? []) as Product[]);
 
         // 3. Fetch Orders
         const { data: ordersData, error: ordersError } = await supabase.from('orders').select('*');
         if (ordersError) throw ordersError;
-        if (ordersData && ordersData.length > 0) setOrders(ordersData as Order[]);
+        setOrders((ordersData ?? []) as Order[]);
 
         // 4. Fetch Invoices
         const { data: invoicesData, error: invoicesError } = await supabase.from('invoices').select('*');
         if (invoicesError) throw invoicesError;
-        if (invoicesData && invoicesData.length > 0) setInvoices(invoicesData as Invoice[]);
+        setInvoices((invoicesData ?? []) as Invoice[]);
 
         // 5. Fetch Cylinder Balances
         const { data: cylindersData, error: cylindersError } = await supabase.from('cylinder_balances').select('*');
         if (cylindersError) throw cylindersError;
-        if (cylindersData && cylindersData.length > 0) setCylinders(cylindersData as CylinderBalance[]);
+        setCylinders((cylindersData ?? []) as CylinderBalance[]);
 
         // 6. Fetch Support Tickets
         const { data: ticketsData, error: ticketsError } = await supabase.from('support_tickets').select('*');
         if (ticketsError) throw ticketsError;
-        if (ticketsData && ticketsData.length > 0) setTickets(ticketsData as SupportTicket[]);
+        setTickets((ticketsData ?? []) as SupportTicket[]);
 
         // 7. Fetch Deals
         const { data: dealsData, error: dealsError } = await supabase.from('deals').select('*');
         if (dealsError) throw dealsError;
-        if (dealsData && dealsData.length > 0) setDeals(dealsData as Deal[]);
+        setDeals((dealsData ?? []) as Deal[]);
 
         // 8. Fetch Quotes
         const { data: quotesData, error: quotesError } = await supabase.from('quotes').select('*');
         if (quotesError) throw quotesError;
-        if (quotesData && quotesData.length > 0) setQuotes(quotesData as Quote[]);
+        setQuotes((quotesData ?? []) as Quote[]);
 
         // 9. Fetch Campaigns
         const { data: campaignsData, error: campaignsError } = await supabase.from('campaigns').select('*');
         if (campaignsError) throw campaignsError;
-        if (campaignsData && campaignsData.length > 0) setCampaigns(campaignsData as Campaign[]);
+        setCampaigns((campaignsData ?? []) as Campaign[]);
 
         // 10. Fetch Approvals
         const { data: approvalsData, error: approvalsError } = await supabase.from('approvals').select('*');
         if (approvalsError) throw approvalsError;
-        if (approvalsData && approvalsData.length > 0) setApprovals(approvalsData as ApprovalRequest[]);
+        setApprovals((approvalsData ?? []) as ApprovalRequest[]);
 
         // 11. Fetch Audit Logs
         const { data: auditLogsData, error: auditLogsError } = await supabase.from('audit_logs').select('*').order('timestamp', { ascending: false });
         if (auditLogsError) throw auditLogsError;
-        if (auditLogsData && auditLogsData.length > 0) setAuditLogs(auditLogsData as AuditLog[]);
+        setAuditLogs((auditLogsData ?? []) as AuditLog[]);
 
-        console.log('Successfully synchronized state with Supabase Cloud Relational Database');
+        const totalRecords = (companiesData?.length ?? 0) + (productsData?.length ?? 0) + (ordersData?.length ?? 0) + (invoicesData?.length ?? 0) + (cylindersData?.length ?? 0) + (ticketsData?.length ?? 0) + (dealsData?.length ?? 0) + (quotesData?.length ?? 0) + (campaignsData?.length ?? 0) + (approvalsData?.length ?? 0) + (auditLogsData?.length ?? 0);
+        setPortalDataStatus(totalRecords === 0 ? 'empty' : 'ready');
       } catch (err) {
-        console.error('Failed to sync tables from Supabase, reverting to local state:', err);
+        const message = err instanceof Error ? err.message.toLowerCase() : '';
+        if (/permission|policy|row-level|not authorized|42501/.test(message)) setPortalDataStatus('unauthorized');
+        else if (/fetch|network|offline|timeout|unavailable/.test(message)) setPortalDataStatus('unavailable');
+        else setPortalDataStatus('error');
       }
     };
 
@@ -325,6 +340,36 @@ export default function App() {
   const clientApprovalToken = new URLSearchParams(window.location.search).get('client_approval');
   if (clientApprovalToken) return <ClientApprovalPortal token={clientApprovalToken} />;
 
+  const canAccessSalesMarketing = canAccessWorkspace('sales-marketing');
+  const canAccessManagement = canAccessWorkspace('management');
+  const canOpenDesignSystem = hasPermission('system.view');
+  const canManageUsers = hasPermission('users.view');
+  const userLabel = profile ? `${profile.firstName} ${profile.lastName}` : 'Authorized COS user';
+  const roleLabel = role?.name ?? 'Authorized role';
+  const dataStatusMessage: Record<Exclude<PortalDataStatus, 'ready'>, { tone: string; text: string }> = {
+    loading: { tone: 'border-[#D8D6CE] bg-white text-[#5E6872]', text: 'Loading governed business records…' },
+    demo: { tone: 'border-[#8A5A12] bg-[#F5ECD8] text-[#65420D]', text: 'Development fixture mode is active. These records are not production data.' },
+    empty: { tone: 'border-[#D8D6CE] bg-white text-[#5E6872]', text: 'No business records are available for this workspace yet.' },
+    unauthorized: { tone: 'border-[#A63A32] bg-[#F6E3E1] text-[#7E2D28]', text: 'Business records are restricted by policy. No demo records have been shown.' },
+    error: { tone: 'border-[#A63A32] bg-[#F6E3E1] text-[#7E2D28]', text: 'Business records could not be loaded. No demo records have been shown.' },
+    unavailable: { tone: 'border-[#A63A32] bg-[#F6E3E1] text-[#7E2D28]', text: 'The business data service is unavailable. No demo records have been shown.' },
+  };
+
+  const enterSalesMarketing = () => {
+    if (!canAccessSalesMarketing) return;
+    setSalesMarketingInitialArea('home');
+    beginPlatformTransition('sales-marketing', 'Authenticating & Launching Sales & Marketing Platform…', () => {
+      window.location.assign('/app/sales-marketing');
+    });
+  };
+
+  const enterManagement = () => {
+    if (!canAccessManagement) return;
+    beginPlatformTransition('management', 'Authenticating & Launching Executive Management Suite…', () => {
+      window.location.assign('/app/management');
+    });
+  };
+
   return (
     <div className="flex h-[100dvh] min-w-0 flex-col overflow-hidden bg-[#F7F9FC] font-sans text-slate-800">
       <CardInteractionManager />
@@ -338,13 +383,25 @@ export default function App() {
       {launchTransition && !isInitializing && (
         <HexLoader fullPage size="lg" label={launchTransition.label} />
       )}
+      {portalDataStatus !== 'ready' && (
+        <div className={`relative z-30 border-b px-4 py-2 text-center text-xs font-medium sm:px-6 ${dataStatusMessage[portalDataStatus].tone}`} role={portalDataStatus === 'loading' ? 'status' : 'alert'}>
+          {dataStatusMessage[portalDataStatus].text}
+        </div>
+      )}
       
       {/* Primary Workspace */}
       <main className="flex-1 overflow-hidden relative flex flex-col">
         {activePlatform === 'gateway' && (
           <IdentityGateway
             isSupabaseConfigured={isSupabaseConfigured}
+            canOpenDesignSystem={canOpenDesignSystem}
+            canAccessSalesMarketing={canAccessSalesMarketing}
+            canAccessManagement={canAccessManagement}
+            canManageUsers={canManageUsers}
+            userLabel={userLabel}
+            roleLabel={roleLabel}
             onOpenDesignSystem={() => beginPlatformTransition('design-system', 'Opening COS Design System…')}
+            onManageUsers={() => window.location.assign('/app/users')}
             onEnterSalesMarketing={() => {
               setSalesMarketingInitialArea('home');
               beginPlatformTransition('sales-marketing', 'Authenticating & Launching Sales & Marketing Platform…', () => {
@@ -727,7 +784,7 @@ export default function App() {
           </div>
         )}
 
-        {activePlatform === 'sales-marketing' && (
+        {activePlatform === 'sales-marketing' && canAccessSalesMarketing && (
           <SalesMarketingPlatform
             companies={companies}
             deals={deals}
@@ -735,13 +792,16 @@ export default function App() {
             auditLogs={auditLogs}
             approvals={approvals}
             initialArea={salesMarketingInitialArea}
+            permissions={permissions}
+            userName={userLabel}
+            userRole={roleLabel}
             onAddLog={handleAddLog}
             onUpdateDeals={handleUpdateDeals}
             onLogoutToGateway={handleLogout}
           />
         )}
 
-        {activePlatform === 'management' && (
+        {activePlatform === 'management' && canAccessManagement && (
           <ManagementPlatform
             companies={companies}
             deals={deals}
@@ -753,7 +813,7 @@ export default function App() {
             auditLogs={auditLogs}
             approvals={approvals}
             products={products}
-            currentRole="CEO / Executive Director"
+            currentRole={roleLabel}
             onAddLog={handleAddLog}
             onUpdateOrders={handleUpdateOrders}
             onUpdateQuotes={handleUpdateQuotes}
@@ -763,7 +823,7 @@ export default function App() {
           />
         )}
 
-        {activePlatform === 'design-system' && (
+        {activePlatform === 'design-system' && canOpenDesignSystem && (
           <DesignSystemPlatform
             onLogoutToGateway={handleLogout}
           />

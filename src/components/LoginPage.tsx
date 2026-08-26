@@ -46,6 +46,9 @@ export default function LoginPage() {
         <AuthField id="login-password" label="Password" type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} error={errors.password} required minLength={MIN_PASSWORD_LENGTH} />
         {errors.access && <p role="alert" className="rounded-xl border border-[#A63A32]/30 bg-[#A63A32]/5 px-4 py-3 text-sm text-[#A63A32]">{errors.access}</p>}
         <AuthSubmitButton>Sign in to workspace</AuthSubmitButton>
+        <div className="flex justify-end">
+          <a href="/password-recovery" className="inline-flex min-h-11 items-center text-sm font-semibold text-[#335AA8] underline decoration-[#335AA8]/30 underline-offset-4 transition hover:text-[#C84F2A] hover:decoration-[#C84F2A]">Forgot password?</a>
+        </div>
       </form>
     </AuthLayout>
   );

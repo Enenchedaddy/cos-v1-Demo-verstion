@@ -8,8 +8,8 @@ const MOCK_ROLES_BY_USER_ID: Record<string, PlatformRole[]> = {
 };
 
 /**
- * Temporary role provider for local testing.
- * Replace this function with the Supabase role query when authentication is connected.
+ * Test-only legacy routing fixture. Production authorization must use
+ * Supabase Auth plus public.get_my_authorization(); no application code imports this module.
  */
 export async function getUserRoles(userId: string): Promise<PlatformRole[]> {
   return [...(MOCK_ROLES_BY_USER_ID[userId.trim().toLowerCase()] ?? [])];

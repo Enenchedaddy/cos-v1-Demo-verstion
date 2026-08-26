@@ -4,13 +4,21 @@ import {
   ShieldCheck,
   Sliders,
   TrendingUp,
+  UserCog,
 } from 'lucide-react';
 import COSLogo from './COSLogo';
 import COSLogoWatermark from './COSLogoWatermark';
 
 interface IdentityGatewayProps {
   isSupabaseConfigured: boolean;
+  canOpenDesignSystem: boolean;
+  canAccessSalesMarketing: boolean;
+  canAccessManagement: boolean;
+  canManageUsers: boolean;
+  userLabel: string;
+  roleLabel: string;
   onOpenDesignSystem: () => void;
+  onManageUsers: () => void;
   onEnterSalesMarketing: () => void;
   onEnterManagement: () => void;
 }
@@ -22,11 +30,7 @@ const workspaces = [
     title: 'Sales & Marketing Platform',
     description:
       'Unified commercial execution and growth platform. Manage client deals, CPQ margin quotes, consent-aware campaigns, content briefs, and cross-channel media ROI analysis.',
-    fieldLabel: 'User identity profile',
-    options: [
-      'Chris Allen (Senior Sales Representative)',
-      'Aisha Bello (Marketing Director)',
-    ],
+    fieldLabel: 'Authenticated identity',
     contextLabel: 'Commercial & campaign scope',
     context: 'Sales + Marketing controls unified',
     icon: TrendingUp,
@@ -39,11 +43,7 @@ const workspaces = [
     title: 'CEO & Management Suite',
     description:
       'Command Centre oversight for group executives. Monitor business performance matrices, OKR strategy mapping, policy overrides, and entity registries.',
-    fieldLabel: 'Executive role profile',
-    options: [
-      'Olivia Reed (Group CEO & Executive Director)',
-      'Clara Evans (Chief Financial Officer)',
-    ],
+    fieldLabel: 'Authenticated identity',
     contextLabel: 'Authorisation clearance',
     context: 'Level 5 · Global executive',
     icon: Building2,
@@ -54,7 +54,14 @@ const workspaces = [
 
 export default function IdentityGateway({
   isSupabaseConfigured,
+  canOpenDesignSystem,
+  canAccessSalesMarketing,
+  canAccessManagement,
+  canManageUsers,
+  userLabel,
+  roleLabel,
   onOpenDesignSystem,
+  onManageUsers,
   onEnterSalesMarketing,
   onEnterManagement,
 }: IdentityGatewayProps) {
@@ -68,6 +75,9 @@ export default function IdentityGateway({
     ['SOX Audit Ledger', 'SECURED'],
     ['GPS Logistics', 'ACTIVE'],
   ];
+  const availableWorkspaces = workspaces.filter((workspace) => (
+    workspace.id === 'sales-marketing' ? canAccessSalesMarketing : canAccessManagement
+  ));
 
   return (
     <div className="relative isolate flex-1 overflow-y-auto bg-[#F3F6FA]">
@@ -87,13 +97,20 @@ export default function IdentityGateway({
             <span className="hidden font-mono text-[10px] uppercase tracking-[0.12em] text-[#77839A] sm:block">
               Internal access · CO-10
             </span>
-            <button
+            {canOpenDesignSystem && <button
               onClick={onOpenDesignSystem}
               className="flex min-h-11 items-center gap-2 rounded-lg border border-[#C9D3E2] bg-white px-3 text-xs font-semibold text-[#26344F] shadow-[0_1px_2px_rgba(15,29,55,0.06)] transition hover:border-[#335AA8] hover:text-[#335AA8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335AA8]"
             >
               <Sliders size={15} strokeWidth={1.8} />
               <span className="hidden sm:inline">Design system</span>
-            </button>
+            </button>}
+            {canManageUsers && <button
+              onClick={onManageUsers}
+              className="flex min-h-11 items-center gap-2 rounded-lg border border-[#C9D3E2] bg-white px-3 text-xs font-semibold text-[#26344F] shadow-[0_1px_2px_rgba(15,29,55,0.06)] transition hover:border-[#C84F2A] hover:text-[#C84F2A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C84F2A]"
+            >
+              <UserCog size={15} strokeWidth={1.8} />
+              <span className="hidden sm:inline">User provisioning</span>
+            </button>}
           </div>
         </header>
 
@@ -180,7 +197,7 @@ export default function IdentityGateway({
           </div>
 
           <div className="grid gap-5 lg:grid-cols-2">
-            {workspaces.map((workspace) => {
+            {availableWorkspaces.map((workspace) => {
               const Icon = workspace.icon;
               return (
                 <article
@@ -225,11 +242,7 @@ export default function IdentityGateway({
                       <span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.08em] text-[#78859B]">
                         {workspace.fieldLabel}
                       </span>
-                      <select className="min-h-11 w-full rounded-lg border border-[#CBD5E2] bg-[#F9FBFD] px-3 text-xs font-semibold text-[#18243A] outline-none transition focus:border-[#335AA8] focus:ring-2 focus:ring-[#335AA8]/15">
-                        {workspace.options.map((option) => (
-                          <option key={option}>{option}</option>
-                        ))}
-                      </select>
+                      <div className="flex min-h-11 items-center rounded-lg border border-[#CBD5E2] bg-[#F9FBFD] px-3 text-xs font-semibold text-[#18243A]">{userLabel}</div>
                     </label>
                     <div>
                       <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.08em] text-[#78859B]">
@@ -237,13 +250,16 @@ export default function IdentityGateway({
                       </p>
                       <div className="flex min-h-11 items-center gap-2 rounded-lg border border-[#D7DFEA] bg-[#F3F6FA] px-3 font-mono text-[10px] uppercase tracking-[0.05em] text-[#46556E]">
                         <ShieldCheck size={14} style={{ color: workspace.accent }} />
-                        {workspace.context}
+                        {workspace.context} · {roleLabel}
                       </div>
                     </div>
                   </div>
 
                   <button
-                    onClick={actions[workspace.id]}
+                    onClick={() => {
+                      actions[workspace.id]();
+                      window.setTimeout(() => window.location.assign(workspace.id === 'management' ? '/app/management' : '/app/sales-marketing'), 1750);
+                    }}
                     className="mt-auto flex min-h-11 w-full items-center justify-center gap-2 rounded-lg px-4 text-xs font-bold text-white shadow-[0_5px_12px_rgba(19,39,71,0.14)] transition hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
                     style={{
                       backgroundColor: workspace.accent,
@@ -261,6 +277,7 @@ export default function IdentityGateway({
                 </article>
               );
             })}
+            {availableWorkspaces.length === 0 && <div className="rounded-2xl border border-[#D7DFEA] bg-white p-8 text-center text-sm text-[#5B6B84]">Your account has no approved business workspace. Contact an administrator if you believe this is incorrect.</div>}
           </div>
         </section>
 

@@ -1,18 +1,27 @@
 import { expect, test } from '@playwright/test';
 
+const e2eEmail = process.env.COS_E2E_EMAIL;
+const e2ePassword = process.env.COS_E2E_PASSWORD;
+
+test.skip(!e2eEmail || !e2ePassword, 'Requires an approved controlled Supabase CEO test account with both workspaces.');
+
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
     window.sessionStorage.setItem('cos-portal-initialized', 'true');
     window.localStorage.clear();
   });
-  await page.goto('/');
+  await page.goto('/login');
+  await page.getByLabel('Work email').fill(e2eEmail!);
+  await page.getByLabel('Password').fill(e2ePassword!);
+  await page.getByRole('button', { name: 'Sign in to workspace' }).click();
+  await page.waitForURL(/\/app$/);
 });
 
 for (const workspace of [
   {
     gatewayLabel: 'Authenticate and enter Sales & Marketing Platform',
     activeArea: 'Home',
-    checkAreas: ['Settings & Governance', 'Content & Social'],
+    checkAreas: ['Strategy & Planning', 'Paid Media'],
     captureName: 'sales-marketing',
   },
   {
@@ -47,7 +56,7 @@ for (const workspace of [
       await page.getByRole('button', { name: 'Back to Main Menu', exact: true }).click();
     }
 
-    const drillParent = workspace.captureName === 'sales-marketing' ? 'Content & Social' : 'Organisation & Headcount';
+    const drillParent = workspace.captureName === 'sales-marketing' ? 'Creators & Partnerships' : 'Organisation & Headcount';
     await page.locator('.cos-expanded-navigation').getByRole('button', { name: drillParent, exact: true }).click();
     await expect(page.getByTestId('cos-drill-title')).toHaveText(drillParent);
     await expect(page.locator('.cos-expanded-navigation').getByRole('button', { name: workspace.captureName === 'sales-marketing' ? 'Home' : 'Command Home', exact: true })).toHaveCount(0);
