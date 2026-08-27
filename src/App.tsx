@@ -39,13 +39,11 @@ function initialRecords<T>(records: T[]): T[] {
 }
 
 export default function App({ initialPlatform = 'gateway' }: { initialPlatform?: AppPlatform }) {
-  const { canAccessWorkspace, hasPermission, permissions, profile, role, signOut } = useAuthorization();
-  const handleLogout = async () => {
-    try {
-      await signOut();
-    } finally {
-      window.location.assign('/login');
-    }
+  const { canAccessWorkspace, hasPermission, permissions, profile, role } = useAuthorization();
+  const handleExitWorkspace = () => {
+    // Leaving a workspace is navigation, not authentication logout. The protected
+    // gateway restores the existing Supabase session and shows allowed workspaces.
+    window.location.assign('/app');
   };
 
   // Shared Database States (The Spine)
@@ -797,7 +795,7 @@ export default function App({ initialPlatform = 'gateway' }: { initialPlatform?:
             userRole={roleLabel}
             onAddLog={handleAddLog}
             onUpdateDeals={handleUpdateDeals}
-            onLogoutToGateway={handleLogout}
+            onExitToGateway={handleExitWorkspace}
           />
         )}
 
@@ -819,13 +817,13 @@ export default function App({ initialPlatform = 'gateway' }: { initialPlatform?:
             onUpdateQuotes={handleUpdateQuotes}
             onUpdateCompanies={handleUpdateCompanies}
             onUpdateApprovals={handleUpdateApprovals}
-            onLogoutToGateway={handleLogout}
+            onExitToGateway={handleExitWorkspace}
           />
         )}
 
         {activePlatform === 'design-system' && canOpenDesignSystem && (
           <DesignSystemPlatform
-            onLogoutToGateway={handleLogout}
+            onExitToGateway={handleExitWorkspace}
           />
         )}
       </main>
@@ -867,6 +865,7 @@ export default function App({ initialPlatform = 'gateway' }: { initialPlatform?:
       {/* Minimized stream trigger badge */}
       {!showSimulatorLogs && (
         <button
+          hidden
           onClick={() => setShowSimulatorLogs(true)}
           className="fixed bottom-4 right-4 bg-[#0B1E3F] hover:bg-[#153463] border border-slate-700 text-slate-200 rounded-lg p-2.5 text-[10px] font-bold shadow-xl z-50 flex items-center space-x-2 transition"
         >

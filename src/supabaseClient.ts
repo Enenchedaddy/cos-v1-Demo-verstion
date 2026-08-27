@@ -9,6 +9,14 @@ export const isSupabaseConfigured = !!(supabaseUrl && supabaseAnonKey && !supaba
 
 export const supabase = createClient(
   supabaseUrl || 'https://your-placeholder-id.supabase.co',
-  supabaseAnonKey || 'placeholder-anon-key'
+  supabaseAnonKey || 'placeholder-anon-key',
+  {
+    auth: {
+      // Supabase owns persisted session and refresh-token management. The COS
+      // application never stores credentials or tokens itself.
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+    },
+  },
 );
-

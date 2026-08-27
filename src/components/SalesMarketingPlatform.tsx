@@ -33,6 +33,40 @@ import type { ApprovalRequest, AuditLog, Campaign, Company, Deal } from '../type
 type WorkspaceState = 'loaded' | 'empty' | 'loading' | 'error' | 'restricted';
 type CreationType = 'deal' | 'task' | 'lead';
 
+/**
+ * Staging/build capability: it reveals Sales & Marketing navigation for
+ * approved test roles without granting business actions or data access.
+ */
+export const SALES_MARKETING_INTERFACE_VISIBILITY_PERMISSION = 'testing.sales_marketing_interface.view';
+
+const SALES_ONLY_AREA_IDS = new Set(['crm', 'sales-execution', 'commerce']);
+const MARKETING_ONLY_AREA_IDS = new Set(['campaigns', 'paid-media', 'lifecycle', 'partnerships']);
+
+export function getSalesMarketingCapabilities(permissions: readonly string[]) {
+  const canInspectSalesMarketingInterface = permissions.includes(SALES_MARKETING_INTERFACE_VISIBILITY_PERMISSION);
+
+  return {
+    canInspectSalesMarketingInterface,
+    canViewSales: permissions.includes('sales.view') || canInspectSalesMarketingInterface,
+    canViewMarketing: permissions.includes('marketing.view') || canInspectSalesMarketingInterface,
+    canCreateSales: permissions.includes('sales.create'),
+  };
+}
+
+export function getVisibleSalesMarketingAreas(permissions: readonly string[]) {
+  const { canInspectSalesMarketingInterface, canViewSales, canViewMarketing } = getSalesMarketingCapabilities(permissions);
+
+  return SALES_MARKETING_NAVIGATION_AREAS.filter((area) => {
+    // Content & Social data remains membership/RLS-controlled after its navigation is visible.
+    if (area.id === 'content-social') return canInspectSalesMarketingInterface;
+    // Settings remains separately controlled and is not part of this visibility capability.
+    if (area.id === 'settings') return false;
+    if (SALES_ONLY_AREA_IDS.has(area.id)) return canViewSales;
+    if (MARKETING_ONLY_AREA_IDS.has(area.id)) return canViewMarketing;
+    return canViewSales || canViewMarketing;
+  });
+}
+
 interface TaskRecord {
   id: string;
   title: string;
@@ -79,7 +113,7 @@ interface SalesMarketingPlatformProps {
     platform: 'S&M',
     details?: string,
   ) => void;
-  onLogoutToGateway?: () => void;
+  onExitToGateway?: () => void;
 }
 
 const INITIAL_TASKS: TaskRecord[] = [
@@ -109,19 +143,10 @@ export default function SalesMarketingPlatform({
   initialArea = 'home',
   onUpdateDeals,
   onAddLog,
-  onLogoutToGateway,
+  onExitToGateway,
 }: SalesMarketingPlatformProps) {
-  const canViewSales = permissions.includes('sales.view');
-  const canViewMarketing = permissions.includes('marketing.view');
-  const canCreateSales = permissions.includes('sales.create');
-  const salesOnlyAreas = new Set(['crm', 'sales-execution', 'commerce']);
-  const marketingOnlyAreas = new Set(['campaigns', 'paid-media', 'lifecycle', 'partnerships']);
-  const visibleAreas = useMemo(() => SALES_MARKETING_NAVIGATION_AREAS.filter((area) => {
-    if (area.id === 'content-social' || area.id === 'settings') return false;
-    if (salesOnlyAreas.has(area.id)) return canViewSales;
-    if (marketingOnlyAreas.has(area.id)) return canViewMarketing;
-    return canViewSales || canViewMarketing;
-  }), [canViewMarketing, canViewSales]);
+  const { canCreateSales } = getSalesMarketingCapabilities(permissions);
+  const visibleAreas = useMemo(() => getVisibleSalesMarketingAreas(permissions), [permissions]);
   const initial = visibleAreas.find((area) => area.id === initialArea) ?? visibleAreas[0] ?? SALES_MARKETING_NAVIGATION_AREAS[0];
   const [activeAreaId, setActiveAreaId] = useState(initial.id);
   const [activeRoute, setActiveRoute] = useState(initial.routes[0]);
@@ -271,7 +296,7 @@ export default function SalesMarketingPlatform({
 
   return (
     <div className="sm-platform-v11 relative flex h-[100dvh] min-w-0 overflow-hidden bg-[#F7F9FC] font-sans text-[#172B4D]">
-      <SalesMarketingSidebar areas={visibleAreas} activeArea={activeArea} activeRoute={activeRoute} mode={sidebarMode} scopeMode={scopeMode} onScopeModeChange={setScopeMode} onAreaSelect={selectArea} onRouteSelect={selectRoute} onBackToMain={() => { setSidebarMode('global'); setAreaSearch(''); }} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} onExit={onLogoutToGateway} userName={userName} userRole={userRole} />
+      <SalesMarketingSidebar areas={visibleAreas} activeArea={activeArea} activeRoute={activeRoute} mode={sidebarMode} scopeMode={scopeMode} onScopeModeChange={setScopeMode} onAreaSelect={selectArea} onRouteSelect={selectRoute} onBackToMain={() => { setSidebarMode('global'); setAreaSearch(''); }} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} onExit={onExitToGateway} userName={userName} userRole={userRole} />
 
       <section className="relative flex min-w-0 flex-1 flex-col overflow-hidden bg-[#F7F9FC]">
         <COSLogoWatermark />

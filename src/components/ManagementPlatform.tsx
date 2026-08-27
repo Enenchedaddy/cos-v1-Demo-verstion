@@ -37,7 +37,7 @@ interface ManagementPlatformProps {
   onUpdateQuotes: (quotes: Quote[]) => void;
   onUpdateCompanies: (companies: Company[]) => void;
   onUpdateApprovals: (approvals: ApprovalRequest[]) => void;
-  onLogoutToGateway?: () => void;
+  onExitToGateway?: () => void;
 }
 
 export default function ManagementPlatform({
@@ -57,7 +57,7 @@ export default function ManagementPlatform({
   onUpdateQuotes,
   onUpdateCompanies,
   onUpdateApprovals,
-  onLogoutToGateway
+  onExitToGateway
 }: ManagementPlatformProps) {
   // Sidebar Tabs States (Morally mapped to Volume 1 PDF hierarchy)
   const [activeTab, setActiveTab] = useState<'home' | 'performance' | 'governance' | 'strategy' | 'organisation' | 'acquisitions' | 'alerts' | 'group-admin'>('home');
@@ -217,7 +217,7 @@ export default function ManagementPlatform({
         onBackToMain={() => setSidebarMode('global')}
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
-        onExit={onLogoutToGateway}
+        onExit={onExitToGateway}
       />
       <aside
         id="management-legacy-sidebar"
@@ -231,7 +231,7 @@ export default function ManagementPlatform({
           activeId={activeTab}
           initials="OR"
           onSelect={selectManagementArea}
-          onExit={onLogoutToGateway}
+          onExit={onExitToGateway}
         />
         <div className="contextual-rail hidden min-h-0 w-[316px] flex-1 flex-col bg-[#0B3672] md:flex">
         <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">

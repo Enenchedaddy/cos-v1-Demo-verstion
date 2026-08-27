@@ -1,13 +1,15 @@
 import { useState, type FormEvent } from 'react';
 import { AuthField, AuthLayout, AuthSubmitButton } from './AuthLayout';
 import { isSupabaseConfigured, supabase } from '../supabaseClient';
+import { loadRememberedWorkEmail, saveRememberedWorkEmail } from '../auth/rememberedEmail';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_PASSWORD_LENGTH = 8;
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(loadRememberedWorkEmail);
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(() => Boolean(loadRememberedWorkEmail()));
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -35,6 +37,8 @@ export default function LoginPage() {
         return;
       }
 
+      saveRememberedWorkEmail(email, rememberMe);
+      setPassword('');
       window.location.assign('/app');
     }
   };
@@ -42,8 +46,22 @@ export default function LoginPage() {
   return (
     <AuthLayout title="Welcome back">
       <form className="space-y-6" onSubmit={handleSubmit} noValidate>
-        <AuthField id="login-email" label="Work email" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} error={errors.email} required />
+        <AuthField id="login-email" label="Work email" type="email" autoComplete="username" value={email} onChange={(event) => setEmail(event.target.value)} error={errors.email} required />
         <AuthField id="login-password" label="Password" type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} error={errors.password} required minLength={MIN_PASSWORD_LENGTH} />
+        <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm text-[#52617A]" htmlFor="remember-me">
+          <input
+            id="remember-me"
+            type="checkbox"
+            checked={rememberMe}
+            onChange={(event) => {
+              const nextRememberMe = event.target.checked;
+              setRememberMe(nextRememberMe);
+              if (!nextRememberMe) saveRememberedWorkEmail('', false);
+            }}
+            className="h-4 w-4 rounded border-[#9AA8BC] text-[#335AA8] focus:ring-[#335AA8]"
+          />
+          <span>Remember my work email on this device</span>
+        </label>
         {errors.access && <p role="alert" className="rounded-xl border border-[#A63A32]/30 bg-[#A63A32]/5 px-4 py-3 text-sm text-[#A63A32]">{errors.access}</p>}
         <AuthSubmitButton>Sign in to workspace</AuthSubmitButton>
         <div className="flex justify-end">

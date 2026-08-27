@@ -94,10 +94,11 @@ export default function IdentityGateway({
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <span className="hidden font-mono text-[10px] uppercase tracking-[0.12em] text-[#77839A] sm:block">
+            <span hidden className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#77839A]">
               Internal access · CO-10
             </span>
             {canOpenDesignSystem && <button
+              hidden
               onClick={onOpenDesignSystem}
               className="flex min-h-11 items-center gap-2 rounded-lg border border-[#C9D3E2] bg-white px-3 text-xs font-semibold text-[#26344F] shadow-[0_1px_2px_rgba(15,29,55,0.06)] transition hover:border-[#335AA8] hover:text-[#335AA8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#335AA8]"
             >
@@ -142,6 +143,7 @@ export default function IdentityGateway({
         </section>
 
         <section
+          hidden
           className="mx-auto max-w-[980px] rounded-2xl border border-[#CAD4E1] bg-white p-4 shadow-[0_7px_20px_rgba(20,36,64,0.08)] sm:p-5"
           aria-labelledby="live-nodes-title"
         >

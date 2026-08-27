@@ -17,6 +17,7 @@ export interface AuthorizationSnapshot {
   profile: AuthorizationProfile;
   role: AuthorizationRole;
   permissions: readonly string[];
+  allowedWorkspaces: readonly WorkspaceId[];
 }
 
 export interface AuthorizationRpcRow {
@@ -28,11 +29,14 @@ export interface AuthorizationRpcRow {
   role_code: string;
   role_name: string;
   permissions: unknown;
+  allowed_workspaces: unknown;
 }
 
 const ROLE_CODES = new Set<AuthorizationRole['code']>([
   'CEO', 'MANAGEMENT', 'SALES', 'MARKETING', 'SOFTWARE_ENGINEER',
 ]);
+
+const WORKSPACE_IDS = new Set<WorkspaceId>(['sales-marketing', 'management']);
 
 export const WORKSPACE_PATHS: Record<WorkspaceId, string> = {
   'sales-marketing': '/app/sales-marketing',
@@ -56,7 +60,9 @@ export function toAuthorizationSnapshot(row: unknown, expectedUserId: string): A
     typeof value.role_code !== 'string' ||
     !ROLE_CODES.has(value.role_code as AuthorizationRole['code']) ||
     !Array.isArray(value.permissions) ||
-    !value.permissions.every((permission) => typeof permission === 'string')
+    !value.permissions.every((permission) => typeof permission === 'string') ||
+    !Array.isArray(value.allowed_workspaces) ||
+    !value.allowed_workspaces.every((workspace) => typeof workspace === 'string' && WORKSPACE_IDS.has(workspace as WorkspaceId))
   ) return null;
 
   return {
@@ -69,19 +75,10 @@ export function toAuthorizationSnapshot(row: unknown, expectedUserId: string): A
     },
     role: { code: value.role_code as AuthorizationRole['code'], name: value.role_name },
     permissions: [...new Set(value.permissions)],
+    allowedWorkspaces: [...new Set(value.allowed_workspaces as WorkspaceId[])],
   };
 }
 
 export function hasPermission(permissions: readonly string[], permission: string): boolean {
   return permissions.includes(permission);
-}
-
-export function resolveAllowedWorkspaces(permissions: readonly string[]): WorkspaceId[] {
-  if (!hasPermission(permissions, 'workspace.view')) return [];
-  const workspaces: WorkspaceId[] = [];
-  if (hasPermission(permissions, 'sales.view') || hasPermission(permissions, 'marketing.view')) {
-    workspaces.push('sales-marketing');
-  }
-  if (hasPermission(permissions, 'management.view')) workspaces.push('management');
-  return workspaces;
 }

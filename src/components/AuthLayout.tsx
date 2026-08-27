@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react';
-import { ArrowLeft } from 'lucide-react';
 import COSLogo from './COSLogo';
 
 interface AuthLayoutProps {
@@ -27,18 +26,7 @@ export function AuthLayout({ title, children, footer }: AuthLayoutProps) {
       </aside>
 
       <div className="flex min-h-[100dvh] min-w-0 flex-col px-3 py-4 sm:px-8 sm:py-8 lg:px-16">
-        <header className="mx-auto flex w-full max-w-[600px] items-center justify-between border-b border-[#D7DEE8] pb-4">
-          <a href="/app" className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#335AA8] lg:hidden">
-            Central Operating System
-          </a>
-          <span aria-hidden="true" />
-          <a href="/app" className="inline-flex min-h-12 items-center gap-2 text-xs font-semibold text-[#52617A] transition hover:text-[#335AA8]">
-            <ArrowLeft size={15} />
-            <span className="hidden sm:inline">Back to gateway</span>
-          </a>
-        </header>
-
-        <section className="mx-auto flex w-full max-w-[520px] flex-1 flex-col justify-center py-8 sm:py-16">
+        <section className="mx-auto flex w-full max-w-[500px] flex-1 flex-col justify-center py-6 sm:py-10">
           <div className="rounded-[20px] border border-[#CAD4E1] bg-white p-5 shadow-[0_12px_32px_rgba(20,36,64,0.08)] sm:rounded-[24px] sm:p-8">
             <div className="mb-7 flex items-start justify-between gap-4 sm:mb-8 sm:gap-8">
               <h1 className="min-w-0 text-[32px] font-semibold leading-[1.05] sm:text-[48px] sm:leading-none">{title}</h1>

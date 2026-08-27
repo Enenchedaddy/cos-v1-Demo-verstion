@@ -3,7 +3,6 @@ import type { User } from '@supabase/supabase-js';
 import { isSupabaseConfigured, supabase } from '../supabaseClient';
 import {
   hasPermission as permissionIncludes,
-  resolveAllowedWorkspaces,
   toAuthorizationSnapshot,
   type AuthorizationProfile,
   type AuthorizationRole,
@@ -80,7 +79,7 @@ export function AuthorizationProvider({ children }: { children: ReactNode }) {
         profile: snapshot.profile,
         role: snapshot.role,
         permissions: snapshot.permissions,
-        allowedWorkspaces: resolveAllowedWorkspaces(snapshot.permissions),
+        allowedWorkspaces: snapshot.allowedWorkspaces,
         error: null,
       });
       setStatus('authorized');

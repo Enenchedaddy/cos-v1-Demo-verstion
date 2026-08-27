@@ -13,10 +13,10 @@ import {
 import COSLogo from './COSLogo';
 
 interface DesignSystemPlatformProps {
-  onLogoutToGateway: () => void;
+  onExitToGateway: () => void;
 }
 
-export default function DesignSystemPlatform({ onLogoutToGateway }: DesignSystemPlatformProps) {
+export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPlatformProps) {
   const [activeSection, setActiveTab] = useState<'cover' | 'brand' | 'type' | 'layout' | 'icons' | 'components' | 'patterns' | 'audit'>('cover');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [copiedToken, setCopiedToken] = useState<string | null>(null);
@@ -180,7 +180,7 @@ export default function DesignSystemPlatform({ onLogoutToGateway }: DesignSystem
           </div>
           <div className="flex items-center gap-2">
             <button 
-              onClick={onLogoutToGateway}
+              onClick={onExitToGateway}
               className="bg-[#4065B3] hover:bg-[#6C84B8] transition text-white px-3 py-1.5 rounded-lg text-xs font-bold font-display cursor-pointer"
             >
               Exit Workspace
