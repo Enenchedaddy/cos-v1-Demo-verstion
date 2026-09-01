@@ -2,6 +2,7 @@ import { StrictMode, type ComponentType } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import LoginPage from './components/LoginPage.tsx';
+import AuthConfirmationPage from './components/AuthConfirmationPage.tsx';
 import PasswordRecoveryPage from './components/PasswordRecoveryPage.tsx';
 import PasswordSetupPage from './components/PasswordSetupPage.tsx';
 import UserProvisioningPage from './components/UserProvisioningPage.tsx';
@@ -20,6 +21,7 @@ const routes: Record<string, ComponentType> = {
   '/': () => <PublicLoginRoute><LoginPage /></PublicLoginRoute>,
   '/login': () => <PublicLoginRoute><LoginPage /></PublicLoginRoute>,
   '/password-recovery': () => <PublicLoginRoute><PasswordRecoveryPage /></PublicLoginRoute>,
+  '/auth/confirm': AuthConfirmationPage,
   '/password-update': PasswordSetupPage,
   '/auth/complete': PasswordSetupPage,
   '/app': AppEntryRoute,
