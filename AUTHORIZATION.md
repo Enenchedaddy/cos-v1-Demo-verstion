@@ -8,13 +8,13 @@ The React authorization provider is an experience and navigation layer. PostgreS
 
 ## Global roles and workspaces
 
-| Role | Sales & Marketing | Management |
-| --- | --- | --- |
-| CEO | Approved read/write permissions | Approved access |
-| MANAGEMENT | Approved read visibility | Approved access |
-| SALES | Sales capabilities | No access |
-| MARKETING | Marketing capabilities | No access |
-| SOFTWARE_ENGINEER | No business workspace by default | No access |
+| Role              | Sales & Marketing                | Management      |
+| ----------------- | -------------------------------- | --------------- |
+| CEO               | Approved read/write permissions  | Approved access |
+| MANAGEMENT        | Approved read visibility         | Approved access |
+| SALES             | Sales capabilities               | No access       |
+| MARKETING         | Marketing capabilities           | No access       |
+| SOFTWARE_ENGINEER | No business workspace by default | No access       |
 
 Sales and Marketing are one workspace. Its canonical URL is `/app/sales-marketing`; Management is `/app/management`. Legacy `/app?workspace=sales`, `/app?workspace=marketing`, and `/app?workspace=management` URLs normalize to canonical URLs and grant no access by themselves.
 
