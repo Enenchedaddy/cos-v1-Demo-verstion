@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AlertTriangle, CheckCircle2, FileCheck2, LoaderCircle, ShieldCheck } from 'lucide-react';
 import COSLogo from '../components/COSLogo';
-import { supabase } from '../supabaseClient';
+import { isSupabaseConfigured, supabase } from '../supabaseClient';
 
 interface ClientApprovalData {
   approvalNumber: string;
@@ -21,6 +21,11 @@ export default function ClientApprovalPortal({ token }: { token: string }) {
 
   useEffect(() => {
     let active = true;
+    if (!isSupabaseConfigured) {
+      setError('The approval service is not configured.');
+      setStatus('error');
+      return () => { active = false; };
+    }
     void supabase.rpc('cs_client_approval', { p_token: token }).then(({ data: response, error: rpcError }) => {
       if (!active) return;
       if (rpcError) { setError(rpcError.message); setStatus('error'); return; }

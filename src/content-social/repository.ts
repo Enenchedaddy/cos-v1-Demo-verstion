@@ -33,6 +33,10 @@ const COLLECTIONS = Object.keys(TABLES) as ContentSocialCollection[];
 const APPROVAL_SELECT = 'id,workspace_id,client_id,brand_id,approval_number,content_item_id,title,route_name,step_name,status,targets,requested_by,requested_at,due_at,client_visible,secure_token_expires_at,decisions,created_at,created_by,updated_at,updated_by,revision,archived_at,deleted_at,deleted_by,deletion_reason,purge_after';
 const STORAGE_VERSION = 2;
 
+export function isContentSocialDemoEnabled(environment: Record<string, unknown>): boolean {
+  return Boolean(environment.DEV && environment.VITE_COS_ALLOW_DEMO === 'true');
+}
+
 class RepositoryError extends Error {
   constructor(
     message: string,
@@ -164,9 +168,12 @@ export class ContentSocialRepository {
 
   async load(): Promise<RepositoryLoadResult> {
     const metaEnv = (import.meta as any).env ?? {};
-    const allowDemo = Boolean(metaEnv.DEV) || metaEnv.VITE_COS_ALLOW_DEMO === 'true';
+    const allowDemo = isContentSocialDemoEnabled(metaEnv);
 
     if (!isSupabaseConfigured) {
+      if (!allowDemo) {
+        throw new RepositoryError('The governed Content & Social data service is not configured.', 'UNAVAILABLE');
+      }
       this.mode = 'demo';
       return { state: loadLocal(this.scope), session: DEMO_SESSION, mode: 'demo', warning: 'Supabase is not configured. Changes are stored in this browser only.' };
     }

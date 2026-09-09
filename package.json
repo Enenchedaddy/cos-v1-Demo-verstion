@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "seed": "tsx scripts/seedSupabase.ts",
-    "clean": "rm -rf dist server.js",
+    "clean": "node scripts/clean.mjs",
     "lint": "tsc --noEmit",
     "test": "vitest",
     "test:run": "vitest run",
@@ -40,5 +40,9 @@
     "typescript": "~5.8.2",
     "vite": "^6.2.3",
     "vitest": "^4.1.10"
+  },
+  "overrides": {
+    "baseline-browser-mapping": "2.11.21",
+    "browserslist": "4.28.9"
   }
 }

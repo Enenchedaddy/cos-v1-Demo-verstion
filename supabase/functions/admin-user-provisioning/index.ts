@@ -266,30 +266,6 @@ Deno.serve(async (request) => {
       await audit(service, actor.userId, target.requested_email, initial ? 'invitation_sent' : 'invitation_resent', correlationId, id, invitedUser.id, target.requested_role_id);
       return json({ data: { id }, requestId: correlationId }, 200, headers);
     }
-    const userId = cleanId(body.userId, 'User ID');
-    if (userId === actor.userId) throw new Error('You cannot administratively change your own role or account status.');
-    if (action === 'update_profile') {
-      requirePermission(actor, 'users.update');
-      const { error } = await service.from('profiles').update({ first_name: cleanText(body.firstName, 'First name', true, 80), last_name: cleanText(body.lastName, 'Last name', true, 80), job_title: cleanText(body.jobTitle, 'Job title'), department: cleanText(body.department, 'Department', false, 120) }).eq('id', userId);
-      if (error) throw error;
-      return json({ data: { id: userId }, requestId: correlationId }, 200, headers);
-    }
-    if (action === 'change_role') {
-      requirePermission(actor, 'users.update');
-      const role = await roleByCode(service, cleanRole(body.roleCode));
-      const { error } = await service.from('profiles').update({ role_id: role.id }).eq('id', userId);
-      if (error) throw error;
-      return json({ data: { id: userId, roleCode: role.code }, requestId: correlationId }, 200, headers);
-    }
-    if (action === 'disable_user' || action === 'enable_user') {
-      requirePermission(actor, action === 'disable_user' ? 'users.disable' : 'users.enable');
-      const nextStatus = action === 'disable_user' ? 'disabled' : 'active';
-      const { error: profileError } = await service.from('profiles').update({ status: nextStatus }).eq('id', userId);
-      if (profileError) throw profileError;
-      const { error: authError } = await service.auth.admin.updateUserById(userId, { ban_duration: action === 'disable_user' ? '876000h' : 'none' });
-      if (authError) throw authError;
-      return json({ data: { id: userId, status: nextStatus }, requestId: correlationId }, 200, headers);
-    }
     throw new Error('Unsupported provisioning action.');
   } catch (error) {
     const code = error instanceof ProvisioningFailure ? error.code : 'REQUEST_REJECTED';

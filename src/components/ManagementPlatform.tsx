@@ -6,58 +6,26 @@
 import React, { useEffect, useState } from 'react';
 import COSLogoWatermark from './COSLogoWatermark';
 import HexLoader from './HexLoader';
-import SidebarEntityScope from './SidebarEntityScope';
 import { MANAGEMENT_RAIL_AREAS } from '../navigation/management';
 import ManagementSidebar from './ManagementSidebar';
-import { ContextRailHeader, ContextRailSearch, ExpandedSidebarNavigation, GlobalIconRail } from './DualRailNavigation';
-import { Company, Deal, Quote, Order, Invoice, CylinderBalance, SupportTicket, Campaign, AuditLog, ApprovalRequest, Product } from '../types';
-import { 
-  Users, TrendingUp, Percent, FileText, Activity, MessageSquare, ArrowRight, Plus, Check, AlertTriangle, 
-  Search, ShieldAlert, Phone, Mail, MapPin, DollarSign, Award, Clock, FileCheck, CheckCircle2, RefreshCw, 
-  Layers, Sliders, Calendar, BookOpen, AlertCircle, PlayCircle, ShieldCheck, Database, HelpCircle, HardDrive, 
-  UserCheck, Shield, Sparkles, Network, Clipboard, Compass, Info, ChevronRight, Minimize2, CheckSquare, XCircle, Ban,
-  FolderOpen, Settings, UserPlus, Building, BarChart2, Briefcase, Zap, GitPullRequest, Globe, Users2, Menu,
-} from 'lucide-react';
+import type { ApprovalRequest, AuditLog, Company, Order } from '../types';
+import { Ban, Menu, Plus, Search, XCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface ManagementPlatformProps {
   companies: Company[];
-  deals: Deal[];
-  quotes: Quote[];
   orders: Order[];
-  invoices: Invoice[];
-  cylinders: CylinderBalance[];
-  tickets: SupportTicket[];
   auditLogs: AuditLog[];
   approvals: ApprovalRequest[];
-  products: Product[];
-  currentRole: string;
-  onAddLog: (action: string, entityType: any, entityName: string, platform: 'Customer' | 'S&M' | 'Management' | 'Shared', details?: string) => void;
-  onUpdateOrders: (orders: Order[]) => void;
-  onUpdateQuotes: (quotes: Quote[]) => void;
-  onUpdateCompanies: (companies: Company[]) => void;
-  onUpdateApprovals: (approvals: ApprovalRequest[]) => void;
   onExitToGateway?: () => void;
 }
 
 export default function ManagementPlatform({
   companies,
-  deals,
-  quotes,
   orders,
-  invoices,
-  cylinders,
-  tickets,
   auditLogs,
   approvals,
-  products,
-  currentRole,
-  onAddLog,
-  onUpdateOrders,
-  onUpdateQuotes,
-  onUpdateCompanies,
-  onUpdateApprovals,
-  onExitToGateway
+  onExitToGateway,
 }: ManagementPlatformProps) {
   // Sidebar Tabs States (Morally mapped to Volume 1 PDF hierarchy)
   const [activeTab, setActiveTab] = useState<'home' | 'performance' | 'governance' | 'strategy' | 'organisation' | 'acquisitions' | 'alerts' | 'group-admin'>('home');
@@ -137,7 +105,7 @@ export default function ManagementPlatform({
         results.push({
           id: `approval-${appr.id}`,
           title: `Approval: ${appr.customerName || 'Pending'}`,
-          subtitle: `Type: ${appr.type} • Req: ${appr.requestedBy} • Status: ${appr.status}`,
+          subtitle: `Type: ${appr.type} â€¢ Req: ${appr.requestedBy} â€¢ Status: ${appr.status}`,
           category: 'Audit / Approval',
           action: () => {
             setActiveTab('home');
@@ -154,7 +122,7 @@ export default function ManagementPlatform({
         results.push({
           id: `log-${log.id}`,
           title: log.action,
-          subtitle: `Op: ${log.user} • Entity: ${log.entityName} • Platform: ${log.platform}`,
+          subtitle: `Op: ${log.user} â€¢ Entity: ${log.entityName} â€¢ Platform: ${log.platform}`,
           category: 'Compliance Log',
           action: () => {
             setActiveTab('governance');
@@ -171,7 +139,7 @@ export default function ManagementPlatform({
         results.push({
           id: `company-${comp.id}`,
           title: comp.name,
-          subtitle: `Sector: ${comp.industry} • Ref: ${comp.customerNumber}`,
+          subtitle: `Sector: ${comp.industry} â€¢ Ref: ${comp.customerNumber}`,
           category: 'Corporate Entity',
           action: () => {
             setActiveTab('performance');
@@ -188,7 +156,7 @@ export default function ManagementPlatform({
         results.push({
           id: `order-${ord.id}`,
           title: `Order ${ord.orderNumber}`,
-          subtitle: `${ord.companyName} • Status: ${ord.status} • Total: £${ord.grandTotal.toLocaleString()}`,
+          subtitle: `${ord.companyName} â€¢ Status: ${ord.status} â€¢ Total: Â£${ord.grandTotal.toLocaleString()}`,
           category: 'Order Record',
           action: () => {
             setActiveTab('performance');
@@ -219,321 +187,6 @@ export default function ManagementPlatform({
         onClose={() => setIsSidebarOpen(false)}
         onExit={onExitToGateway}
       />
-      <aside
-        id="management-legacy-sidebar"
-        aria-label="Management navigation"
-        className="dual-rail-sidebar cos-workspace-sidebar h-full w-[66px] shrink-0 overflow-visible border-r border-[#082B5B] text-white md:w-[382px]"
-        aria-hidden="true"
-        style={{ display: 'none' }}
-      >
-        <GlobalIconRail
-          areas={MANAGEMENT_RAIL_AREAS}
-          activeId={activeTab}
-          initials="OR"
-          onSelect={selectManagementArea}
-          onExit={onExitToGateway}
-        />
-        <div className="contextual-rail hidden min-h-0 w-[316px] flex-1 flex-col bg-[#0B3672] md:flex">
-        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-          {/* Top Branding Section */}
-          <ContextRailHeader area={activeRailArea} />
-
-          <SidebarEntityScope
-            workspaceName="Management"
-            companyScopes={[
-              'DL • DELabs Ltd (UK Hub)',
-              'AG • Advanced Gases Nigeria',
-            ]}
-            groupScopes={['OG • Operating Group', 'COS • Consolidated Group']}
-          />
-
-          <ContextRailSearch value={sidebarSearch} onChange={setSidebarSearch} />
-
-          <ExpandedSidebarNavigation
-            items={MANAGEMENT_RAIL_AREAS}
-            activeParentId={activeTab}
-            activeChildId={activeManagementChild}
-            query={sidebarSearch}
-            ariaLabel="Management modules and views"
-            onParentSelect={selectManagementArea}
-            onChildSelect={selectManagementChild}
-          />
-
-          {/* Navigation Items */}
-          {false && <nav id="management-context-routes" className="dual-rail-context-nav flex-1 p-4">
-            
-            {/* HOME CATEGORY */}
-            <div className={activeTab === 'home' ? '' : 'hidden'}>
-              <div className="mb-2 px-2 text-[11px] font-bold uppercase tracking-[0.08em] text-[#8FB0E1]">Command Views</div>
-              <button
-                onClick={() => { setActiveTab('home'); setSimulatedState('loaded'); }}
-                className={`hidden w-full items-center space-x-3 px-3 py-2 text-xs font-semibold rounded-lg transition ${
-                  activeTab === 'home' ? 'bg-[#264288] text-white border-l-2 border-[#4065B3]' : 'text-[#AFBFDA] hover:bg-[#264288]/40 hover:text-white'
-                }`}
-              >
-                <Activity size={16} />
-                <span>Command Home</span>
-              </button>
-              {activeTab === 'home' && (
-                <div className="space-y-1">
-                  {(['functional', 'company', 'ceo'] as const).map(tab => (
-                    <button
-                      key={tab}
-                      onClick={() => setHomeSubTab(tab)}
-                      className={`w-full min-h-11 rounded-xl border-l-4 px-3 text-left text-sm transition-all duration-200 ${
-                        homeSubTab === tab ? 'text-white font-bold' : 'text-[#AFBFDA] hover:text-white'
-                      }`}
-                    >
-                      {tab === 'functional' && 'Functional Home'}
-                      {tab === 'company' && 'Company Home'}
-                      {tab === 'ceo' && 'Main CEO Dashboard'}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* PERFORMANCE CATEGORY */}
-            <div className={activeTab === 'performance' ? '' : 'hidden'}>
-              <div className="mb-2 px-2 text-[11px] font-bold uppercase tracking-[0.08em] text-[#8FB0E1]">Performance Views</div>
-              <button
-                onClick={() => { setActiveTab('performance'); setSimulatedState('loaded'); }}
-                className={`w-full flex items-center space-x-3 px-3 py-2 text-xs font-semibold rounded-lg transition ${
-                  activeTab === 'performance' ? 'bg-[#264288] text-white border-l-2 border-[#4065B3]' : 'text-[#AFBFDA] hover:bg-[#264288]/40 hover:text-white'
-                }`}
-              >
-                <BarChart2 size={16} />
-                <span>Performance & BUs</span>
-              </button>
-              {activeTab === 'performance' && (
-                <div className="ml-6 mt-1 space-y-1 border-l border-[#264288] pl-3">
-                  {(['bu', 'dictionary', 'reports', 'leaderboard', 'finance', 'inventory'] as const).map(tab => (
-                    <button
-                      key={tab}
-                      onClick={() => setPerformanceSubTab(tab)}
-                      className={`w-full text-left text-[11px] py-1 transition ${
-                        performanceSubTab === tab ? 'text-white font-bold' : 'text-[#AFBFDA] hover:text-white'
-                      }`}
-                    >
-                      {tab === 'bu' && '• Overview & BU matrix'}
-                      {tab === 'dictionary' && '• Metric Dictionary'}
-                      {tab === 'reports' && '• Reports Centre'}
-                      {tab === 'leaderboard' && '• Team & Leaderboard'}
-                      {tab === 'finance' && '• Finance & Cash'}
-                      {tab === 'inventory' && '• Inventory / Stock'}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* GOVERNANCE CATEGORY */}
-            <div className={activeTab === 'governance' ? '' : 'hidden'}>
-              <div className="mb-2 px-2 text-[11px] font-bold uppercase tracking-[0.08em] text-[#8FB0E1]">Governance Views</div>
-              <button
-                onClick={() => { setActiveTab('governance'); setSimulatedState('loaded'); }}
-                className={`w-full flex items-center space-x-3 px-3 py-2 text-xs font-semibold rounded-lg transition ${
-                  activeTab === 'governance' ? 'bg-[#264288] text-white border-l-2 border-[#4065B3]' : 'text-[#AFBFDA] hover:bg-[#264288]/40 hover:text-white'
-                }`}
-              >
-                <Shield size={16} />
-                <span>Governance & Audit</span>
-              </button>
-              {activeTab === 'governance' && (
-                <div className="ml-6 mt-1 space-y-1 border-l border-[#264288] pl-3">
-                  {(['policy', 'console', 'access', 'oversight'] as const).map(tab => (
-                    <button
-                      key={tab}
-                      onClick={() => setGovernanceSubTab(tab)}
-                      className={`w-full text-left text-[11px] py-1 transition ${
-                        governanceSubTab === tab ? 'text-white font-bold' : 'text-[#AFBFDA] hover:text-white'
-                      }`}
-                    >
-                      {tab === 'policy' && '• Approval Policy'}
-                      {tab === 'console' && '• Governance Console'}
-                      {tab === 'access' && '• Access & Elevation'}
-                      {tab === 'oversight' && '• AI Oversight Control'}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* STRATEGY & PLANNING */}
-            <div className={activeTab === 'strategy' ? '' : 'hidden'}>
-              <div className="mb-2 px-2 text-[11px] font-bold uppercase tracking-[0.08em] text-[#8FB0E1]">Strategy Views</div>
-              <button
-                onClick={() => { setActiveTab('strategy'); setSimulatedState('loaded'); }}
-                className={`w-full flex items-center space-x-3 px-3 py-2 text-xs font-semibold rounded-lg transition ${
-                  activeTab === 'strategy' ? 'bg-[#264288] text-white border-l-2 border-[#4065B3]' : 'text-[#AFBFDA] hover:bg-[#264288]/40 hover:text-white'
-                }`}
-              >
-                <Sliders size={16} />
-                <span>Strategy & Planning</span>
-              </button>
-              {activeTab === 'strategy' && (
-                <div className="ml-6 mt-1 space-y-1 border-l border-[#264288] pl-3">
-                  {(['goals', 'strategy-map', 'meetings', 'budgets'] as const).map(tab => (
-                    <button
-                      key={tab}
-                      onClick={() => setStrategySubTab(tab)}
-                      className={`w-full text-left text-[11px] py-1 transition ${
-                        strategySubTab === tab ? 'text-white font-bold' : 'text-[#AFBFDA] hover:text-white'
-                      }`}
-                    >
-                      {tab === 'goals' && '• OKRs & Goals'}
-                      {tab === 'strategy-map' && '• Strategy map'}
-                      {tab === 'meetings' && '• Meetings & Cadence'}
-                      {tab === 'budgets' && '• Budgets & Scenario'}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* ORGANISATION */}
-            <div className={activeTab === 'organisation' ? '' : 'hidden'}>
-              <div className="mb-2 px-2 text-[11px] font-bold uppercase tracking-[0.08em] text-[#8FB0E1]">Organisation Views</div>
-              <button
-                onClick={() => { setActiveTab('organisation'); setSimulatedState('loaded'); }}
-                className={`w-full flex items-center space-x-3 px-3 py-2 text-xs font-semibold rounded-lg transition ${
-                  activeTab === 'organisation' ? 'bg-[#264288] text-white border-l-2 border-[#4065B3]' : 'text-[#AFBFDA] hover:bg-[#264288]/40 hover:text-white'
-                }`}
-              >
-                <Users size={16} />
-                <span>Org & Headcount</span>
-              </button>
-              {activeTab === 'organisation' && (
-                <div className="ml-6 mt-1 space-y-1 border-l border-[#264288] pl-3">
-                  {(['org-chart', 'plan-role'] as const).map(tab => (
-                    <button
-                      key={tab}
-                      onClick={() => setOrganisationSubTab(tab)}
-                      className={`w-full text-left text-[11px] py-1 transition ${
-                        organisationSubTab === tab ? 'text-white font-bold' : 'text-[#AFBFDA] hover:text-white'
-                      }`}
-                    >
-                      {tab === 'org-chart' && '• Org Chart'}
-                      {tab === 'plan-role' && '• Plan / Role map'}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* ACQUISITIONS */}
-            <div className={activeTab === 'acquisitions' ? '' : 'hidden'}>
-              <div className="mb-2 px-2 text-[11px] font-bold uppercase tracking-[0.08em] text-[#8FB0E1]">Acquisition Views</div>
-              <button
-                onClick={() => { setActiveTab('acquisitions'); setSimulatedState('loaded'); }}
-                className={`w-full flex items-center space-x-3 px-3 py-2 text-xs font-semibold rounded-lg transition ${
-                  activeTab === 'acquisitions' ? 'bg-[#264288] text-white border-l-2 border-[#4065B3]' : 'text-[#AFBFDA] hover:bg-[#264288]/40 hover:text-white'
-                }`}
-              >
-                <Briefcase size={16} />
-                <span>M&A Acquisitions</span>
-              </button>
-              {activeTab === 'acquisitions' && (
-                <div className="ml-6 mt-1 space-y-1 border-l border-[#264288] pl-3">
-                  {(['pipeline', 'day-100'] as const).map(tab => (
-                    <button
-                      key={tab}
-                      onClick={() => setAcquisitionsSubTab(tab)}
-                      className={`w-full text-left text-[11px] py-1 transition ${
-                        acquisitionsSubTab === tab ? 'text-white font-bold' : 'text-[#AFBFDA] hover:text-white'
-                      }`}
-                    >
-                      {tab === 'pipeline' && '• M&A Pipeline Board'}
-                      {tab === 'day-100' && '• Day-100 Workspace'}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* ALERTS & KNOWLEDGE */}
-            <div className={activeTab === 'alerts' ? '' : 'hidden'}>
-              <div className="mb-2 px-2 text-[11px] font-bold uppercase tracking-[0.08em] text-[#8FB0E1]">Alert Views</div>
-              <button
-                onClick={() => { setActiveTab('alerts'); setSimulatedState('loaded'); }}
-                className={`w-full flex items-center space-x-3 px-3 py-2 text-xs font-semibold rounded-lg transition ${
-                  activeTab === 'alerts' ? 'bg-[#264288] text-white border-l-2 border-[#4065B3]' : 'text-[#AFBFDA] hover:bg-[#264288]/40 hover:text-white'
-                }`}
-              >
-                <AlertCircle size={16} />
-                <span>Alerts & Policies</span>
-              </button>
-              {activeTab === 'alerts' && (
-                <div className="ml-6 mt-1 space-y-1 border-l border-[#264288] pl-3">
-                  {(['rules', 'knowledge', 'feed'] as const).map(tab => (
-                    <button
-                      key={tab}
-                      onClick={() => setAlertsSubTab(tab)}
-                      className={`w-full text-left text-[11px] py-1 transition ${
-                        alertsSubTab === tab ? 'text-white font-bold' : 'text-[#AFBFDA] hover:text-white'
-                      }`}
-                    >
-                      {tab === 'rules' && '• Notification Rules'}
-                      {tab === 'knowledge' && '• Policy Hub & SOP'}
-                      {tab === 'feed' && '• Announcements Feed'}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* GROUP ADMIN */}
-            <div className={activeTab === 'group-admin' ? '' : 'hidden'}>
-              <div className="mb-2 px-2 text-[11px] font-bold uppercase tracking-[0.08em] text-[#8FB0E1]">Registry Views</div>
-              <button
-                onClick={() => { setActiveTab('group-admin'); setSimulatedState('loaded'); }}
-                className={`w-full flex items-center space-x-3 px-3 py-2 text-xs font-semibold rounded-lg transition ${
-                  activeTab === 'group-admin' ? 'bg-[#264288] text-white border-l-2 border-[#4065B3]' : 'text-[#AFBFDA] hover:bg-[#264288]/40 hover:text-white'
-                }`}
-              >
-                <Settings size={16} />
-                <span>Entity Registry</span>
-              </button>
-              {activeTab === 'group-admin' && (
-                <div className="ml-6 mt-1 space-y-1 border-l border-[#264288] pl-3">
-                  {(['registry', 'profile', 'evidence', 'offtake', 'hub'] as const).map(tab => (
-                    <button
-                      key={tab}
-                      onClick={() => setGroupAdminSubTab(tab)}
-                      className={`w-full text-left text-[11px] py-1 transition ${
-                        groupAdminSubTab === tab ? 'text-white font-bold' : 'text-[#AFBFDA] hover:text-white'
-                      }`}
-                    >
-                      {tab === 'registry' && '• Legal Registry'}
-                      {tab === 'profile' && '• Capability Profiles'}
-                      {tab === 'evidence' && '• Transfer-pricing'}
-                      {tab === 'offtake' && '• Offtake-contract'}
-                      {tab === 'hub' && '• Intercompany Hub'}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-          </nav>}
-        </div>
-
-        {/* Bottom profile info */}
-        <div className="min-h-[67px] shrink-0 border-t border-[#2A4E82] bg-[#082B5B] px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#5B91FF] bg-[#155EEF] text-xs font-bold text-white">
-                OR
-              </div>
-              <div className="text-left">
-                <p className="text-sm font-bold leading-none">Olivia Reed</p>
-                <p className="mt-1 text-[11px] leading-none text-[#AFC8F2]">Group CEO</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        </div>
-      </aside>
 
       {/* Main View Area */}
       <section className="flex-1 flex flex-col overflow-hidden bg-[#F7F9FC]">
@@ -631,14 +284,14 @@ export default function ManagementPlatform({
           {simulatedState === 'loading' ? (
             <HexLoader
               size="lg"
-              label="Loading corporate entities & executive controls…"
+              label="Loading corporate entities & executive controlsâ€¦"
             />
           ) : simulatedState === 'error' ? (
             <div className="flex flex-col items-center justify-center h-full py-20 bg-white rounded-xl border border-red-200 p-8 shadow-sm">
               <div className="bg-red-50 text-red-600 p-3 rounded-full mb-4 border border-red-200">
                 <XCircle size={28} />
               </div>
-              <h3 className="text-sm font-bold text-slate-800 font-display">Contract Violation Detected · Code COS-7F2A</h3>
+              <h3 className="text-sm font-bold text-slate-800 font-display">Contract Violation Detected Â· Code COS-7F2A</h3>
               <p className="text-xs text-slate-500 mt-1 max-w-sm text-center">The DSCR ratio dropped below the required 1.5x on-plan limit. Covenant breach forecast trigger activated.</p>
             </div>
           ) : simulatedState === 'restricted' ? (
@@ -646,7 +299,7 @@ export default function ManagementPlatform({
               <div className="bg-amber-50 text-amber-700 p-3 rounded-full mb-4 border border-amber-200">
                 <Ban size={28} />
               </div>
-              <h3 className="text-sm font-bold text-slate-800 font-display">•••• Access Forbidden</h3>
+              <h3 className="text-sm font-bold text-slate-800 font-display">â€¢â€¢â€¢â€¢ Access Forbidden</h3>
               <p className="text-xs text-slate-500 mt-1 max-w-md text-center">Access to this registry entity requires GATED board-director clearance or multifactor token verification.</p>
             </div>
           ) : simulatedState === 'empty' ? (
@@ -684,7 +337,7 @@ export default function ManagementPlatform({
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                           <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm space-y-1">
                             <span className="text-xs font-bold text-slate-500">Group Pipeline</span>
-                            <h3 className="text-3xl font-black text-slate-900 font-mono">£3,842,000</h3>
+                            <h3 className="text-3xl font-black text-slate-900 font-mono">Â£3,842,000</h3>
                             <span className="text-[10px] text-[#4065B3] font-bold">External opportunities scope</span>
                           </div>
                           <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm space-y-1">
@@ -700,7 +353,7 @@ export default function ManagementPlatform({
                           <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm space-y-1">
                             <span className="text-xs font-bold text-slate-500">Open Approvals</span>
                             <h3 className="text-3xl font-black text-slate-900 font-mono">14</h3>
-                            <span className="text-[10px] text-amber-600 font-bold">3 urgent · entity-labelled</span>
+                            <span className="text-[10px] text-amber-600 font-bold">3 urgent Â· entity-labelled</span>
                           </div>
                         </div>
                       </div>
@@ -752,15 +405,15 @@ export default function ManagementPlatform({
 
                         {/* Exceptions bar */}
                         <div className="p-4 bg-amber-50/50 border border-amber-200 rounded-lg flex justify-between items-center text-xs">
-                          <p className="font-semibold text-slate-800">4 support SLA breaches detected · £184,000 overdue receivables · 7 deals need forecast review</p>
+                          <p className="font-semibold text-slate-800">4 support SLA breaches detected Â· Â£184,000 overdue receivables Â· 7 deals need forecast review</p>
                           <span className="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-bold font-mono">URGENT ACTIONS</span>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 font-mono">
                           <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm">
                             <p className="text-[10px] font-bold text-slate-400">YTD GROUP REVENUE</p>
-                            <p className="text-2xl font-black text-slate-900 mt-1">£24,840,000</p>
-                            <p className="text-[10px] text-green-600 mt-1 font-bold">↑ 12.4% vs last week</p>
+                            <p className="text-2xl font-black text-slate-900 mt-1">Â£24,840,000</p>
+                            <p className="text-[10px] text-green-600 mt-1 font-bold">â†‘ 12.4% vs last week</p>
                           </div>
                           <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm">
                             <p className="text-[10px] font-bold text-slate-400">GROSS MARGIN %</p>
@@ -769,7 +422,7 @@ export default function ManagementPlatform({
                           </div>
                           <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm">
                             <p className="text-[10px] font-bold text-slate-400">OUTSTANDING RECEIVABLES</p>
-                            <p className="text-2xl font-black text-[#B42318] mt-1">£184,000</p>
+                            <p className="text-2xl font-black text-[#B42318] mt-1">Â£184,000</p>
                             <p className="text-[10px] text-slate-500 mt-1">Average DSO: 48 days</p>
                           </div>
                           <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm">
@@ -800,11 +453,11 @@ export default function ManagementPlatform({
                         {/* BU List */}
                         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                           {[
-                            { name: 'Electronics', rev: '£468,300', margin: '34.7%', risk: 'Low' },
-                            { name: 'Industrial Gases', rev: '£392,600', margin: '31.2%', risk: 'High' },
-                            { name: 'Manufacturing', rev: '£196,800', margin: '28.4%', risk: 'Medium' },
-                            { name: 'Imports', rev: '£143,700', margin: '30.1%', risk: 'Low' },
-                            { name: 'Agency', rev: '£83,200', margin: '33.2%', risk: 'Medium' }
+                            { name: 'Electronics', rev: 'Â£468,300', margin: '34.7%', risk: 'Low' },
+                            { name: 'Industrial Gases', rev: 'Â£392,600', margin: '31.2%', risk: 'High' },
+                            { name: 'Manufacturing', rev: 'Â£196,800', margin: '28.4%', risk: 'Medium' },
+                            { name: 'Imports', rev: 'Â£143,700', margin: '30.1%', risk: 'Low' },
+                            { name: 'Agency', rev: 'Â£83,200', margin: '33.2%', risk: 'Medium' }
                           ].map(bu => (
                             <div key={bu.name} className="bg-white p-4 rounded-xl border border-[#D9E0EA] shadow-sm space-y-2">
                               <h4 className="text-xs font-bold text-slate-900 font-display">{bu.name}</h4>
@@ -835,10 +488,10 @@ export default function ManagementPlatform({
                           </thead>
                           <tbody>
                             {[
-                              { m: 'MTD Revenue', def: 'Revenue recognised in period from billing ledgers', owner: 'Idris Khan · Data Analyst' },
-                              { m: 'ROAS', def: 'Attributed digital campaign revenue ÷ total media spend', owner: 'Daniel Kerr · Marketing Ops' },
-                              { m: 'DSO (Days Sales Outstanding)', def: 'Receivables days based on Net-30 payment logs', owner: 'Clara Evans · Finance Director' },
-                              { m: 'SLA Breach Count', def: 'Elapsed ticketing clock > defined support policy limits', owner: 'Helen Shaw · Support Lead' }
+                              { m: 'MTD Revenue', def: 'Revenue recognised in period from billing ledgers', owner: 'Idris Khan Â· Data Analyst' },
+                              { m: 'ROAS', def: 'Attributed digital campaign revenue Ã· total media spend', owner: 'Daniel Kerr Â· Marketing Ops' },
+                              { m: 'DSO (Days Sales Outstanding)', def: 'Receivables days based on Net-30 payment logs', owner: 'Clara Evans Â· Finance Director' },
+                              { m: 'SLA Breach Count', def: 'Elapsed ticketing clock > defined support policy limits', owner: 'Helen Shaw Â· Support Lead' }
                             ].map((row, idx) => (
                               <tr key={idx} className="border-b border-[#D9E0EA] font-semibold text-slate-700">
                                 <td className="p-4 font-bold text-slate-900">{row.m}</td>
@@ -858,11 +511,11 @@ export default function ManagementPlatform({
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="p-4 border border-green-200 bg-green-50/20 rounded-lg">
                             <h4 className="text-xs font-bold text-slate-950 font-display">Board operating pack (FY2026)</h4>
-                            <p className="text-[10px] text-slate-500 mt-1">Status: Active · Generated & signed-off by Olivia Reed</p>
+                            <p className="text-[10px] text-slate-500 mt-1">Status: Active Â· Generated & signed-off by Olivia Reed</p>
                           </div>
                           <div className="p-4 border border-[#D9E0EA] bg-[#F7F9FC] rounded-lg">
                             <h4 className="text-xs font-bold text-slate-950 font-display">Newcastle Depot Productivity Log</h4>
-                            <p className="text-[10px] text-slate-500 mt-1">Status: Complete · Verified by Peter Cole</p>
+                            <p className="text-[10px] text-slate-500 mt-1">Status: Complete Â· Verified by Peter Cole</p>
                           </div>
                         </div>
                       </div>
@@ -889,22 +542,22 @@ export default function ManagementPlatform({
                           </thead>
                           <tbody>
                             <tr className="border-b border-[#D9E0EA]">
-                              <td className="p-4 font-mono font-bold">&lt; £5,000</td>
+                              <td className="p-4 font-mono font-bold">&lt; Â£5,000</td>
                               <td className="p-4">Marcus Hale (Sales Manager)</td>
                               <td className="p-4"><span className="px-2 py-0.5 bg-green-50 text-green-700 font-bold rounded">Manager</span></td>
                             </tr>
                             <tr className="border-b border-[#D9E0EA]">
-                              <td className="p-4 font-mono font-bold">£5,000 – £25,000</td>
+                              <td className="p-4 font-mono font-bold">Â£5,000 â€“ Â£25,000</td>
                               <td className="p-4">Clara Evans (Finance Director)</td>
                               <td className="p-4"><span className="px-2 py-0.5 bg-[#EEF3FB] text-[#4065B3] font-bold rounded">Director</span></td>
                             </tr>
                             <tr className="border-b border-[#D9E0EA]">
-                              <td className="p-4 font-mono font-bold">£25,000 – £100,000</td>
+                              <td className="p-4 font-mono font-bold">Â£25,000 â€“ Â£100,000</td>
                               <td className="p-4">Olivia Reed (Group CEO)</td>
                               <td className="p-4"><span className="px-2 py-0.5 bg-purple-50 text-[#6B21A8] border border-purple-200 font-bold rounded">Executive CEO</span></td>
                             </tr>
                             <tr>
-                              <td className="p-4 font-mono font-bold">&gt; £100,000</td>
+                              <td className="p-4 font-mono font-bold">&gt; Â£100,000</td>
                               <td className="p-4">Board of Directors</td>
                               <td className="p-4"><span className="px-2 py-0.5 bg-red-50 text-[#B42318] border border-red-200 font-bold rounded">Board Approval</span></td>
                             </tr>
@@ -918,9 +571,9 @@ export default function ManagementPlatform({
                       <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm space-y-4">
                         <h3 className="text-xs font-black uppercase text-slate-900 font-display tracking-wider">Audit Log & Governance Console</h3>
                         <div className="p-4 bg-[#F7F9FC] border border-[#D9E0EA] rounded-lg text-xs font-semibold leading-relaxed">
-                          <p className="text-slate-500 font-mono">System event timestamp: 16 Jul 2026 · 14:22 BST</p>
+                          <p className="text-slate-500 font-mono">System event timestamp: 16 Jul 2026 Â· 14:22 BST</p>
                           <p className="text-slate-900 font-bold mt-1">Audit Record ID: AUD-1029-X81A</p>
-                          <p className="text-slate-700 mt-1">"User Olivia Reed (Group CEO) approved the Net-30 credit limit expansion of £184k for Northwind Industrial Ltd."</p>
+                          <p className="text-slate-700 mt-1">"User Olivia Reed (Group CEO) approved the Net-30 credit limit expansion of Â£184k for Northwind Industrial Ltd."</p>
                         </div>
                       </div>
                     )}
@@ -973,9 +626,9 @@ export default function ManagementPlatform({
                       <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm text-left space-y-4">
                         <h3 className="text-xs font-black uppercase text-slate-900 font-display tracking-wider">Transfer-pricing Evidence Register</h3>
                         <div className="p-4 bg-[#F7F9FC] border border-[#D9E0EA] rounded-lg text-xs leading-relaxed space-y-3 font-semibold text-slate-700">
-                          <p>1. <strong>Management Fee Flow:</strong> Cost-plus method. OG Operating Services → Advanced Gases. FY2026 Complete.</p>
-                          <p>2. <strong>Supply/Offtake Flow:</strong> Comparable-price method. Advanced Gases → DECity zones. Review Due.</p>
-                          <p>3. <strong>IP/Brand Licence:</strong> Royalty benchmark method. OG IP Holdings → DELabs. Draft status.</p>
+                          <p>1. <strong>Management Fee Flow:</strong> Cost-plus method. OG Operating Services â†’ Advanced Gases. FY2026 Complete.</p>
+                          <p>2. <strong>Supply/Offtake Flow:</strong> Comparable-price method. Advanced Gases â†’ DECity zones. Review Due.</p>
+                          <p>3. <strong>IP/Brand Licence:</strong> Royalty benchmark method. OG IP Holdings â†’ DELabs. Draft status.</p>
                         </div>
                       </div>
                     )}

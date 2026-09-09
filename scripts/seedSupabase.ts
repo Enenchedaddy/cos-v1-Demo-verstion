@@ -1,63 +1,78 @@
 import dotenv from 'dotenv';
-dotenv.config({ path: '.env.local' });
-dotenv.config();
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from '@supabase/supabase-js';
 import {
-  INITIAL_COMPANIES,
-  INITIAL_PRODUCTS,
-  INITIAL_DEALS,
-  INITIAL_QUOTES,
-  INITIAL_ORDERS,
-  INITIAL_INVOICES,
-  INITIAL_CYLINDERS,
-  INITIAL_SUPPORT_TICKETS,
-  INITIAL_CAMPAIGNS,
   INITIAL_APPROVALS,
   INITIAL_AUDIT_LOGS,
-} from "../src/data";
+  INITIAL_CAMPAIGNS,
+  INITIAL_COMPANIES,
+  INITIAL_CYLINDERS,
+  INITIAL_DEALS,
+  INITIAL_INVOICES,
+  INITIAL_ORDERS,
+  INITIAL_PRODUCTS,
+  INITIAL_QUOTES,
+  INITIAL_SUPPORT_TICKETS,
+} from '../src/data';
+import { toPortalDatabase } from '../src/app/portalDataCodec';
 
-const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-const supabaseKey =
-  process.env.SUPABASE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
+dotenv.config({ path: '.env.local' });
+dotenv.config();
 
-if (!supabaseUrl || !supabaseKey) {
-  console.error(
-    "Missing SUPABASE_URL or SUPABASE_KEY (or VITE_SUPABASE_ equivalents). See .env.local.example",
-  );
-  process.exit(1);
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+const expectedProjectRef = process.env.COS_EXPECTED_SUPABASE_PROJECT_REF;
+const confirmation = process.env.COS_SEED_CONFIRMATION;
+
+if (!supabaseUrl || !supabaseKey || !expectedProjectRef) {
+  throw new Error('SUPABASE_URL, SUPABASE_KEY, and COS_EXPECTED_SUPABASE_PROJECT_REF are required. See .env.example.');
 }
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+const actualProjectRef = new URL(supabaseUrl).hostname.split('.')[0];
+if (actualProjectRef !== expectedProjectRef) {
+  throw new Error(`Refusing to seed project ${actualProjectRef}; expected ${expectedProjectRef}.`);
+}
+if (confirmation !== 'SEED_COS_DEMO_DATA') {
+  throw new Error('Refusing to seed without COS_SEED_CONFIRMATION=SEED_COS_DEMO_DATA.');
+}
 
-async function upsert(table: string, rows: any[]) {
-  if (!rows || rows.length === 0) return;
-  console.log(`Upserting ${rows.length} rows into ${table}...`);
-  const { error } = await supabase.from(table).upsert(rows);
-  if (error) {
-    console.error(`Error upserting ${table}:`, error.message);
-  } else {
-    console.log(`Finished ${table}`);
+const client = createClient(supabaseUrl, supabaseKey, {
+  auth: { autoRefreshToken: false, persistSession: false },
+});
+
+const collections = [
+  ['companies', INITIAL_COMPANIES],
+  ['products', INITIAL_PRODUCTS],
+  ['deals', INITIAL_DEALS],
+  ['quotes', INITIAL_QUOTES],
+  ['orders', INITIAL_ORDERS],
+  ['invoices', INITIAL_INVOICES],
+  ['cylinder_balances', INITIAL_CYLINDERS],
+  ['support_tickets', INITIAL_SUPPORT_TICKETS],
+  ['campaigns', INITIAL_CAMPAIGNS],
+  ['approvals', INITIAL_APPROVALS],
+  ['audit_logs', INITIAL_AUDIT_LOGS],
+] as const;
+
+async function assertTargetsAreEmpty(): Promise<void> {
+  for (const [table] of collections) {
+    const { count, error } = await client.from(table).select('*', { count: 'exact', head: true });
+    if (error) throw new Error(`Could not inspect ${table}: ${error.message}`);
+    if (count !== 0) throw new Error(`Refusing to seed: ${table} already contains ${count ?? 'unknown'} rows.`);
   }
 }
 
-async function run() {
-  try {
-    await upsert("companies", INITIAL_COMPANIES as any);
-    await upsert("products", INITIAL_PRODUCTS as any);
-    await upsert("deals", INITIAL_DEALS as any);
-    await upsert("quotes", INITIAL_QUOTES as any);
-    await upsert("orders", INITIAL_ORDERS as any);
-    await upsert("invoices", INITIAL_INVOICES as any);
-    await upsert("cylinder_balances", INITIAL_CYLINDERS as any);
-    await upsert("support_tickets", INITIAL_SUPPORT_TICKETS as any);
-    await upsert("campaigns", INITIAL_CAMPAIGNS as any);
-    await upsert("approvals", INITIAL_APPROVALS as any);
-    await upsert("audit_logs", INITIAL_AUDIT_LOGS as any);
-    console.log("Seeding completed.");
-  } catch (err) {
-    console.error("Seeding failed:", err);
-    process.exit(1);
+async function run(): Promise<void> {
+  await assertTargetsAreEmpty();
+  for (const [table, records] of collections) {
+    if (records.length === 0) continue;
+    const { error } = await client.from(table).insert(records.map(toPortalDatabase));
+    if (error) throw new Error(`Failed to seed ${table}: ${error.message}`);
+    console.log(`Seeded ${records.length} rows into ${table}.`);
   }
+  console.log(`Seeding completed for ${actualProjectRef}.`);
 }
 
-run();
+run().catch((error: unknown) => {
+  console.error(error instanceof Error ? error.message : error);
+  process.exitCode = 1;
+});

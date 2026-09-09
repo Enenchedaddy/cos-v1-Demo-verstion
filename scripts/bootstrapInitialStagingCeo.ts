@@ -10,7 +10,7 @@ const required = (name: string) => {
   return value;
 };
 const supabaseUrl = required('SUPABASE_URL');
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || required('SUPABASE_KEY');
+const serviceRoleKey = required('SUPABASE_KEY');
 const expectedRef = required('COS_EXPECTED_STAGING_PROJECT_REF');
 if (new URL(supabaseUrl).hostname.split('.')[0] !== expectedRef) throw new Error('Staging project reference does not match. Refusing bootstrap.');
 if (process.env.COS_BOOTSTRAP_STAGING_CONFIRMATION !== 'CREATE_INITIAL_STAGING_CEO') throw new Error('Explicit staging confirmation is required.');

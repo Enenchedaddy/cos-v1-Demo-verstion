@@ -1,4 +1,4 @@
-import { useEffect, useState, type Dispatch, type SetStateAction } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   INITIAL_APPROVALS,
   INITIAL_AUDIT_LOGS,
@@ -26,6 +26,7 @@ import type {
   Quote,
   SupportTicket,
 } from '../types';
+import { fromPortalDatabase, toPortalDatabase } from './portalDataCodec';
 
 type CollectionUpdate<T> = T[] | ((previous: T[]) => T[]);
 type AuditEntityType = AuditLog['entityType'];
@@ -43,27 +44,9 @@ type PortalTable =
   | 'approvals'
   | 'audit_logs';
 
-interface PortalDataActions {
-  addLog: (action: string, entityType: AuditEntityType, entityName: string, platform: AuditPlatform, details?: string) => Promise<void>;
-  updateCompanies: (value: CollectionUpdate<Company>) => Promise<void>;
-  updateOrders: (value: CollectionUpdate<Order>) => Promise<void>;
-  updateInvoices: (value: CollectionUpdate<Invoice>) => Promise<void>;
-  updateCylinders: (value: CollectionUpdate<CylinderBalance>) => Promise<void>;
-  updateTickets: (value: CollectionUpdate<SupportTicket>) => Promise<void>;
-  updateDeals: (value: CollectionUpdate<Deal>) => Promise<void>;
-  updateQuotes: (value: CollectionUpdate<Quote>) => Promise<void>;
-  updateApprovals: (value: CollectionUpdate<ApprovalRequest>) => Promise<void>;
-  addApproval: (approval: ApprovalRequest) => Promise<void>;
-}
+export type PortalDataStatus = 'loading' | 'ready' | 'demo' | 'empty' | 'unauthorized' | 'error' | 'unavailable';
 
-const portalEnvironment = (import.meta as any).env ?? {};
-const isControlledDemoMode = Boolean(portalEnvironment.DEV && portalEnvironment.VITE_COS_ALLOW_DEMO === 'true');
-
-function initialRecords<T>(records: T[]): T[] {
-  return isControlledDemoMode ? records : [];
-}
-
-export interface PortalData extends PortalDataActions {
+interface PortalCollections {
   companies: Company[];
   orders: Order[];
   invoices: Invoice[];
@@ -77,83 +60,163 @@ export interface PortalData extends PortalDataActions {
   auditLogs: AuditLog[];
 }
 
-function resolveUpdate<T>(value: CollectionUpdate<T>, current: T[]): T[] {
-  return typeof value === 'function' ? value(current) : value;
+interface PortalDataActions {
+  addLog: (action: string, entityType: AuditEntityType, entityName: string, platform: AuditPlatform, details?: string) => Promise<void>;
+  updateCompanies: (value: CollectionUpdate<Company>) => Promise<void>;
+  updateOrders: (value: CollectionUpdate<Order>) => Promise<void>;
+  updateInvoices: (value: CollectionUpdate<Invoice>) => Promise<void>;
+  updateCylinders: (value: CollectionUpdate<CylinderBalance>) => Promise<void>;
+  updateTickets: (value: CollectionUpdate<SupportTicket>) => Promise<void>;
+  updateDeals: (value: CollectionUpdate<Deal>) => Promise<void>;
+  updateQuotes: (value: CollectionUpdate<Quote>) => Promise<void>;
+  updateApprovals: (value: CollectionUpdate<ApprovalRequest>) => Promise<void>;
+  addApproval: (approval: ApprovalRequest) => Promise<void>;
 }
 
-async function persistCollection(table: PortalTable, records: unknown[], operation: 'insert' | 'upsert' = 'upsert'): Promise<void> {
-  if (!isSupabaseConfigured) return;
-
-  try {
-    const query = supabase.from(table);
-    const { error } = operation === 'insert' ? await query.insert(records) : await query.upsert(records);
-    if (error) throw error;
-  } catch (error) {
-    console.error(`Supabase write error (${table}):`, error);
-  }
+export interface PortalData extends PortalCollections, PortalDataActions {
+  status: PortalDataStatus;
+  error: string | null;
+  reload: () => Promise<void>;
 }
 
-async function loadCollection<T>(table: PortalTable, setRecords: Dispatch<SetStateAction<T[]>>, orderBy?: string): Promise<void> {
+const portalEnvironment = (import.meta as ImportMeta & { env?: Record<string, unknown> }).env ?? {};
+export const isPortalDemoEnabled = Boolean(
+  portalEnvironment.DEV && portalEnvironment.VITE_COS_ALLOW_DEMO === 'true',
+);
+
+const EMPTY_COLLECTIONS: PortalCollections = {
+  companies: [], orders: [], invoices: [], cylinders: [], tickets: [], products: [],
+  deals: [], quotes: [], campaigns: [], approvals: [], auditLogs: [],
+};
+
+const DEMO_COLLECTIONS: PortalCollections = {
+  companies: INITIAL_COMPANIES,
+  orders: INITIAL_ORDERS,
+  invoices: INITIAL_INVOICES,
+  cylinders: INITIAL_CYLINDERS,
+  tickets: INITIAL_SUPPORT_TICKETS,
+  products: INITIAL_PRODUCTS,
+  deals: INITIAL_DEALS,
+  quotes: INITIAL_QUOTES,
+  campaigns: INITIAL_CAMPAIGNS,
+  approvals: INITIAL_APPROVALS,
+  auditLogs: INITIAL_AUDIT_LOGS,
+};
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
+export function classifyPortalDataError(error: unknown): PortalDataStatus {
+  const message = errorMessage(error).toLowerCase();
+  if (/permission|policy|row-level|not authorized|42501/.test(message)) return 'unauthorized';
+  if (/fetch|network|offline|timeout|unavailable/.test(message)) return 'unavailable';
+  return 'error';
+}
+
+async function readCollection<T>(table: PortalTable, orderBy?: string): Promise<T[]> {
   let query = supabase.from(table).select('*');
   if (orderBy) query = query.order(orderBy, { ascending: false });
   const { data, error } = await query;
   if (error) throw error;
-  setRecords((data ?? []) as T[]);
+  return fromPortalDatabase<T[]>(data ?? []);
+}
+
+async function persistCollection(
+  table: PortalTable,
+  records: unknown[],
+  operation: 'insert' | 'upsert' = 'upsert',
+): Promise<void> {
+  const payload = records.map(toPortalDatabase);
+  const query = supabase.from(table);
+  const { error } = operation === 'insert' ? await query.insert(payload) : await query.upsert(payload);
+  if (error) throw error;
+}
+
+function recordCount(collections: PortalCollections): number {
+  return Object.values(collections).reduce((count, records) => count + records.length, 0);
 }
 
 /**
- * Legacy portal-data utility. Development fixtures are opt-in and never used
- * by a production build; failed Supabase reads leave explicit empty state for
- * the consuming UI instead of retaining demo records.
+ * Owns the legacy business-record boundary. Fixtures require an explicit
+ * development-only flag, live rows are mapped from PostgreSQL naming, and
+ * every failed mutation is rolled back and exposed through the hook state.
  */
 export function usePortalData(): PortalData {
-  const [companies, setCompanies] = useState<Company[]>(() => initialRecords(INITIAL_COMPANIES));
-  const [orders, setOrders] = useState<Order[]>(() => initialRecords(INITIAL_ORDERS));
-  const [invoices, setInvoices] = useState<Invoice[]>(() => initialRecords(INITIAL_INVOICES));
-  const [cylinders, setCylinders] = useState<CylinderBalance[]>(() => initialRecords(INITIAL_CYLINDERS));
-  const [tickets, setTickets] = useState<SupportTicket[]>(() => initialRecords(INITIAL_SUPPORT_TICKETS));
-  const [products, setProducts] = useState<Product[]>(() => initialRecords(INITIAL_PRODUCTS));
-  const [deals, setDeals] = useState<Deal[]>(() => initialRecords(INITIAL_DEALS));
-  const [quotes, setQuotes] = useState<Quote[]>(() => initialRecords(INITIAL_QUOTES));
-  const [campaigns, setCampaigns] = useState<Campaign[]>(() => initialRecords(INITIAL_CAMPAIGNS));
-  const [approvals, setApprovals] = useState<ApprovalRequest[]>(() => initialRecords(INITIAL_APPROVALS));
-  const [auditLogs, setAuditLogs] = useState<AuditLog[]>(() => initialRecords(INITIAL_AUDIT_LOGS));
+  const [collections, setCollections] = useState<PortalCollections>(() => (
+    isPortalDemoEnabled ? DEMO_COLLECTIONS : EMPTY_COLLECTIONS
+  ));
+  const [status, setStatus] = useState<PortalDataStatus>(() => (
+    isPortalDemoEnabled ? 'demo' : 'loading'
+  ));
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const reload = useCallback(async () => {
     if (!isSupabaseConfigured) {
+      setCollections(isPortalDemoEnabled ? DEMO_COLLECTIONS : EMPTY_COLLECTIONS);
+      setStatus(isPortalDemoEnabled ? 'demo' : 'unavailable');
+      setError(isPortalDemoEnabled ? null : 'Supabase is not configured.');
       return;
     }
 
-    const synchronise = async () => {
-      try {
-        await loadCollection<Company>('companies', setCompanies);
-        await loadCollection<Product>('products', setProducts);
-        await loadCollection<Order>('orders', setOrders);
-        await loadCollection<Invoice>('invoices', setInvoices);
-        await loadCollection<CylinderBalance>('cylinder_balances', setCylinders);
-        await loadCollection<SupportTicket>('support_tickets', setTickets);
-        await loadCollection<Deal>('deals', setDeals);
-        await loadCollection<Quote>('quotes', setQuotes);
-        await loadCollection<Campaign>('campaigns', setCampaigns);
-        await loadCollection<ApprovalRequest>('approvals', setApprovals);
-        await loadCollection<AuditLog>('audit_logs', setAuditLogs, 'timestamp');
-      } catch (error) {
-        if (portalEnvironment.DEV) console.error('Portal data synchronisation failed; no fixture fallback is used in production.', error);
-      }
-    };
-
-    void synchronise();
+    setStatus('loading');
+    setError(null);
+    try {
+      const [companies, products, orders, invoices, cylinders, tickets, deals, quotes, campaigns, approvals, auditLogs] = await Promise.all([
+        readCollection<Company>('companies'),
+        readCollection<Product>('products'),
+        readCollection<Order>('orders'),
+        readCollection<Invoice>('invoices'),
+        readCollection<CylinderBalance>('cylinder_balances'),
+        readCollection<SupportTicket>('support_tickets'),
+        readCollection<Deal>('deals'),
+        readCollection<Quote>('quotes'),
+        readCollection<Campaign>('campaigns'),
+        readCollection<ApprovalRequest>('approvals'),
+        readCollection<AuditLog>('audit_logs', 'timestamp'),
+      ]);
+      const next = { companies, products, orders, invoices, cylinders, tickets, deals, quotes, campaigns, approvals, auditLogs };
+      setCollections(next);
+      setStatus(recordCount(next) === 0 ? 'empty' : 'ready');
+    } catch (loadError) {
+      setCollections(isPortalDemoEnabled ? DEMO_COLLECTIONS : EMPTY_COLLECTIONS);
+      setStatus(isPortalDemoEnabled ? 'demo' : classifyPortalDataError(loadError));
+      setError(errorMessage(loadError));
+    }
   }, []);
 
-  const updateCollection = async <T,>(
-    value: CollectionUpdate<T>,
-    current: T[],
-    setRecords: Dispatch<SetStateAction<T[]>>,
+  useEffect(() => {
+    void reload();
+  }, [reload]);
+
+  const mutateCollection = async <K extends keyof PortalCollections>(
+    key: K,
     table: PortalTable,
-  ) => {
-    const next = resolveUpdate(value, current);
-    setRecords(next);
-    await persistCollection(table, next);
+    value: CollectionUpdate<PortalCollections[K][number]>,
+    operation: 'insert' | 'upsert' = 'upsert',
+    recordsToPersist?: unknown[],
+  ): Promise<void> => {
+    if (!isSupabaseConfigured && !isPortalDemoEnabled) {
+      setStatus('unavailable');
+      setError('Supabase is not configured; the change was not applied.');
+      return;
+    }
+
+    const current = collections[key];
+    const next = typeof value === 'function' ? value(current) : value;
+    setCollections((previous) => ({ ...previous, [key]: next }));
+
+    if (status === 'demo') return;
+
+    try {
+      await persistCollection(table, recordsToPersist ?? next, operation);
+      setStatus('ready');
+      setError(null);
+    } catch (writeError) {
+      setCollections((previous) => ({ ...previous, [key]: current }));
+      setStatus(classifyPortalDataError(writeError));
+      setError(errorMessage(writeError));
+    }
   };
 
   const addLog = async (
@@ -174,36 +237,27 @@ export function usePortalData(): PortalData {
       ipAddress: `192.168.1.${Math.floor(Math.random() * 250 + 1)}`,
       details,
     };
-    setAuditLogs((previous) => [log, ...previous]);
-    await persistCollection('audit_logs', [log], 'insert');
+    await mutateCollection('auditLogs', 'audit_logs', (previous) => [log, ...previous], 'insert', [log]);
   };
 
   const addApproval = async (approval: ApprovalRequest) => {
-    setApprovals((previous) => [approval, ...previous]);
-    await persistCollection('approvals', [approval], 'insert');
+    await mutateCollection('approvals', 'approvals', (previous) => [approval, ...previous], 'insert', [approval]);
   };
 
   return {
-    companies,
-    orders,
-    invoices,
-    cylinders,
-    tickets,
-    products,
-    deals,
-    quotes,
-    campaigns,
-    approvals,
-    auditLogs,
+    ...collections,
+    status,
+    error,
+    reload,
     addLog,
-    updateCompanies: (value) => updateCollection(value, companies, setCompanies, 'companies'),
-    updateOrders: (value) => updateCollection(value, orders, setOrders, 'orders'),
-    updateInvoices: (value) => updateCollection(value, invoices, setInvoices, 'invoices'),
-    updateCylinders: (value) => updateCollection(value, cylinders, setCylinders, 'cylinder_balances'),
-    updateTickets: (value) => updateCollection(value, tickets, setTickets, 'support_tickets'),
-    updateDeals: (value) => updateCollection(value, deals, setDeals, 'deals'),
-    updateQuotes: (value) => updateCollection(value, quotes, setQuotes, 'quotes'),
-    updateApprovals: (value) => updateCollection(value, approvals, setApprovals, 'approvals'),
+    updateCompanies: (value) => mutateCollection('companies', 'companies', value),
+    updateOrders: (value) => mutateCollection('orders', 'orders', value),
+    updateInvoices: (value) => mutateCollection('invoices', 'invoices', value),
+    updateCylinders: (value) => mutateCollection('cylinders', 'cylinder_balances', value),
+    updateTickets: (value) => mutateCollection('tickets', 'support_tickets', value),
+    updateDeals: (value) => mutateCollection('deals', 'deals', value),
+    updateQuotes: (value) => mutateCollection('quotes', 'quotes', value),
+    updateApprovals: (value) => mutateCollection('approvals', 'approvals', value),
     addApproval,
   };
 }

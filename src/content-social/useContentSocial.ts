@@ -429,7 +429,7 @@ export function useContentSocial(scope: ScopeContext) {
 
   const issueApprovalLink = useCallback(async (approvalId: string) => {
     const token = await repository.issueApprovalToken(approvalId);
-    return `${window.location.origin}${window.location.pathname}?client_approval=${encodeURIComponent(token)}`;
+    return `${window.location.origin}/client-approval?token=${encodeURIComponent(token)}`;
   }, [repository]);
 
   return {

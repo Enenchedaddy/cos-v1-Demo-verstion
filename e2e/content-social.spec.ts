@@ -4,7 +4,6 @@ const e2eEmail = process.env.COS_E2E_EMAIL;
 const e2ePassword = process.env.COS_E2E_PASSWORD;
 
 test.skip(!e2eEmail || !e2ePassword, 'Requires an approved controlled Supabase test account with Content & Social membership.');
-test.skip(true, 'Content & Social remains membership-authorized and is not exposed through global navigation until its approved integration phase.');
 
 const browserErrors = new WeakMap<object, string[]>();
 
