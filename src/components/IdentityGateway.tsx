@@ -136,10 +136,6 @@ export default function IdentityGateway({
           >
             Central Operating System
           </h1>
-          <p className="mx-auto mt-5 max-w-3xl text-[15px] leading-7 text-[#5A6A84] sm:text-lg sm:leading-8">
-            A single identity gateway for commercial operations, consent-aware growth, and
-            leadership oversight—governed through one shared operating spine.
-          </p>
         </section>
 
         <section
