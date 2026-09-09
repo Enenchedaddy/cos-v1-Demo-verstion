@@ -1,14 +1,21 @@
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 
 type RoleCode = 'CEO' | 'MANAGEMENT' | 'SALES' | 'MARKETING' | 'SOFTWARE_ENGINEER';
-type Action = 'list_requests' | 'list_users' | 'create_request' | 'approve_ceo' | 'reject_ceo' | 'approve_technical' | 'reject_technical' | 'cancel_request' | 'send_invitation' | 'resend_invitation' | 'activate_invitation' | 'update_profile' | 'change_role' | 'disable_user' | 'enable_user';
-type RequestRow = { id: string; requested_by_user_id: string; requested_email: string; first_name: string; last_name: string; requested_role_id: string; status: string; ceo_approval_status: string; technical_approval_status: string; invitation_status: string; auth_user_id: string | null };
+type Action = 'list_requests' | 'list_users' | 'create_request' | 'approve_ceo' | 'reject_ceo' | 'cancel_request' | 'send_invitation' | 'resend_invitation' | 'activate_invitation' | 'update_profile' | 'change_role' | 'disable_user' | 'enable_user';
+type ProvisioningFailureCode = 'INVITATION_CONFIGURATION_INVALID' | 'INVITATION_DELIVERY_FAILED' | 'REQUEST_REJECTED';
+type RequestRow = { id: string; requested_by_user_id: string; requested_email: string; first_name: string; last_name: string; job_title: string | null; department: string | null; requested_role_id: string; status: string; ceo_approval_status: string; technical_approval_status: string; invitation_status: string; auth_user_id: string | null };
 type Authorization = { userId: string; email: string; roleCode: RoleCode; permissions: Set<string> };
 
 const ROLES = new Set<RoleCode>(['CEO', 'MANAGEMENT', 'SALES', 'MARKETING', 'SOFTWARE_ENGINEER']);
-const ACTIONS = new Set<Action>(['list_requests', 'list_users', 'create_request', 'approve_ceo', 'reject_ceo', 'approve_technical', 'reject_technical', 'cancel_request', 'send_invitation', 'resend_invitation', 'activate_invitation', 'update_profile', 'change_role', 'disable_user', 'enable_user']);
+const ACTIONS = new Set<Action>(['list_requests', 'list_users', 'create_request', 'approve_ceo', 'reject_ceo', 'cancel_request', 'send_invitation', 'resend_invitation', 'activate_invitation', 'update_profile', 'change_role', 'disable_user', 'enable_user']);
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+class ProvisioningFailure extends Error {
+  constructor(readonly code: ProvisioningFailureCode) {
+    super(code);
+  }
+}
 
 const json = (body: Record<string, unknown>, status = 200, headers: HeadersInit = {}) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json', ...headers } });
 const cleanText = (value: unknown, name: string, required = false, max = 160) => {
@@ -42,6 +49,31 @@ function headersFor(request: Request): HeadersInit | null {
   return { 'Access-Control-Allow-Origin': origin, 'Access-Control-Allow-Headers': 'authorization, apikey, content-type, x-client-info', 'Access-Control-Allow-Methods': 'POST, OPTIONS', Vary: 'Origin' };
 }
 
+function invitationRedirectUrl() {
+  const configuredOrigin = Deno.env.get('COS_APP_ORIGIN');
+  const configuredOrigins = (Deno.env.get('COS_ALLOWED_ORIGINS') ?? '').split(',').map((value) => value.trim()).filter(Boolean);
+  if (!configuredOrigin) throw new ProvisioningFailure('INVITATION_CONFIGURATION_INVALID');
+  try {
+    const origin = new URL(configuredOrigin);
+    if (origin.protocol !== 'https:' || origin.origin !== configuredOrigin || !configuredOrigins.includes(origin.origin)) {
+      throw new ProvisioningFailure('INVITATION_CONFIGURATION_INVALID');
+    }
+    return new URL('/auth/complete', origin.origin).toString();
+  } catch (error) {
+    if (error instanceof ProvisioningFailure) throw error;
+    throw new ProvisioningFailure('INVITATION_CONFIGURATION_INVALID');
+  }
+}
+
+async function sendInvitation(service: ReturnType<typeof createClient>, email: string, correlationId: string) {
+  const { data, error } = await service.auth.admin.inviteUserByEmail(email, { redirectTo: invitationRedirectUrl() });
+  if (error || !data.user) {
+    console.error('admin-user-provisioning invitation failed', { category: 'invite_user_failed', correlationId });
+    throw new ProvisioningFailure('INVITATION_DELIVERY_FAILED');
+  }
+  return data.user;
+}
+
 async function authorization(caller: ReturnType<typeof createClient>): Promise<Authorization | null> {
   const { data: userData, error: userError } = await caller.auth.getUser();
   const user = userData.user;
@@ -64,12 +96,16 @@ function requireTechnical(actor: Authorization, permission: 'users.approve' | 'u
   requirePermission(actor, 'users.invite');
   if (actor.roleCode !== 'SOFTWARE_ENGINEER') throw new Error('Technical provisioning authority is required.');
 }
-function requireNotSelf(actor: Authorization, target: RequestRow) {
-  if (target.requested_by_user_id === actor.userId || target.requested_email === actor.email) throw new Error('You cannot approve, invite, or administratively change your own account.');
+function requireNotTargetSelf(actor: Authorization, target: RequestRow) {
+  if (target.requested_email === actor.email) throw new Error('You cannot approve, invite, or administratively change your own account.');
+}
+function requireIndependentCeoApproval(actor: Authorization, target: RequestRow) {
+  requireNotTargetSelf(actor, target);
+  if (target.requested_by_user_id === actor.userId) throw new Error('You cannot provide CEO approval for a request you created.');
 }
 
 async function requestById(service: ReturnType<typeof createClient>, id: string) {
-  const { data, error } = await service.from('user_provisioning_requests').select('id, requested_by_user_id, requested_email, first_name, last_name, requested_role_id, status, ceo_approval_status, technical_approval_status, invitation_status, auth_user_id').eq('id', id).single();
+  const { data, error } = await service.from('user_provisioning_requests').select('id, requested_by_user_id, requested_email, first_name, last_name, job_title, department, requested_role_id, status, ceo_approval_status, technical_approval_status, invitation_status, auth_user_id').eq('id', id).single();
   if (error || !data) throw new Error('Provisioning request was not found.');
   return data as RequestRow;
 }
@@ -186,22 +222,21 @@ Deno.serve(async (request) => {
     const id = cleanId(body.requestId, 'Provisioning request ID');
     const target = await requestById(service, id);
     if (action === 'approve_ceo' || action === 'reject_ceo') {
-      requireCeo(actor); requireNotSelf(actor, target);
+      requireCeo(actor); requireIndependentCeoApproval(actor, target);
       if (target.status !== 'PENDING') throw new Error('This request is not awaiting CEO approval.');
       const rejected = action === 'reject_ceo';
-      const { error } = await service.from('user_provisioning_requests').update({ status: rejected ? 'CEO_REJECTED' : 'CEO_APPROVED', ceo_approval_status: rejected ? 'rejected' : 'approved', ceo_approved_by_user_id: actor.userId, ceo_approved_at: new Date().toISOString(), ceo_rejection_reason: rejected ? cleanText(body.reason, 'Rejection reason', true, 400) : null }).eq('id', id);
-      if (error) throw error;
-      await audit(service, actor.userId, target.requested_email, rejected ? 'ceo_rejected' : 'ceo_approved', correlationId, id, null, target.requested_role_id);
-      return json({ data: { id }, requestId: correlationId }, 200, headers);
-    }
-    if (action === 'approve_technical' || action === 'reject_technical') {
-      requireTechnical(actor, 'users.approve'); requireNotSelf(actor, target);
-      if (target.status !== 'CEO_APPROVED' || target.ceo_approval_status !== 'approved') throw new Error('CEO approval is required before technical approval.');
-      const rejected = action === 'reject_technical';
-      const { error } = await service.from('user_provisioning_requests').update({ status: rejected ? 'TECHNICAL_REJECTED' : 'READY_FOR_INVITATION', technical_approval_status: rejected ? 'rejected' : 'approved', technical_approved_by_user_id: actor.userId, technical_approved_at: new Date().toISOString(), technical_rejection_reason: rejected ? cleanText(body.reason, 'Rejection reason', true, 400) : null }).eq('id', id);
-      if (error) throw error;
-      await audit(service, actor.userId, target.requested_email, rejected ? 'technical_rejected' : 'technical_approved', correlationId, id, null, target.requested_role_id);
-      return json({ data: { id }, requestId: correlationId }, 200, headers);
+      if (rejected) {
+        const { error } = await service.from('user_provisioning_requests').update({ status: 'CEO_REJECTED', ceo_approval_status: 'rejected', ceo_approved_by_user_id: actor.userId, ceo_approved_at: new Date().toISOString(), ceo_rejection_reason: cleanText(body.reason, 'Rejection reason', true, 400) }).eq('id', id);
+        if (error) throw error;
+        await audit(service, actor.userId, target.requested_email, 'ceo_rejected', correlationId, id, null, target.requested_role_id);
+        return json({ data: { id }, requestId: correlationId }, 200, headers);
+      }
+
+      const now = new Date().toISOString();
+      const { error: requestError } = await service.from('user_provisioning_requests').update({ status: 'READY_FOR_INVITATION', ceo_approval_status: 'approved', ceo_approved_by_user_id: actor.userId, ceo_approved_at: now, ceo_rejection_reason: null, technical_approval_status: 'not_required', technical_approved_by_user_id: null, technical_approved_at: null, technical_rejection_reason: null, invitation_status: 'not_sent', auth_user_id: null, invited_by_user_id: null, invited_at: null }).eq('id', id);
+      if (requestError) throw requestError;
+      await audit(service, actor.userId, target.requested_email, 'ceo_approved', correlationId, id, null, target.requested_role_id);
+      return json({ data: { id, readyForInvitation: true }, requestId: correlationId }, 200, headers);
     }
     if (action === 'cancel_request') {
       requirePermission(actor, 'users.request');
@@ -212,19 +247,23 @@ Deno.serve(async (request) => {
       return json({ data: { id }, requestId: correlationId }, 200, headers);
     }
     if (action === 'send_invitation' || action === 'resend_invitation') {
-      requireTechnical(actor, 'users.invite'); requireNotSelf(actor, target);
+      requireTechnical(actor, 'users.invite'); requireNotTargetSelf(actor, target);
       const initial = action === 'send_invitation';
-      if (initial && (target.status !== 'READY_FOR_INVITATION' || target.ceo_approval_status !== 'approved' || target.technical_approval_status !== 'approved' || target.invitation_status !== 'not_sent')) throw new Error('Both approvals and READY_FOR_INVITATION are required before sending an invitation.');
+      const canSendApprovedRequest = target.ceo_approval_status === 'approved'
+        && target.invitation_status === 'not_sent'
+        && ((target.status === 'READY_FOR_INVITATION' && ['approved', 'not_required'].includes(target.technical_approval_status))
+          || (target.status === 'CEO_APPROVED' && target.technical_approval_status === 'pending')
+          || (target.status === 'TECHNICAL_REJECTED' && target.technical_approval_status === 'rejected'));
+      if (initial && !canSendApprovedRequest) throw new Error('CEO approval and a request ready for invitation are required before sending an invitation.');
       if (!initial && (target.status !== 'INVITATION_SENT' || !target.auth_user_id)) throw new Error('This request has no pending invitation.');
-      const { data: invitation, error: invitationError } = await service.auth.admin.inviteUserByEmail(target.requested_email, { redirectTo: new URL('/auth/complete', Deno.env.get('COS_APP_ORIGIN')!).toString() });
-      if (invitationError || !invitation.user) throw invitationError ?? new Error('Invitation could not be sent.');
+      const invitedUser = await sendInvitation(service, target.requested_email, correlationId);
       if (initial) {
-        const { error: profileError } = await service.from('profiles').insert({ id: invitation.user.id, first_name: target.first_name, last_name: target.last_name, role_id: target.requested_role_id, status: 'invited' });
+        const { error: profileError } = await service.from('profiles').insert({ id: invitedUser.id, first_name: target.first_name, last_name: target.last_name, job_title: target.job_title, department: target.department, role_id: target.requested_role_id, status: 'invited' });
         if (profileError) throw profileError;
-        const { error: requestError } = await service.from('user_provisioning_requests').update({ status: 'INVITATION_SENT', invitation_status: 'sent', auth_user_id: invitation.user.id, invited_by_user_id: actor.userId, invited_at: new Date().toISOString() }).eq('id', id);
+        const { error: requestError } = await service.from('user_provisioning_requests').update({ status: 'INVITATION_SENT', technical_approval_status: target.technical_approval_status === 'approved' ? 'approved' : 'not_required', technical_approved_by_user_id: null, technical_approved_at: null, technical_rejection_reason: null, invitation_status: 'sent', auth_user_id: invitedUser.id, invited_by_user_id: actor.userId, invited_at: new Date().toISOString() }).eq('id', id);
         if (requestError) throw requestError;
       }
-      await audit(service, actor.userId, target.requested_email, initial ? 'invitation_sent' : 'invitation_resent', correlationId, id, invitation.user.id, target.requested_role_id);
+      await audit(service, actor.userId, target.requested_email, initial ? 'invitation_sent' : 'invitation_resent', correlationId, id, invitedUser.id, target.requested_role_id);
       return json({ data: { id }, requestId: correlationId }, 200, headers);
     }
     const userId = cleanId(body.userId, 'User ID');
@@ -253,7 +292,8 @@ Deno.serve(async (request) => {
     }
     throw new Error('Unsupported provisioning action.');
   } catch (error) {
-    console.error('admin-user-provisioning failed', { category: error instanceof Error ? error.name : 'unknown', correlationId });
-    return json({ error: 'The requested provisioning action could not be completed.', requestId: correlationId }, 400, headers);
+    const code = error instanceof ProvisioningFailure ? error.code : 'REQUEST_REJECTED';
+    console.error('admin-user-provisioning failed', { category: code, correlationId });
+    return json({ error: 'The requested provisioning action could not be completed.', code, requestId: correlationId }, 400, headers);
   }
 });

@@ -15,17 +15,9 @@ export function isCeoApprovalAllowed(role: AuthorizationRole | null, permissions
   return role?.code === 'CEO' && permissions.includes('users.approve') && status === 'PENDING';
 }
 
-export function isTechnicalApprovalAllowed(role: AuthorizationRole | null, permissions: readonly string[], status: string) {
-  return role?.code === 'SOFTWARE_ENGINEER'
-    && permissions.includes('users.approve')
-    && permissions.includes('users.invite')
-    && status === 'CEO_APPROVED';
-}
-
 export function isInvitationAllowed(role: AuthorizationRole | null, permissions: readonly string[], status: string, ceoApproval: string, technicalApproval: string) {
-  return role?.code === 'SOFTWARE_ENGINEER'
-    && permissions.includes('users.invite')
-    && status === 'READY_FOR_INVITATION'
-    && ceoApproval === 'approved'
-    && technicalApproval === 'approved';
+  if (role?.code !== 'SOFTWARE_ENGINEER' || !permissions.includes('users.invite') || ceoApproval !== 'approved') return false;
+  return (status === 'READY_FOR_INVITATION' && ['approved', 'not_required'].includes(technicalApproval))
+    || (status === 'CEO_APPROVED' && technicalApproval === 'pending')
+    || (status === 'TECHNICAL_REJECTED' && technicalApproval === 'rejected');
 }
