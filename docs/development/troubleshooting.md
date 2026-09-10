@@ -4,6 +4,8 @@
 
 Confirm `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are present and restart Vite. Placeholder or missing values deliberately produce an unconfigured state.
 
+For a static deployment, these variables must be present on the build machine before `npm run build`; Vite embeds the browser-safe configuration in the generated assets. Rebuild and replace the deployed artifact after correcting them. Production builds now reject missing, placeholder, secret, and service-role values.
+
 ## Signed in but no workspace
 
 The account must have an active `profiles` row and valid `get_my_authorization()` result. Do not work around this in frontend state or assign a role by email. Ask an authorized administrator to inspect the governed provisioning state.
@@ -35,4 +37,3 @@ Set an approved controlled `COS_E2E_EMAIL` and `COS_E2E_PASSWORD`. The public cl
 ## Seed refuses to run
 
 This is intentional if the project reference differs, confirmation is absent, credentials lack access, or any target table is non-empty. Resolve the condition and inspect any partial state; do not weaken the guard.
-

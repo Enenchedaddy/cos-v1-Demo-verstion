@@ -57,3 +57,12 @@ The two scripts in `scripts/bootstrapInitialStaging*.ts` are staging-only, one-t
 
 `npm run build` only builds the SPA. Vercel serves it with SPA rewrites from `vercel.json`. Database migrations and Edge Functions are separate deployments. No CI/CD pipeline is committed.
 
+Production builds fail closed unless `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` contain a valid HTTPS project URL and a browser-safe Supabase publishable or legacy anon key. Secret and service-role keys are rejected and must never be copied into a frontend build or static web root.
+
+For the approved IIS LAN deployment, build on the configured development machine. Copy only the generated `dist` directory and `scripts/deployIis.ps1` to the IIS host while preserving that relative layout; do not copy `.env.local`. Then run the guarded deployment from an elevated PowerShell session:
+
+```powershell
+.\scripts\deployIis.ps1
+```
+
+The script discovers a unique port-80 site, stages a versioned sibling of its current physical path, preserves the existing root ACL and `web.config`, switches the site, recycles its application pool, and restores the previous path automatically if the local HTTP smoke test fails. Pass `-SiteName 'Exact IIS Site Name'` only when the host has multiple port-80 sites.
