@@ -83,16 +83,7 @@ export default function IdentityGateway({
     <div className="relative isolate flex-1 overflow-y-auto bg-[#F3F6FA]">
       <COSLogoWatermark />
       <div className="mx-auto min-h-full w-full max-w-[1540px] px-4 pb-10 sm:px-7 lg:px-10">
-        <header className="flex min-h-[76px] items-center justify-between gap-3 border-b border-[#D7DEE8]">
-          <div className="flex min-w-0 items-center gap-3">
-            <COSLogo className="h-9 w-9" variant="full" />
-            <div className="min-w-0">
-              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#335AA8]">
-                Central Operating System
-              </p>
-              <p className="truncate text-sm font-semibold text-[#111C33]">Identity gateway</p>
-            </div>
-          </div>
+        <header className="flex min-h-[76px] items-center justify-end gap-3 border-b border-[#D7DEE8]">
           <div className="flex items-center gap-4">
             <span hidden className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#77839A]">
               Internal access · CO-10
@@ -179,19 +170,13 @@ export default function IdentityGateway({
         >
           <div className="mb-4 flex items-end justify-between px-1">
             <div>
-              <p className="font-mono text-[9px] uppercase tracking-[0.13em] text-[#7B879B]">
-                Authorised destinations
-              </p>
               <h2
                 id="workspace-destinations-title"
-                className="mt-1 text-xl font-bold tracking-[-0.02em] text-[#111C33]"
+                className="text-xl font-bold tracking-[-0.02em] text-[#111C33]"
               >
                 Choose your operating workspace
               </h2>
             </div>
-            <p className="hidden text-xs text-[#7B879B] sm:block">
-              Role and scope are recorded on entry.
-            </p>
           </div>
 
           <div className="grid gap-5 lg:grid-cols-2">
@@ -279,14 +264,6 @@ export default function IdentityGateway({
           </div>
         </section>
 
-        <footer className="mx-auto mt-8 flex max-w-[1280px] flex-col gap-2 border-t border-[#D7DEE8] py-5 text-[10px] text-[#758197] sm:flex-row sm:items-center sm:justify-between">
-          <p>
-            Access, changes, and recommendations are recorded against your active identity.
-          </p>
-          <p className="font-mono uppercase tracking-[0.08em]">
-            TLS 1.3 · Session monitored · Internal & confidential
-          </p>
-        </footer>
       </div>
     </div>
   );
