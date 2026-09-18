@@ -1,0 +1,64 @@
+/* The reference design is scoped to login; shared recovery/invitation UI is unchanged. */
+.cos-login {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 64px 20px 96px;
+  background: radial-gradient(ellipse at 50% 56%, #edf3fc 0%, #f7f9fc 58%, #fafbfc 100%);
+  color: #151e2b;
+  font-family: var(--cos-font-sans);
+}
+.cos-login__content { width: 100%; max-width: 572px; }
+.cos-login__brand { margin-bottom: 36px; text-align: center; }
+.cos-login__wordmark { display: flex; align-items: center; justify-content: center; gap: 10px; }
+.cos-login__wordmark > span { font-size: 36px; font-weight: 600; letter-spacing: -2px; }
+.cos-login__logo { width: 64px; height: 64px; }
+.cos-login__logo .cos-logo-assembly,
+.cos-login__logo .cos-logo-facet { animation: none; }
+.cos-login__logo .cos-logo-facet { fill: #151e2b; }
+.cos-login__brand p { margin: 10px 0 0; font-size: 12px; font-weight: 700; letter-spacing: 4px; line-height: 18px; text-transform: uppercase; color: #68779a; }
+.cos-login__card {
+  border: 1px solid transparent;
+  border-radius: 40px;
+  padding: 64px 48px 28px;
+  background: linear-gradient(145deg, #ffffff, #f9fbfe) padding-box,
+    linear-gradient(105deg, #76aaff, #cce6ff 45%, #c2a3ff) border-box;
+  box-shadow: 0 18px 48px -14px #729de54d, 0 5px 16px -8px #91b9ed40;
+}
+.cos-login__card h1 { margin: 0 0 36px; text-align: center; font-family: var(--cos-font-sans) !important; font-size: 44px; font-weight: 700; letter-spacing: -1.5px; line-height: 1.3; }
+.cos-login__form > label + label { margin-top: 28px; }
+.cos-login__form > label > span:first-child { margin-bottom: 8px; color: #6d7896; font-size: 16px; font-weight: 600; letter-spacing: 0; text-transform: none; line-height: 24px; }
+.cos-login__form input:not([type="checkbox"]) { min-height: 64px; border-radius: 13px; background: #f8faff; border-color: #cfd7e8; font-size: 16px; box-shadow: inset 0 1px 2px #1e3a5f03; }
+.cos-login__form input[aria-invalid="true"] { border-color: #a63a32; }
+.cos-login__form > label[for="remember-me"] { margin-top: 22px; min-height: 44px; gap: 14px; color: #707e9e; font-size: 15px; }
+.cos-login__form input[type="checkbox"] { appearance: none; flex-shrink: 0; width: 23px; height: 23px; border: 1px solid #8292b4; border-radius: 5px; background: #fff; }
+.cos-login__form input[type="checkbox"]:checked { background: #216bff; border-color: #216bff; }
+.cos-login__form input[type="checkbox"]:checked::after { content: ''; display: block; width: 6px; height: 12px; margin: 3px auto; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.cos-login__form input:focus-visible { outline: 2px solid #216bff; outline-offset: 3px; }
+.cos-login__form > button { margin-top: 28px; min-height: 60px; border-radius: 14px; background: linear-gradient(155deg, #499fff, #2478ff 52%, #125cf1); box-shadow: 0 6px 15px #2e80f51a, inset 0 1px 2px #ffffff66; font-size: 19px; font-weight: 500; }
+.cos-login__form > button:hover { filter: brightness(1.05); }
+.cos-login__form > div:last-child { margin-top: 20px; }
+.cos-login__form > div:last-child a { color: #1763ff; font-size: 16px; font-weight: 500; text-decoration-color: #9cbcff; }
+.cos-login__form > div:last-child a:hover { color: #124ac0; }
+.cos-login__form > [role="alert"] { margin-top: 16px; }
+@media (max-width: 600px) {
+  .cos-login { padding: 32px 20px; }
+  .cos-login__brand { margin-bottom: 28px; }
+  .cos-login__brand p { font-size: 10px; letter-spacing: 2.8px; }
+  .cos-login__card { padding: 36px 24px 24px; border-radius: 28px; }
+  .cos-login__card h1 { font-size: 34px; margin-bottom: 30px; }
+  .cos-login__form > label[for="remember-me"] { font-size: 13px; gap: 10px; }
+  .cos-login__form > button { font-size: 16px; }
+}
+/* Recovery, invitation and confirmation screens share the login presentation. */
+.cos-auth__brand { display: flex; align-items: center; justify-content: center; gap: 14px; color: #191d30; font-size: 36px; font-weight: 600; letter-spacing: -2px; }
+.cos-auth__logo { display: grid; place-items: center; width: 60px; height: 60px; border-radius: 16px; background: linear-gradient(135deg,#5b9dfb,#2f6fed); }
+.cos-auth .cos-login__card { padding: 44px 40px; }
+.cos-auth .cos-login__card h1 { font-size: 34px; line-height: 1.2; }
+.cos-auth form > label > span:first-child { font-size: 13px; letter-spacing: 0; text-transform: none; }
+.cos-auth form input { min-height: 54px; border-color: #d9dcf0; border-radius: 13px; }
+.cos-auth button[type="submit"] { min-height: 54px; border-radius: 14px; background: linear-gradient(135deg,#5b9dfb,#2f6fed) !important; box-shadow: 0 6px 16px #2f6fed22,inset 0 1px 1px #ffffff55; color: white; }
+@media (max-width: 600px) {
+  .cos-auth .cos-login__card { padding: 30px 24px; }
+  .cos-auth .cos-login__card h1 { font-size: 28px; }
+}

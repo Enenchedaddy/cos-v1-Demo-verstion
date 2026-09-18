@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import COSLogo from './COSLogo';
+import './LoginPage.css';
 
 interface AuthLayoutProps {
   title: string;
@@ -9,35 +10,17 @@ interface AuthLayoutProps {
 
 export function AuthLayout({ title, children, footer }: AuthLayoutProps) {
   return (
-    <main className="min-h-[100dvh] bg-[#F3F6FA] text-[#111C33] lg:grid lg:grid-cols-[minmax(320px,38%)_1fr]">
-      <aside className="relative hidden min-h-[100dvh] overflow-hidden bg-[#183153] lg:flex lg:flex-col lg:justify-between lg:p-8" aria-label="Central Operating System">
-        <a href="/app" className="relative z-10 w-fit text-[11px] font-bold uppercase tracking-[0.16em] text-white">
-          Central Operating System
+    <main className="cos-login cos-auth">
+      <div className="cos-login__content">
+        <a href="/app" className="cos-login__brand cos-auth__brand" aria-label="Central Operating System">
+          <span className="cos-auth__logo"><COSLogo className="h-12 w-12" variant="white" /></span>
+          <span>COS</span>
         </a>
-
-        <div className="relative z-10 mx-auto flex flex-col items-center" aria-hidden="true">
-          <div className="flex aspect-square w-[min(72%,420px)] items-center justify-center rounded-[48px] border border-white/15 bg-[#254663]">
-            <COSLogo className="h-[72%] w-[72%]" variant="white" />
-          </div>
-          <p className="mt-8 font-display text-7xl font-semibold leading-none tracking-[-0.06em] text-white">COS</p>
-        </div>
-
-        <span aria-hidden="true" />
-      </aside>
-
-      <div className="flex min-h-[100dvh] min-w-0 flex-col px-3 py-4 sm:px-8 sm:py-8 lg:px-16">
-        <section className="mx-auto flex w-full max-w-[500px] flex-1 flex-col justify-center py-6 sm:py-10">
-          <div className="rounded-[20px] border border-[#CAD4E1] bg-white p-5 shadow-[0_12px_32px_rgba(20,36,64,0.08)] sm:rounded-[24px] sm:p-8">
-            <div className="mb-7 flex items-start justify-between gap-4 sm:mb-8 sm:gap-8">
-              <h1 className="min-w-0 text-[32px] font-semibold leading-[1.05] sm:text-[48px] sm:leading-none">{title}</h1>
-              <span className="mt-2 h-3 w-3 shrink-0 rounded-full bg-[#335AA8]" aria-hidden="true" />
-            </div>
-            <div>
-              {children}
-            </div>
-          </div>
-          {footer && <div className="mt-6 text-center text-sm text-[#66758D]">{footer}</div>}
+        <section className="cos-login__card" aria-labelledby="auth-title">
+          <h1 id="auth-title">{title}</h1>
+          {children}
         </section>
+        {footer && <div className="mt-6 text-center text-sm text-[#66758D]">{footer}</div>}
       </div>
     </main>
   );

@@ -1,10 +1,10 @@
+import './WorkspaceTheme.css';
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import React, { useEffect, useState } from 'react';
-import COSLogoWatermark from './COSLogoWatermark';
 import HexLoader from './HexLoader';
 import { MANAGEMENT_RAIL_AREAS } from '../navigation/management';
 import ManagementSidebar from './ManagementSidebar';
@@ -60,6 +60,11 @@ export default function ManagementPlatform({
               : activeTab === 'alerts' ? alertsSubTab
                 : groupAdminSubTab;
 
+  const hasPageHeading = activeTab === 'home'
+    || (activeTab === 'performance' && ['bu', 'dictionary', 'reports'].includes(performanceSubTab))
+    || (activeTab === 'governance' && ['policy', 'console'].includes(governanceSubTab))
+    || (activeTab === 'group-admin' && ['registry', 'evidence', 'offtake'].includes(groupAdminSubTab));
+
   const selectManagementArea = (id: string) => {
     if (!MANAGEMENT_RAIL_AREAS.some((area) => area.id === id)) return;
     setActiveTab(id as typeof activeTab);
@@ -105,7 +110,7 @@ export default function ManagementPlatform({
         results.push({
           id: `approval-${appr.id}`,
           title: `Approval: ${appr.customerName || 'Pending'}`,
-          subtitle: `Type: ${appr.type} â€¢ Req: ${appr.requestedBy} â€¢ Status: ${appr.status}`,
+          subtitle: `Type: ${appr.type} • Req: ${appr.requestedBy} • Status: ${appr.status}`,
           category: 'Audit / Approval',
           action: () => {
             setActiveTab('home');
@@ -122,7 +127,7 @@ export default function ManagementPlatform({
         results.push({
           id: `log-${log.id}`,
           title: log.action,
-          subtitle: `Op: ${log.user} â€¢ Entity: ${log.entityName} â€¢ Platform: ${log.platform}`,
+          subtitle: `Op: ${log.user} • Entity: ${log.entityName} • Platform: ${log.platform}`,
           category: 'Compliance Log',
           action: () => {
             setActiveTab('governance');
@@ -139,7 +144,7 @@ export default function ManagementPlatform({
         results.push({
           id: `company-${comp.id}`,
           title: comp.name,
-          subtitle: `Sector: ${comp.industry} â€¢ Ref: ${comp.customerNumber}`,
+          subtitle: `Sector: ${comp.industry} • Ref: ${comp.customerNumber}`,
           category: 'Corporate Entity',
           action: () => {
             setActiveTab('performance');
@@ -156,7 +161,7 @@ export default function ManagementPlatform({
         results.push({
           id: `order-${ord.id}`,
           title: `Order ${ord.orderNumber}`,
-          subtitle: `${ord.companyName} â€¢ Status: ${ord.status} â€¢ Total: Â£${ord.grandTotal.toLocaleString()}`,
+          subtitle: `${ord.companyName} • Status: ${ord.status} • Total: £${ord.grandTotal.toLocaleString()}`,
           category: 'Order Record',
           action: () => {
             setActiveTab('performance');
@@ -173,7 +178,7 @@ export default function ManagementPlatform({
   const q = searchQuery.toLowerCase().trim();
 
   return (
-    <div className="management-platform sales-platform-theme relative flex h-[100dvh] min-w-0 overflow-hidden bg-[#F7F9FC] font-sans">
+    <div className="cos-ui management-platform sales-platform-theme relative flex h-[100dvh] min-w-0 overflow-hidden bg-[#F7F9FC] font-sans">
       
       {/* Standardized dual-rail navigation */}
       <ManagementSidebar
@@ -195,18 +200,7 @@ export default function ManagementPlatform({
         <header className="cos-global-topbar px-4 sm:px-6 flex items-center justify-between shrink-0">
           <div className="flex items-center space-x-1.5 sm:space-x-2 min-w-0">
             <button type="button" className="workspace-sidebar-toggle" aria-controls="management-sidebar" aria-expanded={isSidebarOpen} aria-label={isSidebarOpen ? 'Close navigation' : 'Open navigation'} onClick={() => setIsSidebarOpen((open) => !open)}><Menu size={20} aria-hidden="true" /></button>
-            <span className="text-[10px] bg-[#EEF3FB] text-[#4065B3] font-bold px-2 py-0.5 rounded uppercase tracking-wider font-mono shrink-0 hidden xs:inline">Governed Command Node</span>
-            <span className="text-slate-400 hidden xs:inline">/</span>
-            <span className="text-xs font-bold text-slate-700 capitalize font-display truncate">
-              {activeTab === 'home' && `Home (${homeSubTab})`}
-              {activeTab === 'performance' && `Perf (${performanceSubTab})`}
-              {activeTab === 'governance' && `Gov (${governanceSubTab})`}
-              {activeTab === 'strategy' && `OKRs (${strategySubTab})`}
-              {activeTab === 'organisation' && `Org (${organisationSubTab})`}
-              {activeTab === 'acquisitions' && `M&A (${acquisitionsSubTab})`}
-              {activeTab === 'alerts' && `Policies (${alertsSubTab})`}
-              {activeTab === 'group-admin' && `Legal (${groupAdminSubTab})`}
-            </span>
+
           </div>
 
           <div className="flex items-center space-x-2 sm:space-x-4 shrink-0">
@@ -267,43 +261,38 @@ export default function ManagementPlatform({
               </AnimatePresence>
             </div>
 
-            <div className="hidden md:flex items-center space-x-2">
-              <span className="text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full flex items-center space-x-1">
-                <span className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-pulse"></span>
-                <span>Audit Sync Enabled</span>
-              </span>
-            </div>
+
           </div>
         </header>
 
         {/* Viewport content */}
-        <div className="management-canvas flex-1 overflow-y-auto p-4 sm:p-6 relative isolate">
-          <COSLogoWatermark />
+        <div className="cos-page-canvas management-canvas flex-1 overflow-y-auto p-4 sm:p-6 relative isolate">
+
           
           {/* Simulated view states */}
           {simulatedState === 'loading' ? (
             <HexLoader
               size="lg"
-              label="Loading corporate entities & executive controlsâ€¦"
+              label="Loading corporate entities & executive controls…"
             />
           ) : simulatedState === 'error' ? (
-            <div className="flex flex-col items-center justify-center h-full py-20 bg-white rounded-xl border border-red-200 p-8 shadow-sm">
+            <div className="cos-surface flex flex-col items-center justify-center h-full py-20 bg-white rounded-xl border border-red-200 p-8 shadow-sm">
               <div className="bg-red-50 text-red-600 p-3 rounded-full mb-4 border border-red-200">
                 <XCircle size={28} />
               </div>
-              <h3 className="text-sm font-bold text-slate-800 font-display">Contract Violation Detected Â· Code COS-7F2A</h3>
+              <h3 className="text-sm font-bold text-slate-800 font-display">Contract Violation Detected · Code COS-7F2A</h3>
               <p className="text-xs text-slate-500 mt-1 max-w-sm text-center">The DSCR ratio dropped below the required 1.5x on-plan limit. Covenant breach forecast trigger activated.</p>
             </div>
           ) : simulatedState === 'restricted' ? (
-            <div className="flex flex-col items-center justify-center h-full py-20 bg-white rounded-xl border border-amber-200 p-8 shadow-sm">
+            <div className="cos-surface flex flex-col items-center justify-center h-full py-20 bg-white rounded-xl border border-amber-200 p-8 shadow-sm">
               <div className="bg-amber-50 text-amber-700 p-3 rounded-full mb-4 border border-amber-200">
                 <Ban size={28} />
               </div>
-              <h3 className="text-sm font-bold text-slate-800 font-display">â€¢â€¢â€¢â€¢ Access Forbidden</h3>
+              <h3 className="text-sm font-bold text-slate-800 font-display">•••• Access Forbidden</h3>
               <p className="text-xs text-slate-500 mt-1 max-w-md text-center">Access to this registry entity requires GATED board-director clearance or multifactor token verification.</p>
             </div>
           ) : simulatedState === 'empty' ? (
-            <div className="flex flex-col items-center justify-center h-full py-20 bg-white rounded-xl border border-[#D9E0EA] p-8 shadow-sm">
+            <div className="cos-surface flex flex-col items-center justify-center h-full py-20 bg-white rounded-xl border border-[#D9E0EA] p-8 shadow-sm">
               <Plus className="text-[#4065B3] mb-4" size={40} />
               <h3 className="text-sm font-bold text-slate-800 font-display">No intercompany agreements filed yet</h3>
               <p className="text-xs text-slate-500 mt-1 max-w-xs text-center">Click 'Add Agreement' to define counterparty flows.</p>
@@ -320,6 +309,7 @@ export default function ManagementPlatform({
                 className="space-y-6"
               >
                 
+                {!hasPageHeading && <h1>{activeRailArea.children?.find((child) => child.id === activeManagementChild)?.label ?? activeRailArea.label}</h1>}
                 {/* USE CASE HOME: MORNING RECONCILIATIONS */}
                 {activeTab === 'home' && (
                   <div className="space-y-6 text-left">
@@ -335,25 +325,25 @@ export default function ManagementPlatform({
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                          <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm space-y-1">
+                          <div className="cos-surface bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm space-y-1">
                             <span className="text-xs font-bold text-slate-500">Group Pipeline</span>
-                            <h3 className="text-3xl font-black text-slate-900 font-mono">Â£3,842,000</h3>
+                            <h3 className="text-3xl font-black text-slate-900 font-mono">£3,842,000</h3>
                             <span className="text-[10px] text-[#4065B3] font-bold">External opportunities scope</span>
                           </div>
-                          <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm space-y-1">
+                          <div className="cos-surface bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm space-y-1">
                             <span className="text-xs font-bold text-slate-500">DELabs ROAS</span>
                             <h3 className="text-3xl font-black text-slate-900 font-mono">4.2x</h3>
                             <span className="text-[10px] text-slate-500">UK company proof strip</span>
                           </div>
-                          <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm space-y-1">
+                          <div className="cos-surface bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm space-y-1">
                             <span className="text-xs font-bold text-slate-500">Offtake Cover</span>
                             <h3 className="text-3xl font-black text-slate-900 font-mono">72%</h3>
                             <span className="text-[10px] text-slate-500">Advanced Gases proof strip</span>
                           </div>
-                          <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm space-y-1">
+                          <div className="cos-surface bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm space-y-1">
                             <span className="text-xs font-bold text-slate-500">Open Approvals</span>
                             <h3 className="text-3xl font-black text-slate-900 font-mono">14</h3>
-                            <span className="text-[10px] text-amber-600 font-bold">3 urgent Â· entity-labelled</span>
+                            <span className="text-[10px] text-amber-600 font-bold">3 urgent · entity-labelled</span>
                           </div>
                         </div>
                       </div>
@@ -370,22 +360,22 @@ export default function ManagementPlatform({
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                          <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm space-y-1">
+                          <div className="cos-surface bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm space-y-1">
                             <span className="text-xs font-bold text-slate-500">R&D Validation</span>
                             <h3 className="text-3xl font-black text-slate-900 font-mono">2 trials</h3>
                             <span className="text-[10px] text-slate-500">Product and process validation</span>
                           </div>
-                          <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm space-y-1">
+                          <div className="cos-surface bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm space-y-1">
                             <span className="text-xs font-bold text-slate-500">Operations & Logistics</span>
                             <h3 className="text-3xl font-black text-slate-900 font-mono">96.2%</h3>
                             <span className="text-[10px] text-slate-500 font-bold">Plant uptime & delivery</span>
                           </div>
-                          <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm space-y-1">
+                          <div className="cos-surface bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm space-y-1">
                             <span className="text-xs font-bold text-slate-500">Sales & Marketing</span>
                             <h3 className="text-3xl font-black text-slate-900 font-mono">72%</h3>
                             <span className="text-[10px] text-slate-500">Contracted offtake demand</span>
                           </div>
-                          <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm space-y-1">
+                          <div className="cos-surface bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm space-y-1">
                             <span className="text-xs font-bold text-slate-500">Accounting & Finance</span>
                             <h3 className="text-3xl font-black text-slate-900 font-mono">1.62x</h3>
                             <span className="text-[10px] text-amber-600 font-bold">Stressed DSCR case</span>
@@ -405,27 +395,27 @@ export default function ManagementPlatform({
 
                         {/* Exceptions bar */}
                         <div className="p-4 bg-amber-50/50 border border-amber-200 rounded-lg flex justify-between items-center text-xs">
-                          <p className="font-semibold text-slate-800">4 support SLA breaches detected Â· Â£184,000 overdue receivables Â· 7 deals need forecast review</p>
+                          <p className="font-semibold text-slate-800">4 support SLA breaches detected · £184,000 overdue receivables · 7 deals need forecast review</p>
                           <span className="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-bold font-mono">URGENT ACTIONS</span>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 font-mono">
-                          <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm">
+                          <div className="cos-surface bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm">
                             <p className="text-[10px] font-bold text-slate-400">YTD GROUP REVENUE</p>
-                            <p className="text-2xl font-black text-slate-900 mt-1">Â£24,840,000</p>
+                            <p className="text-2xl font-black text-slate-900 mt-1">£24,840,000</p>
                             <p className="text-[10px] text-green-600 mt-1 font-bold">â†‘ 12.4% vs last week</p>
                           </div>
-                          <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm">
+                          <div className="cos-surface bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm">
                             <p className="text-[10px] font-bold text-slate-400">GROSS MARGIN %</p>
                             <p className="text-2xl font-black text-[#4065B3] mt-1">31.7%</p>
                             <p className="text-[10px] text-slate-500 mt-1">Net Margin: 9.8%</p>
                           </div>
-                          <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm">
+                          <div className="cos-surface bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm">
                             <p className="text-[10px] font-bold text-slate-400">OUTSTANDING RECEIVABLES</p>
-                            <p className="text-2xl font-black text-[#B42318] mt-1">Â£184,000</p>
+                            <p className="text-2xl font-black text-[#B42318] mt-1">£184,000</p>
                             <p className="text-[10px] text-slate-500 mt-1">Average DSO: 48 days</p>
                           </div>
-                          <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm">
+                          <div className="cos-surface bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm">
                             <p className="text-[10px] font-bold text-slate-400">ACTIVE ACTION ITEMS</p>
                             <p className="text-2xl font-black text-orange-600 mt-1">14 approvals</p>
                             <p className="text-[10px] text-slate-500 mt-1">3 urgent exceptions</p>
@@ -453,13 +443,13 @@ export default function ManagementPlatform({
                         {/* BU List */}
                         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                           {[
-                            { name: 'Electronics', rev: 'Â£468,300', margin: '34.7%', risk: 'Low' },
-                            { name: 'Industrial Gases', rev: 'Â£392,600', margin: '31.2%', risk: 'High' },
-                            { name: 'Manufacturing', rev: 'Â£196,800', margin: '28.4%', risk: 'Medium' },
-                            { name: 'Imports', rev: 'Â£143,700', margin: '30.1%', risk: 'Low' },
-                            { name: 'Agency', rev: 'Â£83,200', margin: '33.2%', risk: 'Medium' }
+                            { name: 'Electronics', rev: '£468,300', margin: '34.7%', risk: 'Low' },
+                            { name: 'Industrial Gases', rev: '£392,600', margin: '31.2%', risk: 'High' },
+                            { name: 'Manufacturing', rev: '£196,800', margin: '28.4%', risk: 'Medium' },
+                            { name: 'Imports', rev: '£143,700', margin: '30.1%', risk: 'Low' },
+                            { name: 'Agency', rev: '£83,200', margin: '33.2%', risk: 'Medium' }
                           ].map(bu => (
-                            <div key={bu.name} className="bg-white p-4 rounded-xl border border-[#D9E0EA] shadow-sm space-y-2">
+                            <div key={bu.name} className="cos-surface bg-white p-4 rounded-xl border border-[#D9E0EA] shadow-sm space-y-2">
                               <h4 className="text-xs font-bold text-slate-900 font-display">{bu.name}</h4>
                               <p className="text-lg font-black text-slate-800 font-mono">{bu.rev}</p>
                               <div className="flex justify-between text-[10px] font-semibold">
@@ -473,9 +463,9 @@ export default function ManagementPlatform({
                     )}
 
                     {performanceSubTab === 'dictionary' && (
-                      <div className="bg-white rounded-xl border border-[#D9E0EA] overflow-hidden shadow-sm">
+                      <div className="cos-surface bg-white rounded-xl border border-[#D9E0EA] overflow-hidden shadow-sm">
                         <div className="p-5 border-b border-[#D9E0EA] bg-[#EEF3FB]/40">
-                          <h4 className="font-bold text-slate-800 text-xs font-display">Pillar Metric Dictionary</h4>
+                          <h1 className="font-bold text-slate-800 text-xs font-display">Pillar Metric Dictionary</h1>
                         </div>
                         <div className="overflow-x-auto w-full">
                           <table className="w-full text-xs text-left min-w-[650px]">
@@ -488,10 +478,10 @@ export default function ManagementPlatform({
                           </thead>
                           <tbody>
                             {[
-                              { m: 'MTD Revenue', def: 'Revenue recognised in period from billing ledgers', owner: 'Idris Khan Â· Data Analyst' },
-                              { m: 'ROAS', def: 'Attributed digital campaign revenue Ã· total media spend', owner: 'Daniel Kerr Â· Marketing Ops' },
-                              { m: 'DSO (Days Sales Outstanding)', def: 'Receivables days based on Net-30 payment logs', owner: 'Clara Evans Â· Finance Director' },
-                              { m: 'SLA Breach Count', def: 'Elapsed ticketing clock > defined support policy limits', owner: 'Helen Shaw Â· Support Lead' }
+                              { m: 'MTD Revenue', def: 'Revenue recognised in period from billing ledgers', owner: 'Idris Khan · Data Analyst' },
+                              { m: 'ROAS', def: 'Attributed digital campaign revenue ÷ total media spend', owner: 'Daniel Kerr · Marketing Ops' },
+                              { m: 'DSO (Days Sales Outstanding)', def: 'Receivables days based on Net-30 payment logs', owner: 'Clara Evans · Finance Director' },
+                              { m: 'SLA Breach Count', def: 'Elapsed ticketing clock > defined support policy limits', owner: 'Helen Shaw · Support Lead' }
                             ].map((row, idx) => (
                               <tr key={idx} className="border-b border-[#D9E0EA] font-semibold text-slate-700">
                                 <td className="p-4 font-bold text-slate-900">{row.m}</td>
@@ -506,16 +496,16 @@ export default function ManagementPlatform({
                     )}
 
                     {performanceSubTab === 'reports' && (
-                      <div className="bg-white rounded-xl border border-[#D9E0EA] p-6 space-y-4 shadow-sm">
-                        <h3 className="text-xs font-black uppercase text-slate-900 font-display tracking-wider">Reports Centre & Board Operating Packs</h3>
+                      <div className="cos-surface bg-white rounded-xl border border-[#D9E0EA] p-6 space-y-4 shadow-sm">
+                        <h1 className="text-xs font-black uppercase text-slate-900 font-display tracking-wider">Reports Centre & Board Operating Packs</h1>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="p-4 border border-green-200 bg-green-50/20 rounded-lg">
                             <h4 className="text-xs font-bold text-slate-950 font-display">Board operating pack (FY2026)</h4>
-                            <p className="text-[10px] text-slate-500 mt-1">Status: Active Â· Generated & signed-off by Olivia Reed</p>
+                            <p className="text-[10px] text-slate-500 mt-1">Status: Active · Generated & signed-off by Olivia Reed</p>
                           </div>
                           <div className="p-4 border border-[#D9E0EA] bg-[#F7F9FC] rounded-lg">
                             <h4 className="text-xs font-bold text-slate-950 font-display">Newcastle Depot Productivity Log</h4>
-                            <p className="text-[10px] text-slate-500 mt-1">Status: Complete Â· Verified by Peter Cole</p>
+                            <p className="text-[10px] text-slate-500 mt-1">Status: Complete · Verified by Peter Cole</p>
                           </div>
                         </div>
                       </div>
@@ -529,8 +519,8 @@ export default function ManagementPlatform({
                   <div className="space-y-6 text-left">
                     
                     {governanceSubTab === 'policy' && (
-                      <div className="bg-white rounded-xl border border-[#D9E0EA] p-6 space-y-4 shadow-sm">
-                        <h3 className="text-xs font-black uppercase text-slate-900 font-display tracking-wider">Approval Policy & Delegation matrix</h3>
+                      <div className="cos-surface bg-white rounded-xl border border-[#D9E0EA] p-6 space-y-4 shadow-sm">
+                        <h1 className="text-xs font-black uppercase text-slate-900 font-display tracking-wider">Approval Policy & Delegation matrix</h1>
                         <div className="overflow-x-auto w-full">
                           <table className="w-full text-xs text-left border-collapse font-medium text-slate-700 min-w-[600px]">
                           <thead>
@@ -542,22 +532,22 @@ export default function ManagementPlatform({
                           </thead>
                           <tbody>
                             <tr className="border-b border-[#D9E0EA]">
-                              <td className="p-4 font-mono font-bold">&lt; Â£5,000</td>
+                              <td className="p-4 font-mono font-bold">&lt; £5,000</td>
                               <td className="p-4">Marcus Hale (Sales Manager)</td>
                               <td className="p-4"><span className="px-2 py-0.5 bg-green-50 text-green-700 font-bold rounded">Manager</span></td>
                             </tr>
                             <tr className="border-b border-[#D9E0EA]">
-                              <td className="p-4 font-mono font-bold">Â£5,000 â€“ Â£25,000</td>
+                              <td className="p-4 font-mono font-bold">£5,000 – £25,000</td>
                               <td className="p-4">Clara Evans (Finance Director)</td>
                               <td className="p-4"><span className="px-2 py-0.5 bg-[#EEF3FB] text-[#4065B3] font-bold rounded">Director</span></td>
                             </tr>
                             <tr className="border-b border-[#D9E0EA]">
-                              <td className="p-4 font-mono font-bold">Â£25,000 â€“ Â£100,000</td>
+                              <td className="p-4 font-mono font-bold">£25,000 – £100,000</td>
                               <td className="p-4">Olivia Reed (Group CEO)</td>
                               <td className="p-4"><span className="px-2 py-0.5 bg-purple-50 text-[#6B21A8] border border-purple-200 font-bold rounded">Executive CEO</span></td>
                             </tr>
                             <tr>
-                              <td className="p-4 font-mono font-bold">&gt; Â£100,000</td>
+                              <td className="p-4 font-mono font-bold">&gt; £100,000</td>
                               <td className="p-4">Board of Directors</td>
                               <td className="p-4"><span className="px-2 py-0.5 bg-red-50 text-[#B42318] border border-red-200 font-bold rounded">Board Approval</span></td>
                             </tr>
@@ -568,12 +558,12 @@ export default function ManagementPlatform({
                     )}
 
                     {governanceSubTab === 'console' && (
-                      <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm space-y-4">
-                        <h3 className="text-xs font-black uppercase text-slate-900 font-display tracking-wider">Audit Log & Governance Console</h3>
+                      <div className="cos-surface bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm space-y-4">
+                        <h1 className="text-xs font-black uppercase text-slate-900 font-display tracking-wider">Audit Log & Governance Console</h1>
                         <div className="p-4 bg-[#F7F9FC] border border-[#D9E0EA] rounded-lg text-xs font-semibold leading-relaxed">
-                          <p className="text-slate-500 font-mono">System event timestamp: 16 Jul 2026 Â· 14:22 BST</p>
+                          <p className="text-slate-500 font-mono">System event timestamp: 16 Jul 2026 · 14:22 BST</p>
                           <p className="text-slate-900 font-bold mt-1">Audit Record ID: AUD-1029-X81A</p>
-                          <p className="text-slate-700 mt-1">"User Olivia Reed (Group CEO) approved the Net-30 credit limit expansion of Â£184k for Northwind Industrial Ltd."</p>
+                          <p className="text-slate-700 mt-1">"User Olivia Reed (Group CEO) approved the Net-30 credit limit expansion of £184k for Northwind Industrial Ltd."</p>
                         </div>
                       </div>
                     )}
@@ -586,9 +576,9 @@ export default function ManagementPlatform({
                   <div className="space-y-6 text-left">
                     
                     {groupAdminSubTab === 'registry' && (
-                      <div className="bg-white rounded-xl border border-[#D9E0EA] overflow-hidden shadow-sm">
+                      <div className="cos-surface bg-white rounded-xl border border-[#D9E0EA] overflow-hidden shadow-sm">
                         <div className="p-5 border-b border-[#D9E0EA] bg-[#EEF3FB]/40">
-                          <h4 className="font-bold text-slate-800 text-xs font-display">Legal Entity Registry & Structure</h4>
+                          <h1 className="font-bold text-slate-800 text-xs font-display">Legal Entity Registry & Structure</h1>
                         </div>
                         <div className="overflow-x-auto w-full">
                           <table className="w-full text-xs text-left min-w-[650px]">
@@ -623,19 +613,19 @@ export default function ManagementPlatform({
                     )}
 
                     {groupAdminSubTab === 'evidence' && (
-                      <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm text-left space-y-4">
-                        <h3 className="text-xs font-black uppercase text-slate-900 font-display tracking-wider">Transfer-pricing Evidence Register</h3>
+                      <div className="cos-surface bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm text-left space-y-4">
+                        <h1 className="text-xs font-black uppercase text-slate-900 font-display tracking-wider">Transfer-pricing Evidence Register</h1>
                         <div className="p-4 bg-[#F7F9FC] border border-[#D9E0EA] rounded-lg text-xs leading-relaxed space-y-3 font-semibold text-slate-700">
-                          <p>1. <strong>Management Fee Flow:</strong> Cost-plus method. OG Operating Services â†’ Advanced Gases. FY2026 Complete.</p>
-                          <p>2. <strong>Supply/Offtake Flow:</strong> Comparable-price method. Advanced Gases â†’ DECity zones. Review Due.</p>
-                          <p>3. <strong>IP/Brand Licence:</strong> Royalty benchmark method. OG IP Holdings â†’ DELabs. Draft status.</p>
+                          <p>1. <strong>Management Fee Flow:</strong> Cost-plus method. OG Operating Services → Advanced Gases. FY2026 Complete.</p>
+                          <p>2. <strong>Supply/Offtake Flow:</strong> Comparable-price method. Advanced Gases → DECity zones. Review Due.</p>
+                          <p>3. <strong>IP/Brand Licence:</strong> Royalty benchmark method. OG IP Holdings → DELabs. Draft status.</p>
                         </div>
                       </div>
                     )}
 
                     {groupAdminSubTab === 'offtake' && (
-                      <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm text-left space-y-4">
-                        <h3 className="text-xs font-black uppercase text-slate-900 font-display tracking-wider">Offtake-contract tracker</h3>
+                      <div className="cos-surface bg-white p-5 rounded-xl border border-[#D9E0EA] shadow-sm text-left space-y-4">
+                        <h1 className="text-xs font-black uppercase text-slate-900 font-display tracking-wider">Offtake-contract tracker</h1>
                         <div className="p-4 bg-[#EEF3FB]/40 border border-[#D9E0EA] rounded-lg text-xs space-y-1">
                           <p className="font-bold text-slate-800">Contracted Group Capacity: 25 t/day across three active lines</p>
                           <p className="text-slate-600 font-mono text-[11px]">DECity-zone contracts roll capacity, start dates, and status parameters.</p>

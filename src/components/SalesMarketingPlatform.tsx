@@ -23,7 +23,7 @@ import {
   X,
   type LucideIcon,
 } from 'lucide-react';
-import COSLogoWatermark from './COSLogoWatermark';
+import './WorkspaceTheme.css';
 import ContentSocialModule from '../content-social/ContentSocialModule';
 import { SALES_MARKETING_NAVIGATION_AREAS, type SalesMarketingNavigationArea } from '../navigation/salesMarketing';
 import SalesMarketingSidebar from './SalesMarketingSidebar';
@@ -164,7 +164,7 @@ export default function SalesMarketingPlatform({
   const [creationForm, setCreationForm] = useState({ title: '', company: companies[0]?.name ?? '', owner: 'Aisha Bello', value: '', dueDate: '2026-08-31' });
 
   const activeArea = visibleAreas.find((area) => area.id === activeAreaId) ?? visibleAreas[0] ?? SALES_MARKETING_NAVIGATION_AREAS[0];
-  const ActiveAreaIcon = activeArea.icon;
+  const isMyWork = activeAreaId === 'home' && activeRoute === 'My Work';
 
   useEffect(() => {
     if (!visibleAreas.some((area) => area.id === activeAreaId)) {
@@ -295,15 +295,12 @@ export default function SalesMarketingPlatform({
   };
 
   return (
-    <div className="sm-platform-v11 relative flex h-[100dvh] min-w-0 overflow-hidden bg-[#F7F9FC] font-sans text-[#172B4D]">
+    <div className="sm-platform-v11 cos-ui relative flex h-[100dvh] min-w-0 overflow-hidden bg-[#F7F9FC] font-sans text-[#172B4D]">
       <SalesMarketingSidebar areas={visibleAreas} activeArea={activeArea} activeRoute={activeRoute} mode={sidebarMode} scopeMode={scopeMode} onScopeModeChange={setScopeMode} onAreaSelect={selectArea} onRouteSelect={selectRoute} onBackToMain={() => { setSidebarMode('global'); setAreaSearch(''); }} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} onExit={onExitToGateway} userName={userName} userRole={userRole} />
 
       <section className="relative flex min-w-0 flex-1 flex-col overflow-hidden bg-[#F7F9FC]">
-        <COSLogoWatermark />
         <header className="cos-global-topbar relative z-10 flex shrink-0 items-center justify-between gap-3 px-3 sm:px-5">
           <button type="button" className="workspace-sidebar-toggle" aria-controls="sales-marketing-sidebar" aria-expanded={isSidebarOpen} aria-label={isSidebarOpen ? 'Close navigation' : 'Open navigation'} onClick={() => setIsSidebarOpen((open) => !open)}><Menu size={20} aria-hidden="true" /></button><div className="relative min-w-0 flex-1 sm:max-w-md"><Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6B7A90]" /><input value={globalSearch} onChange={(event) => setGlobalSearch(event.target.value)} placeholder="Search accounts, deals, tasks, campaigns..." className="min-h-10 w-full rounded-lg border border-[#D9E0EA] bg-[#F7F9FC] pl-9 pr-3 text-xs focus:border-[#155EEF]" /></div>
-          <div className="hidden items-center gap-2 xl:flex"><span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" /><span className="text-[10px] font-bold text-emerald-700">Audit Stream Live</span></div>
-          <div className="hidden items-center gap-1 rounded-lg border border-[#D9E0EA] bg-[#F7F9FC] p-1 md:flex" aria-label="Workspace state simulator">{(['loaded', 'empty', 'loading', 'error', 'restricted'] as const).map((state) => <button key={state} type="button" onClick={() => setWorkspaceState(state)} className={`min-h-8 rounded-md px-2 text-[9px] font-bold uppercase ${workspaceState === state ? 'bg-[#155EEF] text-white' : 'text-[#65758B] hover:bg-white'}`}>{state}</button>)}</div>
           <button type="button" onClick={() => activeAreaId === 'content-social' ? setContentNotificationsOpen(true) : setInspectedRecord(allRecords.find((record) => record.kind === 'Audit') ?? null)} className="relative grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-[#D9E0EA] text-[#52617A] hover:border-[#155EEF] hover:text-[#155EEF]" aria-label="Notifications"><Bell size={16} /><span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-amber-400" /></button>
         </header>
 
@@ -327,28 +324,27 @@ export default function SalesMarketingPlatform({
           {workspaceState === 'loaded' && (
             <div className="mx-auto max-w-[1500px] space-y-5">
               <PageTitleBar
-                eyebrow={<span className="flex items-center gap-2"><ActiveAreaIcon size={14} />{activeArea.label}<ChevronRight size={12} /><span>{activeRoute}</span></span>}
                 title={activeRoute}
-                subtitle={<>DELabs Ltd · {scopeMode === 'company' ? 'Company' : 'Group'} scope · governed commercial workspace</>}
-                actions={canCreateSales ? <><CreateButton icon={BriefcaseBusiness} label="New deal" onClick={() => setCreationType('deal')} /><CreateButton icon={ListTodo} label="New task" onClick={() => setCreationType('task')} /><CreateButton icon={UserPlus} label="New lead" primary onClick={() => setCreationType('lead')} /></> : undefined}
+                subtitle={isMyWork ? 'Everything on your plate today, in one place' : <>DELabs Ltd · {scopeMode === 'company' ? 'Company' : 'Group'} scope · governed commercial workspace</>}
+                actions={canCreateSales ? <><CreateButton icon={BriefcaseBusiness} label="New deal" primary onClick={() => setCreationType('deal')} /><CreateButton icon={ListTodo} label="New task" onClick={() => setCreationType('task')} /><CreateButton icon={UserPlus} label="New lead" onClick={() => setCreationType('lead')} /></> : undefined}
               />
 
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="workspace-metrics grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 <MetricCard label="Open pipeline" value={formatMoney(deals.filter((deal) => deal.stage !== 'Closed Won').reduce((sum, deal) => sum + deal.amount, 0))} note={`${deals.length} governed opportunities`} icon={TrendingUp} />
                 <MetricCard label="Active campaigns" value={String(campaigns.filter((campaign) => campaign.status === 'Active').length)} note={`${campaigns.reduce((sum, campaign) => sum + campaign.mqls, 0)} marketing-qualified leads`} icon={Megaphone} />
                 <MetricCard label="Open tasks" value={String(tasks.filter((task) => task.status !== 'Complete').length)} note="Across sales and marketing" icon={ClipboardCheck} />
                 <MetricCard label="Pending approvals" value={String(approvals.filter((approval) => approval.status === 'Pending').length)} note="Central authority queue" icon={ShieldCheck} warning />
               </div>
 
-              <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
-                <section className="overflow-hidden rounded-2xl border border-[#D9E0EA] bg-white shadow-2xs" data-card-ignore>
+              <div className="workspace-panels grid gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
+                <section className="workspace-records overflow-hidden rounded-2xl border border-[#D9E0EA] bg-white shadow-2xs" data-card-ignore>
                   <SectionTitleBar title="Live records" detail={`Records relevant to ${activeArea.shortLabel}`} action={<span className="font-mono text-[10px] text-[#74839A]">{visibleRecords.length} ITEMS</span>} />
-                  <div className="divide-y divide-[#E8ECF2]">{visibleRecords.slice(0, 10).map((record) => <button key={`${record.kind}-${record.id}`} type="button" onClick={() => setInspectedRecord(record)} className="grid min-h-[72px] w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 text-left transition hover:bg-[#F4F7FC] sm:grid-cols-[90px_minmax(0,1fr)_130px_110px_auto] sm:px-5"><span className="hidden text-[9px] font-bold uppercase tracking-[0.08em] text-[#155EEF] sm:block">{record.kind}</span><span className="min-w-0"><span className="block truncate text-xs font-bold text-[#172B4D]">{record.title}</span><span className="mt-1 block truncate text-[11px] text-[#74839A]">{record.subtitle}</span></span><span className="hidden truncate text-[11px] text-[#52617A] sm:block">{record.owner}</span><span className="hidden font-mono text-[10px] text-[#172B4D] sm:block">{record.value ?? record.date ?? '—'}</span><span className="rounded-md bg-[#EEF3FB] px-2 py-1 text-[9px] font-bold text-[#155EEF]">{record.status}</span></button>)}{visibleRecords.length === 0 && <div className="p-10 text-center"><Search className="mx-auto text-[#9AA8BA]" size={24} /><p className="mt-3 text-sm font-bold text-[#172B4D]">No matching records</p><button type="button" onClick={() => setGlobalSearch('')} className="mt-2 text-xs font-semibold text-[#155EEF]">Clear search</button></div>}</div>
+                  <div className="divide-y divide-[#E8ECF2]">{visibleRecords.slice(0, 10).map((record) => <button key={`${record.kind}-${record.id}`} type="button" onClick={() => setInspectedRecord(record)} className="workspace-record grid min-h-[72px] w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 text-left transition hover:bg-[#F4F7FC] sm:grid-cols-[90px_minmax(0,1fr)_130px_110px_auto] sm:px-5"><span className="hidden text-[9px] font-bold uppercase tracking-[0.08em] text-[#155EEF] sm:block">{record.kind}</span><span className="min-w-0"><span className="block truncate text-xs font-bold text-[#172B4D]">{record.title}</span><span className="mt-1 block truncate text-[11px] text-[#74839A]">{record.subtitle}</span></span><span className="hidden truncate text-[11px] text-[#52617A] sm:block">{record.owner}</span><span className="hidden font-mono text-[10px] text-[#172B4D] sm:block">{record.value ?? record.date ?? '—'}</span><span data-status={record.status} className="workspace-status rounded-md bg-[#EEF3FB] px-2 py-1 text-[9px] font-bold text-[#155EEF]">{record.status}</span></button>)}{visibleRecords.length === 0 && <div className="p-10 text-center"><Search className="mx-auto text-[#9AA8BA]" size={24} /><p className="mt-3 text-sm font-bold text-[#172B4D]">No matching records</p><button type="button" onClick={() => setGlobalSearch('')} className="mt-2 text-xs font-semibold text-[#155EEF]">Clear search</button></div>}</div>
                 </section>
 
                 <aside className="space-y-4">
-                  <section className="rounded-2xl border border-[#D9E0EA] bg-white p-5 shadow-2xs"><div className="flex items-center justify-between"><h2 className="text-sm font-bold">Operating pulse</h2><Activity size={17} className="text-[#155EEF]" /></div><div className="mt-5 space-y-4"><PulseRow label="Pipeline coverage" value="72%" width="72%" /><PulseRow label="Campaign delivery" value="84%" width="84%" /><PulseRow label="Consent health" value="96%" width="96%" /></div></section>
-                  <section className="rounded-2xl border border-[#D9E0EA] bg-[#061B3A] p-5 text-white shadow-2xs"><div className="flex items-center gap-2"><CircleDollarSign size={17} className="text-sky-300" /><h2 className="text-sm font-bold text-white">Commercial signal</h2></div><p className="mt-4 text-2xl font-extrabold text-white">{campaigns.length ? `${Math.round(campaigns.reduce((sum, campaign) => sum + campaign.roi, 0) / campaigns.length)}%` : '0%'}</p><p className="mt-1 text-xs leading-5 text-[#B8CAE2]">Average recorded campaign ROI across the active entity scope.</p><button type="button" onClick={() => { setActiveAreaId('analytics'); setActiveRoute('ROI'); }} className="mt-5 flex min-h-10 w-full items-center justify-center rounded-lg bg-[#155EEF] text-xs font-bold hover:bg-[#004EEB]">Inspect ROI</button></section>
+                  <section className="workspace-pulse rounded-2xl border border-[#D9E0EA] bg-white p-5 shadow-2xs"><div className="flex items-center justify-between"><h2 className="text-sm font-bold">Operating pulse</h2><Activity size={17} className="text-[#155EEF]" /></div><div className="mt-5 space-y-4"><PulseRow label="Pipeline coverage" value="72%" width="72%" /><PulseRow label="Campaign delivery" value="84%" width="84%" /><PulseRow label="Consent health" value="96%" width="96%" /></div></section>
+                  <section className="workspace-roi rounded-2xl border border-[#D9E0EA] bg-[#061B3A] p-5 text-white shadow-2xs"><div className="flex items-center gap-2"><CircleDollarSign size={17} className="text-sky-300" /><h2 className="text-sm font-bold text-white">Commercial signal</h2></div><p className="mt-4 text-2xl font-extrabold text-white">{campaigns.length ? `${Math.round(campaigns.reduce((sum, campaign) => sum + campaign.roi, 0) / campaigns.length)}%` : '0%'}</p><p className="mt-1 text-xs leading-5 text-[#B8CAE2]">Average recorded campaign ROI across the active entity scope.</p><button type="button" onClick={() => { setActiveAreaId('analytics'); setActiveRoute('ROI'); }} className="mt-5 flex min-h-10 w-full items-center justify-center rounded-lg bg-[#155EEF] text-xs font-bold hover:bg-[#004EEB]">Inspect ROI</button></section>
                 </aside>
               </div>
             </div>
@@ -372,7 +368,7 @@ function PulseRow({ label, value, width }: { label: string; value: string; width
 }
 
 function CreateButton({ icon: Icon, label, onClick, primary = false }: { icon: LucideIcon; label: string; onClick: () => void; primary?: boolean }) {
-  return <button type="button" onClick={onClick} className={`flex min-h-10 items-center gap-2 rounded-lg border px-3 text-xs font-bold transition ${primary ? 'border-[#155EEF] bg-[#155EEF] text-white hover:bg-[#004EEB]' : 'border-[#D4DBE6] bg-white text-[#34445E] hover:border-[#155EEF] hover:text-[#155EEF]'}`}><Icon size={14} />{label}</button>;
+  return <button type="button" onClick={onClick} data-primary={primary} className={`flex min-h-10 items-center gap-2 rounded-lg border px-3 text-xs font-bold transition ${primary ? 'border-[#155EEF] bg-[#155EEF] text-white hover:bg-[#004EEB]' : 'border-[#D4DBE6] bg-white text-[#34445E] hover:border-[#155EEF] hover:text-[#155EEF]'}`}><Icon size={14} />{label}</button>;
 }
 
 function StatePanel({ icon: Icon, title, detail, action, actionLabel, spinning = false, danger = false }: { icon: LucideIcon; title: string; detail: string; action?: () => void; actionLabel?: string; spinning?: boolean; danger?: boolean }) {

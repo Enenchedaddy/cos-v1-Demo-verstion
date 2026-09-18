@@ -1,0 +1,58 @@
+/* Gateway-only presentation; workspace permissions and launch handlers stay in React. */
+.cos-gateway {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  background: radial-gradient(ellipse at 50% 48%, #edf4ff 0%, #f7f9fc 60%, #fafbfc 100%);
+  color: #151e2b;
+  font-family: var(--cos-font-sans);
+}
+.cos-gateway__content { width: 100%; max-width: 1128px; margin: 0 auto; padding: clamp(72px, 17.4vh, 173px) 40px 80px; }
+.cos-gateway__brand { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 58px; }
+.cos-gateway__brand > span { font-size: 36px; font-weight: 600; letter-spacing: -2px; line-height: 1; }
+.cos-gateway__logo { width: 64px; height: 64px; }
+.cos-gateway__logo .cos-logo-assembly,
+.cos-gateway__logo .cos-logo-facet { animation: none; }
+.cos-gateway__logo .cos-logo-facet { fill: #151e2b; }
+.cos-gateway__workspaces { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.cos-gateway__card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 412px;
+  padding: 56px 44px 48px;
+  border: 1.5px solid transparent;
+  border-radius: 38px;
+  background: linear-gradient(145deg, #fff, #fbfcff) padding-box,
+    linear-gradient(105deg, #86b6ff, #d7e9ff 46%, #c5a4ff) border-box;
+  box-shadow: 0 16px 48px -12px #729de540;
+}
+.cos-gateway__icon { margin-left: 9px; color: #172432; flex-shrink: 0; }
+.cos-gateway__card h2 { margin: 36px 9px 40px; color: #151e2b; font-family: var(--cos-font-sans) !important; font-size: 38px; font-weight: 700; letter-spacing: -1.2px; line-height: 1.08; text-wrap: initial; }
+.cos-gateway__enter { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 68px; margin-top: auto; padding: 12px 20px; border: 0; border-radius: 16px; background: linear-gradient(155deg, #499fff, #2478ff 52%, #0860ff); box-shadow: 0 6px 15px #2e80f51a, inset 0 1px 2px #ffffff66; color: #fff; font-size: 23px; font-weight: 500; cursor: pointer; transition: filter 160ms ease; }
+.cos-gateway__enter:hover { filter: brightness(1.06); }
+.cos-gateway button:focus-visible { outline: 2px solid #216bff !important; outline-offset: 4px !important; }
+.cos-gateway__utilities { position: absolute; top: 20px; right: 24px; }
+.cos-gateway__users { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 14px; border: 1px solid #d4dfef; border-radius: 12px; background: #ffffffc9; color: #425775; font-size: 12px; font-weight: 600; cursor: pointer; }
+.cos-gateway__users:hover { background: #edf4ff; }
+.cos-gateway__empty { grid-column: 1 / -1; border: 1px solid #d4dfef; border-radius: 24px; background: #fff; padding: 40px; color: #52617a; text-align: center; }
+.cos-gateway__card:only-child { grid-column: 1 / -1; width: 100%; max-width: 512px; justify-self: center; }
+@media (max-width: 900px) {
+  .cos-gateway__content { padding-right: 24px; padding-left: 24px; }
+  .cos-gateway__card { padding: 40px 28px 32px; }
+  .cos-gateway__card h2 { font-size: 29px; margin-left: 0; margin-right: 0; }
+  .cos-gateway__icon { margin-left: 0; }
+}
+@media (max-width: 640px) {
+  .cos-gateway__content { max-width: 440px; padding: 88px 20px 40px; }
+  .cos-gateway__brand { margin-bottom: 32px; }
+  .cos-gateway__workspaces { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .cos-gateway__card { min-height: 320px; border-radius: 28px; padding: 30px 28px; }
+  .cos-gateway__icon { width: 58px; height: 58px; }
+  .cos-gateway__card h2 { margin-top: 24px; margin-bottom: 28px; font-size: 28px; }
+  .cos-gateway__enter { min-height: 58px; font-size: 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cos-gateway__enter { transition: none; }
+}

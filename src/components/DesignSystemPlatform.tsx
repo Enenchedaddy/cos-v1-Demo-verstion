@@ -1,3 +1,4 @@
+import './WorkspaceTheme.css';
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -71,15 +72,16 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
 
   // Color tokens data
   const colors = [
-    { name: 'ink', hex: '#15202B', role: 'Primary text and chart anchors' },
-    { name: 'cos-navy', hex: '#183153', role: 'Navigation and brand surfaces' },
-    { name: 'paper', hex: '#FCFBF7', role: 'Warm application canvas' },
+    { name: 'ink', hex: '#191D30', role: 'Primary text and chart anchors' },
+    { name: 'cos-navy', hex: '#121427', role: 'Navigation and brand surfaces' },
+    { name: 'paper', hex: '#EEF0FB', role: 'Soft lavender application canvas' },
     { name: 'panel', hex: '#FFFFFF', role: 'Focused work surfaces' },
-    { name: 'rule', hex: '#D8D6CE', role: 'Dividers and input boundaries' },
-    { name: 'signal', hex: '#C84F2A', role: 'Primary action and AI provenance' },
-    { name: 'muted', hex: '#5E6872', role: 'Secondary copy and metadata' },
-    { name: 'navy-soft', hex: '#DDE6EF', role: 'Information and selection tint' },
-    { name: 'signal-soft', hex: '#F7E7DF', role: 'Recommendation and attention tint' },
+    { name: 'rule', hex: '#D9DCFF', role: 'Dividers and input boundaries' },
+    { name: 'signal', hex: '#2F6FED', role: 'Primary action gradient end' },
+    { name: 'signal-light', hex: '#5B9DFB', role: 'Primary action gradient start' },
+    { name: 'muted', hex: '#777E91', role: 'Secondary copy and metadata' },
+    { name: 'navy-soft', hex: '#E9EEFF', role: 'Information and selection tint' },
+    { name: 'signal-soft', hex: '#EEF2FF', role: 'Recommendation and attention tint' },
     { name: 'success', hex: '#246B4A', role: 'Verified and complete' },
     { name: 'warning', hex: '#8A5A12', role: 'At risk and approaching threshold' },
     { name: 'danger', hex: '#A63A32', role: 'Breach and destructive action' }
@@ -152,7 +154,7 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
   ];
 
   return (
-    <div className="flex-1 bg-slate-950 flex flex-col h-full overflow-hidden text-slate-100 font-sans">
+    <div className="cos-ui design-system-platform flex-1 bg-slate-950 flex flex-col h-full overflow-hidden text-slate-100 font-sans">
       
       {/* Top Bar with COS V1.0 Identity */}
       <div className="bg-[#182A5C] border-b border-[#264288] px-6 h-14 shrink-0 flex items-center justify-between">
@@ -169,15 +171,12 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
           <COSLogo className="w-8 h-8" variant="white" />
           <div>
             <h2 className="text-xs font-black tracking-widest text-[#AFBFDA] uppercase font-display">Central Operating System</h2>
-            <p className="text-sm font-extrabold text-white tracking-tight uppercase">COS_V1_Demo • DESIGN SYSTEM CORE</p>
+            <p className="text-sm font-extrabold text-white tracking-tight uppercase">COS Design System</p>
           </div>
         </div>
 
         <div className="flex items-center space-x-2">
-          <div className="hidden md:flex items-center space-x-1.5 bg-[#264288]/40 border border-[#264288] rounded-lg px-2.5 py-1 text-xs text-[#AFBFDA] font-mono">
-            <Activity size={12} className="text-[#6C84B8] animate-pulse" />
-            <span>v1.0.0 (Build-Ready Spec)</span>
-          </div>
+
           <div className="flex items-center gap-2">
             <button 
               onClick={onExitToGateway}
@@ -227,6 +226,7 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
               return (
                 <button
                   key={tab.id}
+                  aria-current={isSelected ? 'page' : undefined}
                   onClick={() => {
                     setActiveTab(tab.id as any);
                     setIsSidebarOpen(false);
@@ -245,41 +245,38 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
           </div>
 
           <div className="p-4 border-t border-[#264288]/40 space-y-2 text-[10px] text-[#AFBFDA]">
-            <p>Every slide matches WCAG AA contrast rules automatically.</p>
-            <div className="flex items-center space-x-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span className="font-mono">SOX Compliance Verified</span>
-            </div>
+            <p>Shared colors, typography, and component patterns.</p>
+
           </div>
         </aside>
 
         {/* Main Sandbox Canvas */}
-        <div className="flex-1 bg-[#F7F9FC] text-slate-800 p-8 overflow-y-auto relative">
+        <div className="cos-page-canvas flex-1 bg-[#F7F9FC] text-slate-800 p-8 overflow-y-auto relative">
           
           {/* Cover INDEX */}
           {activeSection === 'cover' && (
             <div className="max-w-4xl mx-auto py-12 flex flex-col items-center justify-center text-center space-y-8">
-              <div className="bg-white p-8 rounded-2xl border border-[#D9E0EA] shadow-xl shadow-slate-200/50 flex flex-col items-center">
+              <div className="cos-surface bg-white p-8 rounded-2xl border border-[#D9E0EA] shadow-xl shadow-slate-200/50 flex flex-col items-center">
                 <COSLogo className="w-32 h-32 mb-6 animate-fade-in" variant="full" />
-                <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 font-display">COS</h1>
+                <p className="text-4xl font-extrabold tracking-tight text-slate-900 font-display">COS</p>
                 <p className="text-sm font-semibold tracking-widest text-slate-400 uppercase font-display mt-1">Central Operating System</p>
               </div>
 
               <div className="space-y-3">
-                <h2 className="text-3xl font-black text-slate-900 font-display leading-tight sm:text-4xl">
-                  COS_V1_Demo • Design System Standard
-                </h2>
+                <h1 className="text-3xl font-black text-slate-900 font-display leading-tight sm:text-4xl">
+                  COS Design System
+                </h1>
                 <p className="text-sm text-slate-500 font-medium max-w-xl mx-auto font-sans leading-relaxed">
                   Welcome to the Live Build-Ready Specification Workspace. This portal demonstrates the unified UI guidelines, layout structures, and governance rules required to run the Central Operating System.
                 </p>
               </div>
 
               <div className="border-t border-[#D9E0EA] pt-6 max-w-lg w-full grid grid-cols-2 gap-4 text-xs font-mono text-slate-400">
-                <div className="text-left bg-white p-3.5 rounded-lg border border-[#D9E0EA]">
+                <div className="cos-surface text-left bg-white p-3.5 rounded-lg border border-[#D9E0EA]">
                   <span className="text-slate-500 font-bold block mb-1 uppercase">SPECIFICATION</span>
                   <span>Volume 0 • Build-ready UI</span>
                 </div>
-                <div className="text-left bg-white p-3.5 rounded-lg border border-[#D9E0EA]">
+                <div className="cos-surface text-left bg-white p-3.5 rounded-lg border border-[#D9E0EA]">
                   <span className="text-slate-500 font-bold block mb-1 uppercase">LAST REVISED</span>
                   <span>17 Jul 2026 • v1.0.0</span>
                 </div>
@@ -308,7 +305,7 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
 
               {/* Logo specifications */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white p-6 rounded-xl border border-[#D9E0EA] flex flex-col items-center justify-between text-center">
+                <div className="cos-surface bg-white p-6 rounded-xl border border-[#D9E0EA] flex flex-col items-center justify-between text-center">
                   <div className="bg-slate-50 p-6 rounded-lg w-full flex justify-center items-center h-40 border border-[#D9E0EA]/40">
                     <COSLogo className="w-20 h-20" variant="full" />
                   </div>
@@ -328,7 +325,7 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
                   </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-xl border border-[#D9E0EA] flex flex-col items-center justify-between text-center">
+                <div className="cos-surface bg-white p-6 rounded-xl border border-[#D9E0EA] flex flex-col items-center justify-between text-center">
                   <div className="bg-slate-50 p-6 rounded-lg w-full flex justify-center items-center h-40 border border-[#D9E0EA]/40">
                     <COSLogo className="w-20 h-20" variant="monochrome" />
                   </div>
@@ -372,7 +369,7 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
               </div>
 
               {/* Contrast Table WCAG AA */}
-              <div className="bg-white rounded-xl border border-[#D9E0EA] p-5 space-y-4">
+              <div className="cos-surface bg-white rounded-xl border border-[#D9E0EA] p-5 space-y-4">
                 <h3 className="text-sm font-extrabold text-slate-900 font-display">Contrast Release Verification (WCAG AA)</h3>
                 <div className="overflow-x-auto w-full">
                   <table className="w-full text-left text-xs min-w-[500px]">
@@ -434,7 +431,7 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
                   <p className="text-xs text-[#AFBFDA]">Covers, section dividers, and page level titles only. Expresses professional weight.</p>
                 </div>
 
-                <div className="bg-white rounded-xl p-6 border border-[#D9E0EA] text-slate-800 flex flex-col justify-between min-h-[11rem] h-auto gap-4 shadow-sm">
+                <div className="cos-surface bg-white rounded-xl p-6 border border-[#D9E0EA] text-slate-800 flex flex-col justify-between min-h-[11rem] h-auto gap-4 shadow-sm">
                   <div>
                     <span className="text-[10px] bg-[#EEF3FB] text-[#4065B3] rounded px-2 py-0.5 uppercase font-mono font-bold">UI WORKHORSE</span>
                     <h3 className="text-3xl font-bold font-sans tracking-tight mt-2">IBM Plex Sans</h3>
@@ -444,7 +441,7 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
               </div>
 
               {/* Sizing spec matrix */}
-              <div className="bg-white rounded-xl border border-[#D9E0EA] p-5 space-y-4">
+              <div className="cos-surface bg-white rounded-xl border border-[#D9E0EA] p-5 space-y-4">
                 <h3 className="text-sm font-extrabold text-slate-900 font-display">Published Type Scale Specimens</h3>
                 <div className="space-y-4 divide-y divide-[#D9E0EA]/60">
                   
@@ -523,7 +520,7 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
               </div>
 
               {/* Global Density Controls */}
-              <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] space-y-3">
+              <div className="cos-surface bg-white p-5 rounded-xl border border-[#D9E0EA] space-y-3">
                 <div className="flex justify-between items-center">
                   <h3 className="text-sm font-extrabold text-slate-900 font-display">Global Density Playground</h3>
                   <div className="flex space-x-1.5 bg-slate-100 p-1 rounded-lg border border-[#D9E0EA]">
@@ -576,7 +573,7 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
 
               {/* Radius constraints */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] flex flex-col justify-between min-h-[9rem] h-auto gap-4">
+                <div className="cos-surface bg-white p-5 rounded-xl border border-[#D9E0EA] flex flex-col justify-between min-h-[9rem] h-auto gap-4">
                   <div>
                     <span className="text-[10px] font-bold text-slate-400 font-mono">sm • INPUTS & CHIPS</span>
                     <div className="text-sm font-bold text-slate-900 mt-1">Rounded Corner Limit: 6px</div>
@@ -586,7 +583,7 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
                   </div>
                 </div>
 
-                <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] flex flex-col justify-between min-h-[9rem] h-auto gap-4">
+                <div className="cos-surface bg-white p-5 rounded-xl border border-[#D9E0EA] flex flex-col justify-between min-h-[9rem] h-auto gap-4">
                   <div>
                     <span className="text-[10px] font-bold text-slate-400 font-mono">md • BUTTONS & CARDS</span>
                     <div className="text-sm font-bold text-slate-900 mt-1">Rounded Corner Limit: 8px</div>
@@ -596,7 +593,7 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
                   </div>
                 </div>
 
-                <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] flex flex-col justify-between min-h-[9rem] h-auto gap-4">
+                <div className="cos-surface bg-white p-5 rounded-xl border border-[#D9E0EA] flex flex-col justify-between min-h-[9rem] h-auto gap-4">
                   <div>
                     <span className="text-[10px] font-bold text-slate-400 font-mono">flat • EVERYTHING ELSE</span>
                     <div className="text-sm font-bold text-slate-900 mt-1">Flat Edges Structure</div>
@@ -619,7 +616,7 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
               </div>
 
               {/* Icon rules */}
-              <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-medium">
+              <div className="cos-surface bg-white p-5 rounded-xl border border-[#D9E0EA] grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-medium">
                 <div className="p-3.5 bg-slate-50 rounded-lg">
                   <span className="font-bold text-slate-900 block">Family constraint</span>
                   <span className="text-slate-500 text-[11px] mt-1 block">Lucide icons only. Never load foreign vectors.</span>
@@ -640,7 +637,7 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
 
               {/* Searchable icons */}
               <div className="space-y-4">
-                <div className="flex flex-wrap gap-4 justify-between items-center bg-white p-4 rounded-xl border border-[#D9E0EA]">
+                <div className="cos-surface flex flex-wrap gap-4 justify-between items-center bg-white p-4 rounded-xl border border-[#D9E0EA]">
                   <h3 className="text-sm font-extrabold text-slate-900 font-display">Authoritative Registry Finder</h3>
                   <div className="relative">
                     <Search size={14} className="absolute left-2.5 top-2.5 text-slate-400" />
@@ -658,7 +655,7 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
                   {iconsRegistry
                     .filter(i => !searchQuery || i.key.includes(searchQuery.toLowerCase()) || i.val.includes(searchQuery.toLowerCase()))
                     .map((item, idx) => (
-                      <div key={idx} className="bg-white p-3.5 rounded-lg border border-[#D9E0EA] flex flex-col items-center justify-center text-center space-y-2 hover:border-[#4065B3] transition">
+                      <div key={idx} className="cos-surface bg-white p-3.5 rounded-lg border border-[#D9E0EA] flex flex-col items-center justify-center text-center space-y-2 hover:border-[#4065B3] transition">
                         <div className="w-8 h-8 rounded-md bg-[#EEF3FB] flex items-center justify-center">
                           {/* Dynamically lookup/generate representation, wait, we can show text or just render the lucide representation */}
                           <span className="text-[10px] font-bold text-[#4065B3] font-mono">[{idx}]</span>
@@ -682,39 +679,39 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
               </div>
 
               {/* State contract */}
-              <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] space-y-4">
+              <div className="cos-surface bg-white p-5 rounded-xl border border-[#D9E0EA] space-y-4">
                 <h3 className="text-sm font-extrabold text-slate-900 font-display">Every Component ID supports the Full States Contract</h3>
                 
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-3.5">
-                  <div className="bg-white p-3 rounded-lg border border-[#D9E0EA] space-y-1.5">
+                  <div className="cos-surface bg-white p-3 rounded-lg border border-[#D9E0EA] space-y-1.5">
                     <span className="text-[9px] text-slate-400 font-black block uppercase">DEFAULT</span>
                     <button className="w-full bg-[#4065B3] text-white text-[10px] font-bold py-1.5 px-2 rounded-md">
                       Action Button
                     </button>
                   </div>
 
-                  <div className="bg-white p-3 rounded-lg border border-[#D9E0EA] space-y-1.5">
+                  <div className="cos-surface bg-white p-3 rounded-lg border border-[#D9E0EA] space-y-1.5">
                     <span className="text-[9px] text-[#4065B3] font-black block uppercase">HOVER</span>
                     <button className="w-full bg-[#6C84B8] text-white text-[10px] font-bold py-1.5 px-2 rounded-md shadow-xs">
                       Action Button
                     </button>
                   </div>
 
-                  <div className="bg-white p-3 rounded-lg border border-[#D9E0EA] space-y-1.5">
+                  <div className="cos-surface bg-white p-3 rounded-lg border border-[#D9E0EA] space-y-1.5">
                     <span className="text-[9px] text-slate-400 font-black block uppercase">FOCUS</span>
                     <button className="w-full bg-[#4065B3] text-white text-[10px] font-bold py-1.5 px-2 rounded-md ring-2 ring-[#6C84B8]">
                       Action Button
                     </button>
                   </div>
 
-                  <div className="bg-white p-3 rounded-lg border border-[#D9E0EA] space-y-1.5">
+                  <div className="cos-surface bg-white p-3 rounded-lg border border-[#D9E0EA] space-y-1.5">
                     <span className="text-[9px] text-[#264288] font-black block uppercase">DISABLED</span>
                     <button className="w-full bg-slate-100 text-slate-400 border border-[#D9E0EA] text-[10px] font-bold py-1.5 px-2 rounded-md cursor-not-allowed" disabled>
                       Action Button
                     </button>
                   </div>
 
-                  <div className="bg-white p-3 rounded-lg border border-[#D9E0EA] space-y-1.5">
+                  <div className="cos-surface bg-white p-3 rounded-lg border border-[#D9E0EA] space-y-1.5">
                     <span className="text-[9px] text-[#B42318] font-black block uppercase">ERROR</span>
                     <button className="w-full bg-[#B42318] text-white text-[10px] font-bold py-1.5 px-2 rounded-md border border-[#B42318]/50 shadow-sm">
                       Action Button
@@ -738,7 +735,7 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
                 
                 {/* AI Surface Contract & Interactive Why Panel */}
                 <div className="space-y-6">
-                  <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] space-y-4">
+                  <div className="cos-surface bg-white p-5 rounded-xl border border-[#D9E0EA] space-y-4">
                     <div className="flex justify-between items-center">
                       <h3 className="text-sm font-extrabold text-slate-900 font-display">AI Surface Contract (5 Classes)</h3>
                       <div className="flex space-x-1.5 bg-slate-100 p-1 rounded-lg border border-[#D9E0EA]">
@@ -803,7 +800,7 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
 
                   {/* Why Panel View */}
                   {showWhyPanel && (
-                    <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] space-y-4 animate-fade-in relative">
+                    <div className="cos-surface bg-white p-5 rounded-xl border border-[#D9E0EA] space-y-4 animate-fade-in relative">
                       <button 
                         onClick={() => setShowWhyPanel(false)}
                         className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 cursor-pointer"
@@ -859,7 +856,7 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
 
                 {/* Governed Kill Switch long press simulator */}
                 <div className="space-y-6">
-                  <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] space-y-4">
+                  <div className="cos-surface bg-white p-5 rounded-xl border border-[#D9E0EA] space-y-4">
                     <h3 className="text-sm font-extrabold text-slate-900 font-display">Governed Feature Kill Switch</h3>
                     
                     <div className="p-6 bg-slate-50 rounded-lg border border-[#D9E0EA]/40 text-center space-y-4">
@@ -926,7 +923,7 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
                   </div>
 
                   {/* Standard States showcase */}
-                  <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] space-y-3">
+                  <div className="cos-surface bg-white p-5 rounded-xl border border-[#D9E0EA] space-y-3">
                     <h3 className="text-sm font-extrabold text-slate-900 font-display">Standard States Specimen</h3>
                     <div className="p-6 bg-slate-50 rounded-lg border border-[#D9E0EA]/40 text-center space-y-2">
                       <AlertCircle size={22} className="text-[#B42318] mx-auto" />
@@ -977,7 +974,7 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
                   { label: 'Weighted pipeline', val: '£2,116,000', sub: 'Probability weighed' },
                   { label: 'Cash flow on hand', val: '£2,340,000', sub: 'Bridged bank balance' }
                 ].map((stat, i) => (
-                  <div key={i} className="bg-white p-4 rounded-xl border border-[#D9E0EA] shadow-xs">
+                  <div key={i} className="cos-surface bg-white p-4 rounded-xl border border-[#D9E0EA] shadow-xs">
                     <span className="text-[10px] text-slate-400 font-mono font-bold block uppercase">{stat.label}</span>
                     <span className="text-lg font-extrabold text-slate-900 block mt-1 font-mono">{stat.val}</span>
                     <span className="text-[10px] text-[#166534] font-semibold mt-0.5 block">{stat.sub}</span>
@@ -988,7 +985,7 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
                 {/* 5 business units */}
-                <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] space-y-3">
+                <div className="cos-surface bg-white p-5 rounded-xl border border-[#D9E0EA] space-y-3">
                   <h3 className="text-xs font-black text-slate-400 font-mono uppercase tracking-wider">5 Core Business Units</h3>
                   <div className="flex flex-wrap gap-2">
                     {['Electronics', 'Industrial Gases', 'Manufacturing', 'Imports', 'Agency'].map((b, idx) => (
@@ -1000,7 +997,7 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
                 </div>
 
                 {/* 10 Accounts */}
-                <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] space-y-3">
+                <div className="cos-surface bg-white p-5 rounded-xl border border-[#D9E0EA] space-y-3">
                   <h3 className="text-xs font-black text-slate-400 font-mono uppercase tracking-wider">10 Core Client Accounts</h3>
                   <div className="flex flex-wrap gap-2">
                     {[
@@ -1017,7 +1014,7 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
               </div>
 
               {/* 12 initials-only users */}
-              <div className="bg-white p-5 rounded-xl border border-[#D9E0EA] space-y-3">
+              <div className="cos-surface bg-white p-5 rounded-xl border border-[#D9E0EA] space-y-3">
                 <h3 className="text-xs font-black text-slate-400 font-mono uppercase tracking-wider">12 Authorized Initials-Only Users</h3>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs leading-normal">
                   {[

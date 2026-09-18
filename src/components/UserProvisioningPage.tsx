@@ -1,3 +1,4 @@
+import './WorkspaceTheme.css';
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { ArrowLeft, CheckCircle2, RefreshCw, Send, Users } from 'lucide-react';
 import { useAuthorization } from '../auth/AuthorizationProvider';
@@ -117,7 +118,7 @@ export default function UserProvisioningPage() {
   }), [requests]);
 
   return (
-    <main className="min-h-screen bg-[#F5F7FA] px-4 py-6 text-[#15202B] sm:px-7 lg:px-10">
+    <main className="cos-ui cos-provisioning min-h-screen bg-[#F5F7FA] px-4 py-6 text-[#15202B] sm:px-7 lg:px-10">
       <div className="mx-auto max-w-7xl">
         <a href="/app" className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[#183153]">
           <ArrowLeft size={16} /> Back to gateway
@@ -136,7 +137,7 @@ export default function UserProvisioningPage() {
         {error && <p className="mt-5 border-l-4 border-[#A63A32] bg-[#F6E3E1] px-4 py-3 text-sm text-[#7E2D28]" role="alert">{error}</p>}
         {message && <p className="mt-5 border-l-4 border-[#246B4A] bg-[#E4F0E9] px-4 py-3 text-sm text-[#1B5238]" role="status">{message}</p>}
 
-        {canRequest && <section className="mt-6 border border-[#D8D6CE] bg-white p-5 sm:p-6">
+        {canRequest && <section className="cos-surface mt-6 border border-[#D8D6CE] bg-white p-5 sm:p-6">
           <div className="flex items-center gap-3">
             <span className="grid h-10 w-10 place-items-center bg-[#EDF1F6] text-[#183153]"><Users size={18} /></span>
             <div><h2 className="font-semibold">Create employee request</h2><p className="text-sm text-[#5E6872]">Creates a pending request; it does not create an Auth account or send an email.</p></div>
@@ -162,10 +163,10 @@ export default function UserProvisioningPage() {
             ['CEO approved', grouped.ceoApproved.length],
             ['Ready for invitation', grouped.ready.length],
             ['Invitation sent', grouped.sent.length],
-          ].map(([label, count]) => <article key={String(label)} className="border border-[#D8D6CE] bg-white p-4"><p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#5E6872]">{label}</p><p className="mt-2 text-3xl font-semibold">{count}</p></article>)}
+          ].map(([label, count]) => <article key={String(label)} className="cos-surface border border-[#D8D6CE] bg-white p-4"><p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#5E6872]">{label}</p><p className="mt-2 text-3xl font-semibold">{count}</p></article>)}
         </section>
 
-        <section className="mt-6 border border-[#D8D6CE] bg-white p-5 sm:p-6">
+        <section className="cos-surface mt-6 border border-[#D8D6CE] bg-white p-5 sm:p-6">
           <h2 className="font-semibold">Provisioning requests</h2>
           <div className="mt-4 space-y-3">
             {requests.length === 0 ? <p className="py-8 text-center text-sm text-[#5E6872]">No provisioning requests yet.</p> : requests.map((request) => <article key={request.id} className="border border-[#E4E1D9] p-4">
@@ -182,7 +183,7 @@ export default function UserProvisioningPage() {
           </div>
         </section>
 
-        <section className="mt-6 border border-[#D8D6CE] bg-white p-5 sm:p-6">
+        <section className="cos-surface mt-6 border border-[#D8D6CE] bg-white p-5 sm:p-6">
           <h2 className="font-semibold">Account lifecycle</h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {users.map((user) => <article key={user.id} className="border border-[#E4E1D9] p-4"><p className="font-semibold">{user.first_name} {user.last_name}</p><p className="mt-1 text-sm text-[#5E6872]">{user.role?.name ?? 'Role unavailable'}</p><p className="mt-3 inline-flex items-center gap-2 text-xs font-semibold"><CheckCircle2 size={14} className="text-[#246B4A]" /> {user.status}</p><p className="mt-2 text-xs text-[#5E6872]">Created {dateLabel(user.created_at)}</p></article>)}
