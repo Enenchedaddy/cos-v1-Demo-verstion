@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./components/SurfaceMotion.css";
 
 @theme {
   --font-display: "Montserrat", sans-serif;

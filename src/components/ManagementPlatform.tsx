@@ -5,12 +5,12 @@ import './WorkspaceTheme.css';
  */
 
 import React, { useEffect, useState } from 'react';
-import HexLoader from './HexLoader';
+import { ContentSkeleton } from './SurfaceMotion';
 import { MANAGEMENT_RAIL_AREAS } from '../navigation/management';
 import ManagementSidebar from './ManagementSidebar';
 import type { ApprovalRequest, AuditLog, Company, Order } from '../types';
 import { Ban, Menu, Plus, Search, XCircle } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 
 interface ManagementPlatformProps {
   companies: Company[];
@@ -27,6 +27,7 @@ export default function ManagementPlatform({
   approvals,
   onExitToGateway,
 }: ManagementPlatformProps) {
+  const reducedMotion = useReducedMotion();
   // Sidebar Tabs States (Morally mapped to Volume 1 PDF hierarchy)
   const [activeTab, setActiveTab] = useState<'home' | 'performance' | 'governance' | 'strategy' | 'organisation' | 'acquisitions' | 'alerts' | 'group-admin'>('home');
   const [homeSubTab, setHomeSubTab] = useState<'functional' | 'company' | 'ceo'>('functional');
@@ -226,10 +227,11 @@ export default function ManagementPlatform({
               <AnimatePresence>
                 {searchQuery.trim() !== '' && (
                   <motion.div 
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: reducedMotion ? 0 : 4 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    className="absolute right-0 mt-2 w-72 sm:w-96 bg-white rounded-xl border border-[#D9E0EA] shadow-xl z-50 overflow-hidden max-h-96 flex flex-col"
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: reducedMotion ? 0 : .15, ease: 'easeOut' }}
+                    className="cos-popover absolute right-0 mt-2 w-72 sm:w-96 bg-white rounded-xl border border-[#D9E0EA] shadow-xl z-50 overflow-hidden max-h-96 flex flex-col"
                   >
                     <div className="p-2.5 bg-slate-50 border-b border-[#D9E0EA] flex justify-between items-center shrink-0">
                       <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Search Results ({searchResults.length})</span>
@@ -271,8 +273,7 @@ export default function ManagementPlatform({
           
           {/* Simulated view states */}
           {simulatedState === 'loading' ? (
-            <HexLoader
-              size="lg"
+            <ContentSkeleton
               label="Loading corporate entities & executive controls…"
             />
           ) : simulatedState === 'error' ? (
@@ -302,10 +303,10 @@ export default function ManagementPlatform({
             <AnimatePresence mode="wait">
               <motion.div
                 key={`${activeTab}-${homeSubTab}-${performanceSubTab}-${governanceSubTab}-${strategySubTab}`}
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -5 }}
-                transition={{ duration: 0.15 }}
+                initial={{ opacity: reducedMotion ? 1 : 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: reducedMotion ? 0 : .2, ease: 'easeOut' }}
                 className="space-y-6"
               >
                 
@@ -454,7 +455,7 @@ export default function ManagementPlatform({
                               <p className="text-lg font-black text-slate-800 font-mono">{bu.rev}</p>
                               <div className="flex justify-between text-[10px] font-semibold">
                                 <span className="text-slate-500">Margin: {bu.margin}</span>
-                                <span className={`font-bold ${bu.risk === 'Low' ? 'text-green-600' : bu.risk === 'High' ? 'text-red-600 animate-pulse' : 'text-amber-600'}`}>{bu.risk}</span>
+                                <span className={`font-bold ${bu.risk === 'Low' ? 'text-green-600' : bu.risk === 'High' ? 'text-red-600' : 'text-amber-600'}`}>{bu.risk}</span>
                               </div>
                             </div>
                           ))}

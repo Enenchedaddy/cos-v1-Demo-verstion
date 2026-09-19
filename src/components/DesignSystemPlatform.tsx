@@ -1,3 +1,5 @@
+import { AnimatePresence } from 'motion/react';
+import { ToastSurface, useContentFade } from './SurfaceMotion';
 import './WorkspaceTheme.css';
 /**
  * @license
@@ -19,6 +21,7 @@ interface DesignSystemPlatformProps {
 
 export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPlatformProps) {
   const [activeSection, setActiveTab] = useState<'cover' | 'brand' | 'type' | 'layout' | 'icons' | 'components' | 'patterns' | 'audit'>('cover');
+  const contentRef = useContentFade(activeSection);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [copiedToken, setCopiedToken] = useState<string | null>(null);
   const [density, setDensity] = useState<'comfortable' | 'compact' | 'dense'>('compact');
@@ -251,13 +254,13 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
         </aside>
 
         {/* Main Sandbox Canvas */}
-        <div className="cos-page-canvas flex-1 bg-[#F7F9FC] text-slate-800 p-8 overflow-y-auto relative">
+        <div ref={contentRef} className=" cos-page-canvas flex-1 bg-[#F7F9FC] text-slate-800 p-8 overflow-y-auto relative">
           
           {/* Cover INDEX */}
           {activeSection === 'cover' && (
             <div className="max-w-4xl mx-auto py-12 flex flex-col items-center justify-center text-center space-y-8">
               <div className="cos-surface bg-white p-8 rounded-2xl border border-[#D9E0EA] shadow-xl shadow-slate-200/50 flex flex-col items-center">
-                <COSLogo className="w-32 h-32 mb-6 animate-fade-in" variant="full" />
+                <COSLogo className="w-32 h-32 mb-6" variant="full" />
                 <p className="text-4xl font-extrabold tracking-tight text-slate-900 font-display">COS</p>
                 <p className="text-sm font-semibold tracking-widest text-slate-400 uppercase font-display mt-1">Central Operating System</p>
               </div>
@@ -296,7 +299,7 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
 
           {/* BRAND */}
           {activeSection === 'brand' && (
-            <div className="max-w-5xl mx-auto space-y-8 animate-fade-in">
+            <div className="max-w-5xl mx-auto space-y-8">
               <div className="border-b border-[#D9E0EA] pb-3">
                 <span className="text-xs font-bold text-[#4065B3] tracking-widest uppercase">Chapter 01</span>
                 <h1 className="text-2xl font-black text-slate-900 font-display tracking-tight mt-0.5">Brand Identity & Palette</h1>
@@ -346,7 +349,7 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
                       onClick={() => handleCopy(c.name, c.hex)}
                       className="bg-white rounded-xl border border-[#D9E0EA] overflow-hidden cursor-pointer hover:shadow-md transition group flex flex-col justify-between"
                     >
-                      <div className="h-16 w-full relative transition-all group-hover:scale-105" style={{ backgroundColor: c.hex }}>
+                      <div className="h-16 w-full relative transition-all" style={{ backgroundColor: c.hex }}>
                         <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-[10px] font-bold">
                           Click to Copy
                         </div>
@@ -362,7 +365,7 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
                   ))}
                 </div>
                 {copiedToken && (
-                  <div className="text-xs text-[#166534] bg-[#EEF3FB] border border-[#AFBFDA] rounded-lg p-2.5 font-mono text-center animate-pulse">
+                  <div className="text-xs text-[#166534] bg-[#EEF3FB] border border-[#AFBFDA] rounded-lg p-2.5 font-mono text-center">
                     Copied token value for <span className="font-bold">{copiedToken}</span> to clipboard!
                   </div>
                 )}
@@ -414,7 +417,7 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
 
           {/* TYPOGRAPHY */}
           {activeSection === 'type' && (
-            <div className="max-w-5xl mx-auto space-y-8 animate-fade-in">
+            <div className="max-w-5xl mx-auto space-y-8">
               <div className="border-b border-[#D9E0EA] pb-3">
                 <span className="text-xs font-bold text-[#4065B3] tracking-widest uppercase">Chapter 02</span>
                 <h1 className="text-2xl font-black text-slate-900 font-display tracking-tight mt-0.5">Typography Architecture</h1>
@@ -512,7 +515,7 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
 
           {/* LAYOUT TOKENS */}
           {activeSection === 'layout' && (
-            <div className="max-w-5xl mx-auto space-y-8 animate-fade-in">
+            <div className="max-w-5xl mx-auto space-y-8">
               <div className="border-b border-[#D9E0EA] pb-3">
                 <span className="text-xs font-bold text-[#4065B3] tracking-widest uppercase">Chapter 03</span>
                 <h1 className="text-2xl font-black text-slate-900 font-display tracking-tight mt-0.5">Layout Spacing & Density</h1>
@@ -608,7 +611,7 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
 
           {/* ICONOGRAPHY */}
           {activeSection === 'icons' && (
-            <div className="max-w-5xl mx-auto space-y-8 animate-fade-in">
+            <div className="max-w-5xl mx-auto space-y-8">
               <div className="border-b border-[#D9E0EA] pb-3">
                 <span className="text-xs font-bold text-[#4065B3] tracking-widest uppercase">Chapter 04</span>
                 <h1 className="text-2xl font-black text-slate-900 font-display tracking-tight mt-0.5">Authoritative Icon Registry</h1>
@@ -671,7 +674,7 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
 
           {/* COMPONENT LIBRARY */}
           {activeSection === 'components' && (
-            <div className="max-w-5xl mx-auto space-y-8 animate-fade-in">
+            <div className="max-w-5xl mx-auto space-y-8">
               <div className="border-b border-[#D9E0EA] pb-3">
                 <span className="text-xs font-bold text-[#4065B3] tracking-widest uppercase">Chapter 05</span>
                 <h1 className="text-2xl font-black text-slate-900 font-display tracking-tight mt-0.5">Component Library SPEC</h1>
@@ -724,7 +727,7 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
 
           {/* PATTERNS & AI SANDBOX */}
           {activeSection === 'patterns' && (
-            <div className="max-w-5xl mx-auto space-y-8 animate-fade-in">
+            <div className="max-w-5xl mx-auto space-y-8">
               <div className="border-b border-[#D9E0EA] pb-3">
                 <span className="text-xs font-bold text-[#4065B3] tracking-widest uppercase">Chapter 06</span>
                 <h1 className="text-2xl font-black text-slate-900 font-display tracking-tight mt-0.5">Interactive UX Pattern Sandbox</h1>
@@ -800,7 +803,7 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
 
                   {/* Why Panel View */}
                   {showWhyPanel && (
-                    <div className="cos-surface bg-white p-5 rounded-xl border border-[#D9E0EA] space-y-4 animate-fade-in relative">
+                    <div className="cos-surface bg-white p-5 rounded-xl border border-[#D9E0EA] space-y-4 relative">
                       <button 
                         onClick={() => setShowWhyPanel(false)}
                         className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 cursor-pointer"
@@ -939,8 +942,8 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
               </div>
 
               {/* Toast notifier */}
-              {toastMessage && (
-                <div className="fixed bottom-6 left-6 bg-slate-900 text-white rounded-xl border border-slate-800 p-4 shadow-xl z-50 flex items-center space-x-3 max-w-sm animate-fade-in font-sans">
+              <AnimatePresence>{toastMessage && (
+                <ToastSurface className="fixed bottom-6 left-6 bg-slate-900 text-white rounded-xl border border-slate-800 p-4 shadow-xl z-50 flex items-center space-x-3 max-w-sm font-sans">
                   <Info className="text-[#6C84B8] shrink-0" size={18} />
                   <div className="text-xs flex-1">
                     <p className="font-bold text-white">System notification</p>
@@ -952,14 +955,14 @@ export default function DesignSystemPlatform({ onExitToGateway }: DesignSystemPl
                   >
                     Dismiss
                   </button>
-                </div>
-              )}
+                </ToastSurface>
+              )}</AnimatePresence>
             </div>
           )}
 
           {/* AUDIT & DATASETS */}
           {activeSection === 'audit' && (
-            <div className="max-w-5xl mx-auto space-y-8 animate-fade-in">
+            <div className="max-w-5xl mx-auto space-y-8">
               <div className="border-b border-[#D9E0EA] pb-3">
                 <span className="text-xs font-bold text-[#4065B3] tracking-widest uppercase">Chapter 07</span>
                 <h1 className="text-2xl font-black text-slate-900 font-display tracking-tight mt-0.5">Audit log & Datasets</h1>

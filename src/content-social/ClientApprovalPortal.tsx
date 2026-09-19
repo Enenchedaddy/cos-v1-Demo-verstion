@@ -1,3 +1,4 @@
+import { ContentSkeleton } from '../components/SurfaceMotion';
 import '../components/WorkspaceTheme.css';
 import { useEffect, useState } from 'react';
 import { AlertTriangle, CheckCircle2, FileCheck2, LoaderCircle, ShieldCheck } from 'lucide-react';
@@ -49,5 +50,6 @@ export default function ClientApprovalPortal({ token }: { token: string }) {
 }
 
 function PortalState({ icon: Icon, title, detail, spinning = false }: { icon: typeof FileCheck2; title: string; detail: string; spinning?: boolean }) {
+  if (spinning) return <ContentSkeleton label={title} layout="detail" />;
   return <section className="mt-16 rounded-2xl border border-[#D9E0EA] bg-white p-10 text-center"><Icon className={`mx-auto text-[#155EEF] ${spinning ? 'animate-spin' : ''}`} size={28} /><h1 className="mt-5 font-display text-xl font-bold">{title}</h1><p className="mt-2 text-sm text-[#74839A]">{detail}</p></section>;
 }
