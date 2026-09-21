@@ -38,6 +38,7 @@ import {
 } from './domain';
 import { ContentSocialRepository, RepositoryError, type ContentSocialCollection } from './repository';
 import { DEMO_SESSION } from './seed';
+import { publisherCommand } from './publisher';
 
 type LoadStatus = 'loading' | 'loaded' | 'error' | 'restricted';
 
@@ -116,7 +117,7 @@ export function useContentSocial(scope: ScopeContext) {
 
   const createIdea = useCallback(async (raw: IdeaInput) => {
     if (!session) return;
-    assertCan(session.role, 'idea.manage');
+    assertCan(session.roles ?? [session.role], 'idea.manage');
     const input = ideaInputSchema.parse(raw);
     const idea: ContentIdea = { ...recordBase(), ...input, status: 'OPEN' };
     const event = audit('idea.created', 'ContentIdea', idea.id, `Created idea “${idea.title}”.`);
@@ -127,7 +128,7 @@ export function useContentSocial(scope: ScopeContext) {
 
   const convertIdea = useCallback(async (ideaId: string) => {
     if (!session) return;
-    assertCan(session.role, 'brief.manage');
+    assertCan(session.roles ?? [session.role], 'brief.manage');
     const current = stateRef.current;
     const idea = current.ideas.find((item) => item.id === ideaId);
     if (!idea) throw new Error('Idea not found.');
@@ -150,7 +151,7 @@ export function useContentSocial(scope: ScopeContext) {
 
   const createBrief = useCallback(async (raw: BriefInput) => {
     if (!session) return;
-    assertCan(session.role, 'brief.manage');
+    assertCan(session.roles ?? [session.role], 'brief.manage');
     const input = briefInputSchema.parse(raw);
     const current = stateRef.current;
     const brief: ContentBrief = {
@@ -167,7 +168,7 @@ export function useContentSocial(scope: ScopeContext) {
 
   const setBriefStatus = useCallback(async (briefId: string, nextStatus: ContentBrief['status']) => {
     if (!session) return;
-    assertCan(session.role, 'brief.manage');
+    assertCan(session.roles ?? [session.role], 'brief.manage');
     const current = stateRef.current;
     const brief = current.briefs.find((item) => item.id === briefId);
     if (!brief) throw new Error('Brief not found.');
@@ -179,7 +180,7 @@ export function useContentSocial(scope: ScopeContext) {
 
   const createContentFromBrief = useCallback(async (briefId: string) => {
     if (!session) return;
-    assertCan(session.role, 'content.create');
+    assertCan(session.roles ?? [session.role], 'content.create');
     const current = stateRef.current;
     const brief = current.briefs.find((item) => item.id === briefId);
     if (!brief) throw new Error('Brief not found.');
@@ -210,7 +211,7 @@ export function useContentSocial(scope: ScopeContext) {
 
   const transitionContent = useCallback(async (itemId: string, target: LifecycleState) => {
     if (!session) return;
-    assertCan(session.role, 'content.transition');
+    assertCan(session.roles ?? [session.role], 'content.transition');
     const current = stateRef.current;
     const item = current.contentItems.find((record) => record.id === itemId);
     if (!item) throw new Error('Content item not found.');
@@ -222,8 +223,13 @@ export function useContentSocial(scope: ScopeContext) {
 
   const createVersion = useCallback(async (itemId: string, raw: VersionInput) => {
     if (!session) return;
-    assertCan(session.role, 'version.create');
+    assertCan(session.roles ?? [session.role], 'version.create');
     const input = versionInputSchema.parse(raw);
+    if (session.mode === 'supabase') {
+      await publisherCommand('version.create', { item_id: itemId, copy: input.copy, change_summary: input.changeSummary, external_asset_url: input.externalAssetUrl });
+      await reload();
+      return;
+    }
     const current = stateRef.current;
     const item = current.contentItems.find((record) => record.id === itemId);
     const variant = current.variants.find((record) => record.contentItemId === itemId);
@@ -239,13 +245,18 @@ export function useContentSocial(scope: ScopeContext) {
     const contentItems = current.contentItems.map((record) => record.id === itemId ? { ...record, currentVersionId: versionId, updatedAt: isoNow(), updatedBy: session.userId, revision: record.revision + 1 } : record);
     const approvals = invalidateAffectedApprovals(current.approvals, variant.id, versionId);
     const event = audit('version.created', 'ContentVersion', versionId, `Created immutable v${version.versionNumber}; affected approvals were marked stale.`, versionId);
-    await commit({ ...current, contentItems, variants, versions: [version, ...current.versions], approvals, auditEvents: [event, ...current.auditEvents] }, ['contentItems', 'variants', 'versions', 'approvals', 'auditEvents']);
+    await commit({ ...current, contentItems, variants, versions: [version, ...current.versions], approvals, auditEvents: [event, ...current.auditEvents] }, ['versions', 'variants', 'contentItems', 'approvals', 'auditEvents']);
     return version;
-  }, [audit, commit, recordBase, session]);
+  }, [audit, commit, recordBase, reload, session]);
 
   const requestApproval = useCallback(async (itemId: string) => {
     if (!session) return;
-    assertCan(session.role, 'approval.request');
+    assertCan(session.roles ?? [session.role], 'approval.request');
+    if (session.mode === 'supabase') {
+      await publisherCommand('approval.request', { item_id: itemId });
+      await reload();
+      return;
+    }
     const current = stateRef.current;
     const item = current.contentItems.find((record) => record.id === itemId);
     const variant = current.variants.find((record) => record.contentItemId === itemId && record.currentVersionId === item?.currentVersionId);
@@ -254,7 +265,7 @@ export function useContentSocial(scope: ScopeContext) {
     const approval: ContentApproval = {
       ...recordBase(),
       approvalNumber: `APR-${new Date().toISOString().slice(0, 10).replaceAll('-', '')}-${String(current.approvals.length + 1).padStart(3, '0')}`,
-      contentItemId: item.id, title: item.title, routeName: 'DELabs standard client approval', stepName: 'Client decision',
+      contentItemId: item.id, title: item.title, routeName: `${scope.brandName} content approval`, stepName: 'Client decision',
       status: 'PENDING', targets: [{ variantId: variant.id, versionId: version.id, channel: variant.channel, versionNumber: version.versionNumber }],
       requestedBy: session.displayName, requestedAt: isoNow(), dueAt: new Date(Date.now() + 2 * 86400000).toISOString(), clientVisible: true,
       secureTokenExpiresAt: new Date(Date.now() + 7 * 86400000).toISOString(), decisions: [],
@@ -263,11 +274,16 @@ export function useContentSocial(scope: ScopeContext) {
     const event = audit('approval.requested', 'ContentApproval', approval.id, `Requested approval for exact ${variant.channel} v${version.versionNumber}.`, version.id);
     await commit({ ...current, contentItems, approvals: [approval, ...current.approvals], auditEvents: [event, ...current.auditEvents] }, ['contentItems', 'approvals', 'auditEvents']);
     return approval;
-  }, [audit, commit, recordBase, session]);
+  }, [audit, commit, recordBase, reload, scope.brandName, session]);
 
   const decideApproval = useCallback(async (approvalId: string, action: 'APPROVED' | 'CHANGES_REQUESTED' | 'REJECTED', comment: string) => {
     if (!session) return;
-    assertCan(session.role, 'approval.decide');
+    assertCan(session.roles ?? [session.role], 'approval.decide');
+    if (session.mode === 'supabase') {
+      await publisherCommand('approval.decide', { approval_id: approvalId, decision: action, comment });
+      await reload();
+      return;
+    }
     const current = stateRef.current;
     const approval = current.approvals.find((item) => item.id === approvalId);
     if (!approval || approval.status !== 'PENDING') throw new Error('Only a pending current approval can be decided.');
@@ -278,11 +294,11 @@ export function useContentSocial(scope: ScopeContext) {
     const contentItems = current.contentItems.map((item) => item.id === approval.contentItemId ? { ...item, exceptions: action === 'CHANGES_REQUESTED' ? [...item.exceptions, { flag: 'NEEDS_CHANGES' as const, reason: comment || 'Changes requested during approval.', owner: item.owner, openedAt: isoNow(), openedBy: session.userId }] : item.exceptions, updatedAt: isoNow(), updatedBy: session.userId, revision: item.revision + 1 } : item);
     const event = audit(`approval.${action.toLowerCase()}`, 'ContentApproval', approvalId, `${session.displayName} recorded ${action} for ${approval.approvalNumber}.`, approval.targets.map((target) => target.versionId).join(','));
     await commit({ ...current, approvals, contentItems, auditEvents: [event, ...current.auditEvents] }, ['approvals', 'contentItems', 'auditEvents']);
-  }, [audit, commit, session]);
+  }, [audit, commit, reload, session]);
 
   const scheduleContent = useCallback(async (itemId: string, raw: ScheduleInput) => {
     if (!session) return;
-    assertCan(session.role, 'schedule.manage');
+    assertCan(session.roles ?? [session.role], 'schedule.manage');
     const input = scheduleInputSchema.parse(raw);
     const current = stateRef.current;
     const item = current.contentItems.find((record) => record.id === itemId);
@@ -298,7 +314,7 @@ export function useContentSocial(scope: ScopeContext) {
 
   const confirmManualPublish = useCallback(async (scheduleId: string, raw: PublishInput) => {
     if (!session) return;
-    assertCan(session.role, 'publish.confirm');
+    assertCan(session.roles ?? [session.role], 'publish.confirm');
     const input = publishInputSchema.parse(raw);
     const current = stateRef.current;
     const schedule = current.schedules.find((record) => record.id === scheduleId);
@@ -315,7 +331,7 @@ export function useContentSocial(scope: ScopeContext) {
 
   const addAsset = useCallback(async (raw: AssetInput) => {
     if (!session) return;
-    assertCan(session.role, 'asset.view');
+    assertCan(session.roles ?? [session.role], 'asset.view');
     const input = assetInputSchema.parse(raw);
     const current = stateRef.current;
     const asset = { ...recordBase(), ...input, assetNumber: `AST-${new Date().getFullYear()}-${String(current.assets.length + 1).padStart(3, '0')}`, rightsStatus: 'MISSING' as const, usageContentItemIds: [] };
@@ -334,7 +350,7 @@ export function useContentSocial(scope: ScopeContext) {
 
   const addCommunityRecord = useCallback(async (raw: CommunityInput) => {
     if (!session) return;
-    assertCan(session.role, 'community.manage');
+    assertCan(session.roles ?? [session.role], 'community.manage');
     const input = communityInputSchema.parse(raw);
     const current = stateRef.current;
     const record = { ...recordBase(), ...input, channel: input.channel as ContentSocialState['communityRecords'][number]['channel'], status: 'NEW' as const };
@@ -345,7 +361,7 @@ export function useContentSocial(scope: ScopeContext) {
 
   const updateCommunityStatus = useCallback(async (recordId: string, nextStatus: ContentSocialState['communityRecords'][number]['status']) => {
     if (!session) return;
-    assertCan(session.role, 'community.manage');
+    assertCan(session.roles ?? [session.role], 'community.manage');
     const current = stateRef.current;
     const communityRecords = current.communityRecords.map((item) => item.id === recordId ? { ...item, status: nextStatus, updatedAt: isoNow(), updatedBy: session.userId, revision: item.revision + 1 } : item);
     const event = audit('community.status_changed', 'CommunityRecord', recordId, `Community record moved to ${nextStatus}.`);
@@ -354,7 +370,7 @@ export function useContentSocial(scope: ScopeContext) {
 
   const addListeningSignal = useCallback(async (raw: ListeningInput) => {
     if (!session) return;
-    assertCan(session.role, 'listening.manage');
+    assertCan(session.roles ?? [session.role], 'listening.manage');
     const input = listeningInputSchema.parse(raw);
     const current = stateRef.current;
     const signal = { ...recordBase(), ...input, channel: input.channel as ContentSocialState['listeningSignals'][number]['channel'], status: 'NEW' as const };
@@ -378,7 +394,7 @@ export function useContentSocial(scope: ScopeContext) {
 
   const addMetric = useCallback(async (raw: MetricInput) => {
     if (!session) return;
-    assertCan(session.role, 'metric.manage');
+    assertCan(session.roles ?? [session.role], 'metric.manage');
     const input = metricInputSchema.parse(raw);
     const current = stateRef.current;
     const metric = { ...recordBase(), ...input, channel: input.channel as ContentSocialState['metrics'][number]['channel'], verifiedBy: input.sourceType === 'VERIFIED' ? session.displayName : null };

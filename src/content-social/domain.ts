@@ -47,12 +47,13 @@ const ROLE_PERMISSIONS: Record<ModuleRole, readonly string[]> = {
   CLIENT_APPROVER: ['approval.view', 'approval.decide'],
 };
 
-export function can(role: ModuleRole, permission: string): boolean {
-  const permissions = ROLE_PERMISSIONS[role] ?? [];
+export function can(role: ModuleRole | readonly ModuleRole[], permission: string): boolean {
+  if (Array.isArray(role)) return role.some(item => can(item, permission));
+  const permissions = ROLE_PERMISSIONS[role as ModuleRole] ?? [];
   return permissions.includes('*') || permissions.includes(permission);
 }
 
-export function assertCan(role: ModuleRole, permission: string): void {
+export function assertCan(role: ModuleRole | readonly ModuleRole[], permission: string): void {
   if (!can(role, permission)) {
     throw new DomainError('Your current role cannot perform this action.', 'FORBIDDEN');
   }

@@ -21,11 +21,11 @@ test.beforeEach(async ({ page }, testInfo) => {
   await page.getByRole('button', { name: 'Sign in to workspace' }).click();
   await page.waitForURL(/\/app$/);
   await page.getByRole('button', { name: 'Authenticate and enter Sales & Marketing Platform' }).click();
-  const contentArea = testInfo.project.name === 'mobile-chromium'
-    ? page.getByLabel('Content & Social')
-    : page.getByLabel('Sales and Marketing modules').getByRole('button', { name: 'Content & Social', exact: true });
+  if (testInfo.project.name === 'mobile-chromium') await page.getByRole('button', { name: 'Open navigation', exact: true }).click();
+  const contentArea = page.getByRole('navigation', { name: 'Sales and Marketing areas', exact: true }).getByRole('button', { name: 'Content & Social', exact: true });
   await contentArea.waitFor();
   await contentArea.click();
+  if (testInfo.project.name === 'mobile-chromium') await page.getByRole('button', { name: 'Close Sales and Marketing sidebar', exact: true }).click();
 });
 
 test('opens the unified Content & Social workspace and creates a governed idea', async ({ page }, testInfo) => {
@@ -34,10 +34,10 @@ test('opens the unified Content & Social workspace and creates a governed idea',
     await page.screenshot({ path: `test-results/content-social-overview-${testInfo.project.name}.png`, fullPage: true });
   }
   if (testInfo.project.name === 'mobile-chromium') {
-    await page.getByLabel('Content & Social area').selectOption('Planning & Briefs');
-  } else {
-    await page.getByRole('button', { name: 'Planning & Briefs' }).click();
+    await page.getByRole('button', { name: 'Open navigation', exact: true }).click();
   }
+  await page.getByRole('navigation', { name: 'Content & Social routes', exact: true }).getByRole('button', { name: 'Planning & Briefs', exact: true }).click();
+  if (testInfo.project.name === 'mobile-chromium') await page.getByRole('button', { name: 'Close Sales and Marketing sidebar', exact: true }).click();
   await page.getByRole('button', { name: 'New idea' }).click();
   await page.getByLabel('Idea title').fill('Customer evidence explainer');
   await page.getByLabel('Summary').fill('Turn the latest delivery evidence into a concise social explainer.');
@@ -48,10 +48,12 @@ test('opens the unified Content & Social workspace and creates a governed idea',
   expect(browserErrors.get(page)).toEqual([]);
 });
 
-test('exposes a usable mobile route selector without a duplicate navigation drawer', async ({ page }, testInfo) => {
+test('uses the existing mobile sidebar without a duplicate area dropdown', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile-chromium', 'Responsive-only assertion.');
-  await expect(page.getByLabel('Content & Social area')).toBeVisible();
-  await page.getByLabel('Content & Social area').selectOption('Performance');
+  await expect(page.getByLabel('Content & Social area')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Open navigation', exact: true }).click();
+  await page.getByRole('navigation', { name: 'Content & Social routes', exact: true }).getByRole('button', { name: 'Performance', exact: true }).click();
+  await page.getByRole('button', { name: 'Close Sales and Marketing sidebar', exact: true }).click();
   await expect(page.getByRole('heading', { name: /measure with explicit source confidence/i })).toBeVisible();
   await expect(page.locator('[role="dialog"]')).toHaveCount(0);
 });

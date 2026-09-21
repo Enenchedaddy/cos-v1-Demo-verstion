@@ -100,17 +100,18 @@ async function resolveSession(client: SupabaseClient, user: User, scope: ScopeCo
     .eq('workspace_id', scope.workspaceId)
     .or(`client_id.is.null,client_id.eq.${scope.clientId}`)
     .or(`brand_id.is.null,brand_id.eq.${scope.brandId}`)
-    .limit(1)
-    .maybeSingle();
+    .order('role');
 
   if (error) throw error;
-  if (!data || !isModuleRole(data.role)) {
+  const memberships = (data ?? []).filter(item => isModuleRole(item.role));
+  if (!memberships.length) {
     throw new RepositoryError('Your account has no Content & Social membership for this entity scope.', 'RESTRICTED');
   }
   return {
     userId: user.id,
-    displayName: data.display_name || user.email || 'COS user',
-    role: data.role,
+    displayName: memberships[0].display_name || 'COS user',
+    role: memberships[0].role as ModuleRole,
+    roles: [...new Set(memberships.map(item => item.role as ModuleRole))],
     mode: 'supabase',
   };
 }

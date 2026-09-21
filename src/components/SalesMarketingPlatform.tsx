@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import './WorkspaceTheme.css';
 import ContentSocialModule from '../content-social/ContentSocialModule';
+import { useCompanyDirectory } from '../content-social/CompanyScope';
 import { SALES_MARKETING_NAVIGATION_AREAS, type SalesMarketingNavigationArea } from '../navigation/salesMarketing';
 import SalesMarketingSidebar from './SalesMarketingSidebar';
 import { PageTitleBar, SectionTitleBar } from './Typography';
@@ -55,12 +56,12 @@ export function getSalesMarketingCapabilities(permissions: readonly string[]) {
   };
 }
 
-export function getVisibleSalesMarketingAreas(permissions: readonly string[]) {
+export function getVisibleSalesMarketingAreas(permissions: readonly string[], hasContentSocialMembership = false) {
   const { canInspectSalesMarketingInterface, canViewSales, canViewMarketing } = getSalesMarketingCapabilities(permissions);
 
   return SALES_MARKETING_NAVIGATION_AREAS.filter((area) => {
     // Content & Social data remains membership/RLS-controlled after its navigation is visible.
-    if (area.id === 'content-social') return canInspectSalesMarketingInterface;
+    if (area.id === 'content-social') return canInspectSalesMarketingInterface || hasContentSocialMembership;
     // Settings remains separately controlled and is not part of this visibility capability.
     if (area.id === 'settings') return false;
     if (SALES_ONLY_AREA_IDS.has(area.id)) return canViewSales;
@@ -148,7 +149,9 @@ export default function SalesMarketingPlatform({
   onExitToGateway,
 }: SalesMarketingPlatformProps) {
   const { canCreateSales } = getSalesMarketingCapabilities(permissions);
-  const visibleAreas = useMemo(() => getVisibleSalesMarketingAreas(permissions), [permissions]);
+  const { directory } = useCompanyDirectory();
+  const hasContentSocialMembership = Boolean(directory?.memberships.length);
+  const visibleAreas = useMemo(() => getVisibleSalesMarketingAreas(permissions, hasContentSocialMembership), [permissions, hasContentSocialMembership]);
   const initial = visibleAreas.find((area) => area.id === initialArea) ?? visibleAreas[0] ?? SALES_MARKETING_NAVIGATION_AREAS[0];
   const [activeAreaId, setActiveAreaId] = useState(initial.id);
   const [activeRoute, setActiveRoute] = useState(initial.routes[0]);

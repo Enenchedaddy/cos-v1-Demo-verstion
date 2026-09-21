@@ -50,9 +50,13 @@ describe('Sales & Marketing module visibility', () => {
     });
   });
 
-  it('shows Content & Social only through the staging interface capability and keeps Settings hidden', () => {
+  it('keeps staging inspection separate from data access and Settings hidden', () => {
     expect(visibleIds([SALES_MARKETING_INTERFACE_VISIBILITY_PERMISSION])).toContain('content-social');
     expect(visibleIds([SALES_MARKETING_INTERFACE_VISIBILITY_PERMISSION])).not.toContain('settings');
     expect(visibleIds(['sales.view'])).not.toContain('content-social');
+  });
+  it('shows the existing Social Publisher submenu to scoped members without a testing bypass', () => {
+    expect(getVisibleSalesMarketingAreas(['marketing.view'], true).find(area => area.id === 'content-social')?.routes).toContain('Social Publisher');
+    expect(getVisibleSalesMarketingAreas(['marketing.view'], false).some(area => area.id === 'content-social')).toBe(false);
   });
 });

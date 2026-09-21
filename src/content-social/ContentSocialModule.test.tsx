@@ -1,7 +1,7 @@
-import { render, screen } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import ContentSocialModule from './ContentSocialModule';
-import { createSeedState, DEMO_SESSION } from './seed';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { ScopedContentSocialModule as ContentSocialModule } from './ContentSocialModule';
+import { createSeedState, DELABS_SCOPE, DEMO_SESSION } from './seed';
 
 const action = vi.fn(async () => undefined);
 const hook = {
@@ -28,12 +28,22 @@ const hook = {
 vi.mock('./useContentSocial', () => ({ useContentSocial: () => hook }));
 
 const props = {
+  scope: DELABS_SCOPE,
   globalSearch: '', scopeMode: 'company' as const, notificationOpen: false,
   onNotificationClose: vi.fn(), onRouteChange: vi.fn(),
 };
 
 describe('ContentSocialModule', () => {
   beforeEach(() => vi.clearAllMocks());
+  afterEach(cleanup);
+
+  it('omits the redundant area dropdown and preserves section navigation', () => {
+    render(<ContentSocialModule {...props} activeRoute="Overview" />);
+    expect(screen.queryByLabelText('Content & Social area')).not.toBeInTheDocument();
+    expect(screen.queryByText('Content & Social area')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /open publisher/i }));
+    expect(props.onRouteChange).toHaveBeenCalledWith('Social Publisher');
+  });
 
   it('renders the governed overview with live seed metrics', () => {
     render(<ContentSocialModule {...props} activeRoute="Overview" />);

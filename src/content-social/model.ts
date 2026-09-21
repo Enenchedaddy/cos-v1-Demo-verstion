@@ -39,12 +39,14 @@ export interface ScopeContext {
   workspaceName: string;
   clientName: string;
   brandName: string;
+  timezone?: string;
 }
 
 export interface ContentSocialSession {
   userId: string;
   displayName: string;
   role: ModuleRole;
+  roles?: ModuleRole[];
   mode: 'supabase' | 'demo';
 }
 
@@ -128,6 +130,7 @@ export interface PlatformVariant extends ScopedRecord {
 }
 
 export interface ContentVersion extends ScopedRecord {
+  publisherMediaId?: string | null;
   contentItemId: string;
   variantId: string;
   versionNumber: number;
@@ -171,6 +174,7 @@ export interface ContentApproval extends ScopedRecord {
 }
 
 export interface ContentSchedule extends ScopedRecord {
+  socialAccountId?: string | null;
   contentItemId: string;
   variantId: string;
   versionId: string;

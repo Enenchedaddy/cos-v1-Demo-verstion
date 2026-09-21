@@ -1,0 +1,10 @@
+# All three functions authenticate inside their handlers. The callback uses
+# single-use OAuth state; the worker uses a separate server-only scheduler secret.
+[functions.social-publisher]
+verify_jwt = false
+
+[functions.social-publisher-callback]
+verify_jwt = false
+
+[functions.social-publisher-worker]
+verify_jwt = false

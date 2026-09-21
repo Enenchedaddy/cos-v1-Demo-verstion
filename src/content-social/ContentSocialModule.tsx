@@ -1,6 +1,6 @@
 import { AnimatePresence } from 'motion/react';
 import { FloatingLayer, ToastSurface, ContentSkeleton } from '../components/SurfaceMotion';
-import { useMemo, useState, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react';
+import { useEffect, useMemo, useRef, useState, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react';
 import {
   AlertTriangle,
   Archive,
@@ -60,14 +60,14 @@ import {
   type ScopeContext,
   type VersionInput,
 } from './model';
-import { DELABS_SCOPE } from './seed';
+import { CompanyScope } from './CompanyScope';
+import SocialPublisher from './SocialPublisher';
+import PublisherImage from './PublisherImage';
 import { useContentSocial } from './useContentSocial';
 import { PageTitleBar, SectionTitleBar } from '../components/Typography';
 
 type WorkspaceState = 'loaded' | 'empty' | 'loading' | 'error' | 'restricted';
 type ModalType = 'idea' | 'brief' | 'version' | 'schedule' | 'publish' | 'asset' | 'community' | 'listening' | 'metric' | null;
-
-export const CONTENT_SOCIAL_ROUTES = ['Overview', 'Planning & Briefs', 'Production Pipeline', 'Content Calendar', 'Approvals', 'Asset Library', 'Social Publisher', 'Community Inbox', 'Social Listening', 'Performance', 'Module Settings'] as const;
 
 interface ContentSocialModuleProps {
   activeRoute: string;
@@ -79,15 +79,15 @@ interface ContentSocialModuleProps {
   onRouteChange: (route: string) => void;
 }
 
-const defaultBrief: BriefInput = { title: '', objective: '', audience: '', keyMessage: '', callToAction: '', owner: 'Aisha Bello', dueDate: '2026-08-31', channels: ['LinkedIn'], formats: ['Short video'] };
-const defaultIdea: IdeaInput = { title: '', summary: '', source: 'Planning session', owner: 'Aisha Bello', priority: 'MEDIUM' };
+const defaultBrief: BriefInput = { title: '', objective: '', audience: '', keyMessage: '', callToAction: '', owner: '', dueDate: new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10), channels: ['Instagram'], formats: ['Static'] };
+const defaultIdea: IdeaInput = { title: '', summary: '', source: 'Planning session', owner: '', priority: 'MEDIUM' };
 const defaultVersion: VersionInput = { copy: '', changeSummary: '', externalAssetUrl: '' };
-const defaultSchedule: ScheduleInput = { plannedAt: '2026-08-20T10:00', timezone: 'Europe/London' };
-const defaultPublish: PublishInput = { externalUrl: '', publishedAt: '2026-08-20T10:05', proofNote: '' };
-const defaultAsset: AssetInput = { name: '', sourceUrl: '', owner: 'Aisha Bello', sourceProvider: 'Drive', type: 'IMAGE' };
-const defaultCommunity: CommunityInput = { channel: 'LinkedIn', externalThreadUrl: '', contactName: '', summary: '', owner: 'Aisha Bello', classification: 'ENQUIRY', priority: 'MEDIUM' };
-const defaultListening: ListeningInput = { channel: 'LinkedIn', sourceUrl: '', topic: '', summary: '', owner: 'Aisha Bello', severity: 'MEDIUM', sentiment: 'NEUTRAL' };
-const defaultMetric: MetricInput = { contentItemId: '', channel: 'LinkedIn', metric: 'IMPRESSIONS', value: 0, periodStart: '2026-08-01', periodEnd: '2026-08-13', sourceType: 'MANUAL', sourceReference: '' };
+const defaultSchedule: ScheduleInput = { plannedAt: new Date(Date.now() + 86400000).toISOString().slice(0, 16), timezone: 'Europe/London' };
+const defaultPublish: PublishInput = { externalUrl: '', publishedAt: new Date().toISOString().slice(0, 16), proofNote: '' };
+const defaultAsset: AssetInput = { name: '', sourceUrl: '', owner: '', sourceProvider: 'Drive', type: 'IMAGE' };
+const defaultCommunity: CommunityInput = { channel: 'LinkedIn', externalThreadUrl: '', contactName: '', summary: '', owner: '', classification: 'ENQUIRY', priority: 'MEDIUM' };
+const defaultListening: ListeningInput = { channel: 'LinkedIn', sourceUrl: '', topic: '', summary: '', owner: '', severity: 'MEDIUM', sentiment: 'NEUTRAL' };
+const defaultMetric: MetricInput = { contentItemId: '', channel: 'LinkedIn', metric: 'IMPRESSIONS', value: 0, periodStart: new Date().toISOString().slice(0, 8) + '01', periodEnd: new Date().toISOString().slice(0, 10), sourceType: 'MANUAL', sourceReference: '' };
 
 const statusTone: Record<string, string> = {
   APPROVED: 'bg-emerald-50 text-emerald-700 border-emerald-200', PUBLISHED: 'bg-emerald-50 text-emerald-700 border-emerald-200', VALID: 'bg-emerald-50 text-emerald-700 border-emerald-200', RESOLVED: 'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -102,10 +102,20 @@ function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : 'The action could not be completed.';
 }
 
-export default function ContentSocialModule({ activeRoute, globalSearch, forcedState = 'loaded', scopeMode, notificationOpen, onNotificationClose, onRouteChange }: ContentSocialModuleProps) {
-  const scope: ScopeContext = DELABS_SCOPE;
+export default function ContentSocialModule(props: ContentSocialModuleProps) {
+  return <CompanyScope>{scope => <ScopedContentSocialModule {...props} scope={scope} />}</CompanyScope>;
+}
+
+export function ScopedContentSocialModule({ scope, activeRoute, globalSearch, forcedState = 'loaded', scopeMode, notificationOpen, onNotificationClose, onRouteChange }: ContentSocialModuleProps & { scope: ScopeContext }) {
   const module = useContentSocial(scope);
   const { state, session, actions } = module;
+  const previousRoute = useRef(activeRoute);
+  useEffect(() => {
+    if (previousRoute.current !== activeRoute) {
+      previousRoute.current = activeRoute;
+      void module.reload();
+    }
+  }, [activeRoute, module.reload]);
   const [modal, setModal] = useState<ModalType>(null);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(null);
@@ -153,7 +163,7 @@ export default function ContentSocialModule({ activeRoute, globalSearch, forcedS
 
   if (effectiveState === 'restricted') {
     return <SignInPanel
-      detail={module.error ?? 'Sign in with an invited account that has a DELabs Content & Social membership.'}
+      detail={module.error ?? 'Sign in with an invited account that has membership for this brand.'}
       credentials={credentials}
       busy={module.mutating}
       onChange={setCredentials}
@@ -163,10 +173,10 @@ export default function ContentSocialModule({ activeRoute, globalSearch, forcedS
 
   if (effectiveState !== 'loaded') {
     const panels: Record<Exclude<WorkspaceState, 'loaded'>, { icon: LucideIcon; title: string; detail: string; action?: () => void; label?: string }> = {
-      loading: { icon: LoaderCircle, title: 'Loading Content & Social', detail: 'Resolving your DELabs scope, permissions, workflow records, and audit context.' },
+      loading: { icon: LoaderCircle, title: 'Loading Content & Social', detail: 'Resolving your selected scope, permissions, workflow records, and audit context.' },
       empty: { icon: Sparkles, title: 'No records in this view', detail: 'Start with a governed content idea or brief.', action: () => setModal('idea'), label: 'Create an idea' },
       error: { icon: AlertTriangle, title: 'Content & Social could not be loaded', detail: module.error ?? 'No records were changed. Retry the scoped query.', action: module.reload, label: 'Retry' },
-      restricted: { icon: LockKeyhole, title: 'Restricted Content & Social scope', detail: module.error ?? 'Your account does not have a membership for this DELabs brand.' },
+      restricted: { icon: LockKeyhole, title: 'Restricted Content & Social scope', detail: module.error ?? 'Your account does not have a membership for this brand.' },
     };
     const panel = panels[effectiveState];
     return <StatePanel {...panel} spinning={effectiveState === 'loading'} />;
@@ -174,14 +184,6 @@ export default function ContentSocialModule({ activeRoute, globalSearch, forcedS
 
   return (
     <div className="content-social-module mx-auto w-full max-w-[1500px] space-y-5">
-      <div className="lg:hidden">
-        <label className="text-[10px] font-bold uppercase tracking-[0.08em] text-[#68778D]">Content & Social area
-          <select value={activeRoute} onChange={(event) => onRouteChange(event.target.value)} className="mt-2 min-h-11 w-full rounded-lg border border-[#CBD5E2] bg-white px-3 text-sm text-[#172B4D]">
-            {CONTENT_SOCIAL_ROUTES.map((route) => <option key={route}>{route}</option>)}
-          </select>
-        </label>
-      </div>
-
       {module.warning && <InlineNotice tone="warning" title="Persistence mode" detail={module.warning} />}
       {module.error && <InlineNotice tone="danger" title="Save failed" detail={module.error} />}
       {success && <InlineNotice tone="success" title="Change recorded" detail={success} onDismiss={() => setSuccess(undefined)} />}
@@ -194,9 +196,9 @@ export default function ContentSocialModule({ activeRoute, globalSearch, forcedS
       {!globalSearch.trim() && activeRoute === 'Planning & Briefs' && <PlanningView state={state} onNewIdea={() => setModal('idea')} onNewBrief={() => setModal('brief')} onConvert={(id) => void run(() => actions.convertIdea(id), 'Idea converted to a governed draft brief.')} onBriefStatus={(id, status) => void run(() => actions.setBriefStatus(id, status), `Brief moved to ${status}.`)} onCreateContent={(id) => void run(() => actions.createContentFromBrief(id), 'Production work created from the approved brief.')} />}
       {!globalSearch.trim() && activeRoute === 'Production Pipeline' && <PipelineView state={state} onInspect={setSelectedItemId} />}
       {!globalSearch.trim() && activeRoute === 'Content Calendar' && <CalendarView state={state} onSchedule={(id) => openForItem('schedule', id)} />}
-      {!globalSearch.trim() && activeRoute === 'Approvals' && <ApprovalsView approvals={state.approvals} canDecide={session ? can(session.role, 'approval.decide') : false} canShare={session ? can(session.role, 'approval.request') : false} decisionComment={decisionComment} onComment={setDecisionComment} onShare={(id) => void createApprovalLink(id)} onDecide={(id, action) => void run(() => actions.decideApproval(id, action, decisionComment), `Approval decision ${action.toLowerCase()} was recorded against the exact version.`)} />}
+      {!globalSearch.trim() && activeRoute === 'Approvals' && <ApprovalsView approvals={state.approvals} canDecide={session ? can(session.roles ?? [session.role], 'approval.decide') : false} canShare={session ? can(session.roles ?? [session.role], 'approval.request') : false} decisionComment={decisionComment} onComment={setDecisionComment} onShare={(id) => void createApprovalLink(id)} onDecide={(id, action) => void run(() => actions.decideApproval(id, action, decisionComment), `Approval decision ${action.toLowerCase()} was recorded against the exact version.`)} />}
       {!globalSearch.trim() && activeRoute === 'Asset Library' && <AssetView state={state} onAdd={() => setModal('asset')} onRights={(id, status) => void run(() => actions.setAssetRights(id, status), `Asset rights set to ${status}.`)} />}
-      {!globalSearch.trim() && activeRoute === 'Social Publisher' && <PublisherView state={state} onPublish={(scheduleId) => { setSelectedScheduleId(scheduleId); setFormError(undefined); setModal('publish'); }} />}
+      {!globalSearch.trim() && activeRoute === 'Social Publisher' && session && <SocialPublisher scope={scope} state={state} session={session} onReload={module.reload} onRouteChange={onRouteChange} legacy={<PublisherView state={state} onPublish={(scheduleId) => { setSelectedScheduleId(scheduleId); setFormError(undefined); setModal('publish'); }} />} />}
       {!globalSearch.trim() && activeRoute === 'Community Inbox' && <CommunityView state={state} onAdd={() => setModal('community')} onStatus={(id, status) => void run(() => actions.updateCommunityStatus(id, status), `Community record moved to ${status}.`)} />}
       {!globalSearch.trim() && activeRoute === 'Social Listening' && <ListeningView state={state} onAdd={() => setModal('listening')} onConvert={(id) => void run(() => actions.convertListeningSignal(id), 'Listening signal converted to a traceable content idea.')} />}
       {!globalSearch.trim() && activeRoute === 'Performance' && <PerformanceView state={state} onAdd={() => setModal('metric')} />}
@@ -223,12 +225,12 @@ export default function ContentSocialModule({ activeRoute, globalSearch, forcedS
 
 function OverviewView({ state, onRouteChange, onInspect }: { state: ReturnType<typeof useContentSocial>['state']; onRouteChange: (route: string) => void; onInspect: (id: string) => void }) {
   const pending = state.approvals.filter((item) => item.status === 'PENDING');
-  const overdue = state.contentItems.filter((item) => new Date(item.dueDate) < new Date('2026-08-13') && !['PUBLISHED', 'ARCHIVED', 'CANCELLED'].includes(item.lifecycleState));
-  const scheduled = state.schedules.filter((item) => item.status === 'READY');
+  const overdue = state.contentItems.filter((item) => new Date(item.dueDate) < new Date(new Date().toISOString().slice(0, 10)) && !['PUBLISHED', 'ARCHIVED', 'CANCELLED'].includes(item.lifecycleState));
+  const scheduled = state.schedules.filter((item) => item.publishMethod === 'MANUAL' && item.status === 'READY');
   const published = state.publishRecords.filter((item) => item.status === 'PUBLISHED');
   const owners = [...new Set(state.contentItems.map((item) => item.owner))];
   return <>
-    <PageHeading eyebrow="Command centre" title="Content operations at a glance" detail="One governed view of DELabs planning, production, approval, publishing, response, and learning." actions={<button className="cs-button-primary" onClick={() => onRouteChange('Planning & Briefs')}><Plus size={15} />Plan content</button>} />
+    <PageHeading eyebrow="Command centre" title="Content operations at a glance" detail="One governed view of this brand’s planning, production, approval, publishing, response, and learning." actions={<button className="cs-button-primary" onClick={() => onRouteChange('Planning & Briefs')}><Plus size={15} />Plan content</button>} />
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
       <MetricCard label="Active production" value={String(state.contentItems.filter((item) => ['ASSIGNED', 'IN_PRODUCTION', 'INTERNAL_REVIEW'].includes(item.lifecycleState)).length)} note="Assigned through internal review" icon={ClipboardCheck} />
       <MetricCard label="Awaiting approval" value={String(pending.length)} note="Exact-version decisions" icon={ShieldCheck} tone="amber" />
@@ -276,7 +278,7 @@ function CalendarView({ state, onSchedule }: { state: ReturnType<typeof useConte
   return <>
     <PageHeading eyebrow="Content calendar" title="Schedule the approved version—not just the idea" detail="Times are stored in UTC and displayed with the configured brand timezone." />
     <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
-      <Surface title="Publication agenda" detail="DELabs · Europe/London"><RecordTable headers={['Date & time', 'Content', 'Channel', 'Version', 'Status']} rows={state.schedules.map((schedule) => { const item = state.contentItems.find((record) => record.id === schedule.contentItemId); const version = state.versions.find((record) => record.id === schedule.versionId); return [formatDateTime(schedule.plannedAt), item?.title ?? 'Unknown', schedule.channel, `v${version?.versionNumber ?? '?'}`, <Status value={schedule.status} />]; })} /></Surface>
+      <Surface title="Publication agenda" detail="Selected brand · times shown in your browser timezone"><RecordTable headers={['Date & time', 'Content', 'Channel', 'Version', 'Status']} rows={state.schedules.map((schedule) => { const item = state.contentItems.find((record) => record.id === schedule.contentItemId); const version = state.versions.find((record) => record.id === schedule.versionId); return [formatDateTime(schedule.plannedAt), item?.title ?? 'Unknown', schedule.channel, `v${version?.versionNumber ?? '?'}`, <Status value={schedule.status} />]; })} /></Surface>
       <Surface title="Unscheduled tray" detail="Eligible work awaiting a slot"><div className="divide-y divide-[#E8EDF4]">{unscheduled.map((item) => <div key={item.id} className="p-4"><p className="text-xs font-bold">{item.title}</p><p className="mt-1 text-[10px] text-[#74839A]">{formatLifecycle(item.lifecycleState)} · {item.primaryChannel}</p><button className="cs-button-small mt-3" onClick={() => onSchedule(item.id)}><CalendarDays size={12} />Schedule</button></div>)}{unscheduled.length === 0 && <EmptyInline label="No eligible unscheduled work." />}</div></Surface>
     </div>
   </>;
@@ -299,9 +301,9 @@ function AssetView({ state, onAdd, onRights }: { state: ReturnType<typeof useCon
 function PublisherView({ state, onPublish }: { state: ReturnType<typeof useContentSocial>['state']; onPublish: (scheduleId: string) => void }) {
   return <>
     <PageHeading eyebrow="Manual social publisher" title="Publication status follows evidence" detail="Passing the planned time does not mark a record Published. An authorised user must capture the live result." />
-    <InlineNotice tone="warning" title="Launch adapter" detail="Publishing remains manual for all ten canonical channels. COS stores the approved version, planned time, external action, proof, result, and failure history." />
+    <InlineNotice tone="warning" title="Launch adapter" detail="Existing manual publication records remain available here. Instagram connector jobs are tracked separately above." />
     <div className="grid gap-5 xl:grid-cols-2">
-      <Surface title="Ready queue" detail="Approved versions awaiting external publication"><div className="divide-y divide-[#E8EDF4]">{state.schedules.filter((item) => item.status === 'READY').map((schedule) => { const item = state.contentItems.find((record) => record.id === schedule.contentItemId); return <article key={schedule.id} className="p-5"><div className="flex items-start justify-between"><div><h3 className="text-sm font-bold">{item?.title}</h3><p className="mt-1 text-xs text-[#65758B]">{schedule.channel} · {formatDateTime(schedule.plannedAt)}</p></div><Status value={schedule.status} /></div><button className="cs-button-primary mt-4" onClick={() => onPublish(schedule.id)}><Send size={14} />Record publication proof</button></article>; })}{state.schedules.every((item) => item.status !== 'READY') && <EmptyInline label="Nothing is ready for manual publication." />}</div></Surface>
+      <Surface title="Ready queue" detail="Approved versions awaiting external publication"><div className="divide-y divide-[#E8EDF4]">{state.schedules.filter((item) => item.publishMethod === 'MANUAL' && item.status === 'READY').map((schedule) => { const item = state.contentItems.find((record) => record.id === schedule.contentItemId); return <article key={schedule.id} className="p-5"><div className="flex items-start justify-between"><div><h3 className="text-sm font-bold">{item?.title}</h3><p className="mt-1 text-xs text-[#65758B]">{schedule.channel} · {formatDateTime(schedule.plannedAt)}</p></div><Status value={schedule.status} /></div><button className="cs-button-primary mt-4" onClick={() => onPublish(schedule.id)}><Send size={14} />Record publication proof</button></article>; })}{state.schedules.every((item) => item.publishMethod !== 'MANUAL' || item.status !== 'READY') && <EmptyInline label="Nothing is ready for manual publication." />}</div></Surface>
       <Surface title="Publication evidence" detail="Truthful external result register"><div className="divide-y divide-[#E8EDF4]">{state.publishRecords.map((record) => { const item = state.contentItems.find((content) => content.id === record.contentItemId); return <article key={record.id} className="p-5"><div className="flex justify-between gap-3"><div><h3 className="text-sm font-bold">{item?.title}</h3><p className="mt-1 text-xs text-[#65758B]">{record.channel} · {formatDateTime(record.publishedAt ?? '')}</p></div><Status value={record.status} /></div><p className="mt-3 text-xs leading-5 text-[#65758B]">{record.proofNote}</p>{record.externalUrl && <a href={record.externalUrl} target="_blank" rel="noreferrer" className="cs-link mt-3">Inspect live proof <ExternalLink size={12} /></a>}</article>; })}</div></Surface>
     </div>
   </>;
@@ -335,7 +337,7 @@ function SettingsView({ state, session, scopeMode, onReset }: { state: ReturnTyp
   return <>
     <PageHeading eyebrow="Module settings" title="Govern workflow, access, and operational evidence" detail="Production permissions are enforced by Supabase Auth, scoped membership, RLS, and append-only audit." />
     <div className="grid gap-5 xl:grid-cols-[380px_minmax(0,1fr)]">
-      <div className="space-y-5"><Surface title="Active security context" detail="Resolved for every request"><dl className="divide-y divide-[#E8EDF4] px-5 py-2"><KeyValue label="Identity" value={session?.displayName ?? 'Unavailable'} /><KeyValue label="Role" value={session?.role ?? 'None'} /><KeyValue label="Persistence" value={session?.mode === 'supabase' ? 'Tenant-secured Supabase' : 'Development demo'} /><KeyValue label="Scope" value={`DELabs · ${scopeMode}`} /></dl></Surface><Surface title="Launch adapter policy" detail="No variable-cost dependency"><div className="space-y-3 p-5 text-xs text-[#65758B]"><p>Assets: secure external links</p><p>Publishing: manual proof register</p><p>Community: external-thread register</p><p>Listening: manual signals and CSV</p><p>Analytics: verified/manual/CSV observations</p></div></Surface>{session?.mode === 'demo' && <button className="cs-button-secondary w-full justify-center" onClick={onReset}><RotateCcw size={14} />Restore demo data</button>}</div>
+      <div className="space-y-5"><Surface title="Active security context" detail="Resolved for every request"><dl className="divide-y divide-[#E8EDF4] px-5 py-2"><KeyValue label="Identity" value={session?.displayName ?? 'Unavailable'} /><KeyValue label="Role" value={session?.role ?? 'None'} /><KeyValue label="Persistence" value={session?.mode === 'supabase' ? 'Tenant-secured Supabase' : 'Development demo'} /><KeyValue label="Scope" value={`Selected brand · ${scopeMode}`} /></dl></Surface><Surface title="Launch adapter policy" detail="No variable-cost dependency"><div className="space-y-3 p-5 text-xs text-[#65758B]"><p>Assets: secure external links</p><p>Publishing: manual proof register</p><p>Community: external-thread register</p><p>Listening: manual signals and CSV</p><p>Analytics: verified/manual/CSV observations</p></div></Surface>{session?.mode === 'demo' && <button className="cs-button-secondary w-full justify-center" onClick={onReset}><RotateCcw size={14} />Restore demo data</button>}</div>
       <Surface title="Immutable audit stream" detail={`${state.auditEvents.length} scoped events retained`}><RecordTable headers={['Time', 'Actor', 'Action', 'Target', 'Evidence']} rows={state.auditEvents.slice(0, 50).map((event) => [formatDateTime(event.occurredAt), event.actorName, event.action, `${event.targetType} · ${event.targetId.slice(0, 8)}`, event.summary])} /></Surface>
     </div>
   </>;
@@ -345,7 +347,7 @@ function ContentInspector({ item, state, onClose, onTransition, onVersion, onApp
   const versions = state.versions.filter((version) => version.contentItemId === item.id).sort((a, b) => b.versionNumber - a.versionNumber);
   const transitions = allowedTransitions(item, state);
   const currentApproval = state.approvals.find((approval) => approval.contentItemId === item.id && ['PENDING', 'APPROVED'].includes(approval.status));
-  return <FloatingLayer className="fixed inset-0 z-[70] flex justify-end bg-[#061B3A]/45" role="dialog" aria-modal="true" aria-labelledby="content-inspector-title"><button className="flex-1 cursor-default" onClick={onClose} aria-label="Close inspector" /><aside className="flex h-full w-full max-w-xl flex-col bg-white shadow-2xl"><header className="flex items-start justify-between border-b border-[#D9E0EA] p-5"><div><p className="font-mono text-[9px] text-[#155EEF]">{item.contentNumber}</p><h2 id="content-inspector-title" className="mt-2 text-lg font-bold">{item.title}</h2><p className="mt-1 text-xs text-[#65758B]">{item.owner} · due {formatDate(item.dueDate)}</p></div><button className="cs-icon-button" onClick={onClose} aria-label="Close content inspector"><X size={17} /></button></header><div className="flex-1 overflow-y-auto p-5"><div className="flex flex-wrap items-center gap-2"><Status value={item.lifecycleState} />{item.exceptions.map((exception) => <span key={`${exception.flag}-${exception.openedAt}`}><Status value={exception.flag} /></span>)}</div><section className="mt-6"><h3 className="text-xs font-bold uppercase tracking-[.06em] text-[#52617A]">Allowed workflow actions</h3><div className="mt-3 flex flex-wrap gap-2">{transitions.map((target) => <button key={target} className="cs-button-small" onClick={() => onTransition(target)}>{formatLifecycle(target)}</button>)}{transitions.length === 0 && <p className="text-xs text-[#74839A]">This record is in a terminal state.</p>}</div></section><section className="mt-7"><div className="flex items-center justify-between"><h3 className="text-xs font-bold uppercase tracking-[.06em] text-[#52617A]">Immutable versions</h3><button className="cs-link" onClick={onVersion}><Plus size={12} />New version</button></div><div className="mt-3 divide-y divide-[#E8EDF4] border-y border-[#E8EDF4]">{versions.map((version) => <article key={version.id} className="py-4"><div className="flex justify-between"><p className="font-mono text-xs font-semibold">v{version.versionNumber}</p>{version.id === item.currentVersionId && <Status value="CURRENT" />}</div><p className="mt-2 text-xs text-[#52617A]">{version.copy}</p><p className="mt-2 text-[10px] text-[#74839A]">{version.changeSummary} · {formatDateTime(version.submittedAt ?? version.createdAt)}</p>{version.externalAssetUrl && <a className="cs-link mt-2" href={version.externalAssetUrl} target="_blank" rel="noreferrer">Open source asset <ExternalLink size={11} /></a>}</article>)}</div></section><section className="mt-7"><h3 className="text-xs font-bold uppercase tracking-[.06em] text-[#52617A]">Approval and scheduling</h3><div className="mt-3 rounded-xl border border-[#D9E0EA] bg-[#F7F9FC] p-4"><div className="flex items-center justify-between"><span className="text-xs font-semibold">Current approval</span>{currentApproval ? <Status value={currentApproval.status} /> : <Status value="NOT_REQUESTED" />}</div><div className="mt-4 flex flex-wrap gap-2">{item.currentVersionId && (!currentApproval || currentApproval.status === 'STALE') && <button className="cs-button-secondary" onClick={onApproval}>Request approval</button>}{item.lifecycleState !== 'SCHEDULED' && <button className="cs-button-primary" onClick={onSchedule}><CalendarDays size={13} />Schedule current version</button>}</div></div></section></div></aside></FloatingLayer>;
+  return <FloatingLayer className="fixed inset-0 z-[70] flex justify-end bg-[#061B3A]/45" role="dialog" aria-modal="true" aria-labelledby="content-inspector-title"><button className="flex-1 cursor-default" onClick={onClose} aria-label="Close inspector" /><aside className="flex h-full w-full max-w-xl flex-col bg-white shadow-2xl"><header className="flex items-start justify-between border-b border-[#D9E0EA] p-5"><div><p className="font-mono text-[9px] text-[#155EEF]">{item.contentNumber}</p><h2 id="content-inspector-title" className="mt-2 text-lg font-bold">{item.title}</h2><p className="mt-1 text-xs text-[#65758B]">{item.owner} · due {formatDate(item.dueDate)}</p></div><button className="cs-icon-button" onClick={onClose} aria-label="Close content inspector"><X size={17} /></button></header><div className="flex-1 overflow-y-auto p-5"><div className="flex flex-wrap items-center gap-2"><Status value={item.lifecycleState} />{item.exceptions.map((exception) => <span key={`${exception.flag}-${exception.openedAt}`}><Status value={exception.flag} /></span>)}</div><section className="mt-6"><h3 className="text-xs font-bold uppercase tracking-[.06em] text-[#52617A]">Allowed workflow actions</h3><div className="mt-3 flex flex-wrap gap-2">{transitions.map((target) => <button key={target} className="cs-button-small" onClick={() => onTransition(target)}>{formatLifecycle(target)}</button>)}{transitions.length === 0 && <p className="text-xs text-[#74839A]">This record is in a terminal state.</p>}</div></section><section className="mt-7"><div className="flex items-center justify-between"><h3 className="text-xs font-bold uppercase tracking-[.06em] text-[#52617A]">Immutable versions</h3><button className="cs-link" onClick={onVersion}><Plus size={12} />New version</button></div><div className="mt-3 divide-y divide-[#E8EDF4] border-y border-[#E8EDF4]">{versions.map((version) => <article key={version.id} className="py-4"><div className="flex justify-between"><p className="font-mono text-xs font-semibold">v{version.versionNumber}</p>{version.id === item.currentVersionId && <Status value="CURRENT" />}</div><p className="mt-2 text-xs text-[#52617A]">{version.copy}</p><p className="mt-2 text-[10px] text-[#74839A]">{version.changeSummary} · {formatDateTime(version.submittedAt ?? version.createdAt)}</p>{version.publisherMediaId && <PublisherImage versionId={version.id} />}{version.externalAssetUrl && <a className="cs-link mt-2" href={version.externalAssetUrl} target="_blank" rel="noreferrer">Open source asset <ExternalLink size={11} /></a>}</article>)}</div></section><section className="mt-7"><h3 className="text-xs font-bold uppercase tracking-[.06em] text-[#52617A]">Approval and scheduling</h3><div className="mt-3 rounded-xl border border-[#D9E0EA] bg-[#F7F9FC] p-4"><div className="flex items-center justify-between"><span className="text-xs font-semibold">Current approval</span>{currentApproval ? <Status value={currentApproval.status} /> : <Status value="NOT_REQUESTED" />}</div><div className="mt-4 flex flex-wrap gap-2">{item.currentVersionId && (!currentApproval || currentApproval.status === 'STALE') && <button className="cs-button-secondary" onClick={onApproval}>Request approval</button>}{item.lifecycleState !== 'SCHEDULED' && <button className="cs-button-primary" onClick={onSchedule}><CalendarDays size={13} />Schedule current version</button>}</div></div></section></div></aside></FloatingLayer>;
 }
 
 function NotificationDrawer({ notifications, onClose, onRead }: { notifications: ReturnType<typeof useContentSocial>['state']['notifications']; onClose: () => void; onRead: (id: string) => void }) {
@@ -353,7 +355,7 @@ function NotificationDrawer({ notifications, onClose, onRead }: { notifications:
 }
 
 function SearchResults({ results, onOpen }: { results: ReturnType<typeof searchState>; onOpen: (result: ReturnType<typeof searchState>[number]) => void }) {
-  return <><PageHeading eyebrow="Scoped search" title="Search results" detail="Results are limited to the active DELabs entity scope." /><Surface title={`${results.length} matching records`} detail="Ideas, briefs, content, assets, community, and listening"><div className="divide-y divide-[#E8EDF4]">{results.map((result) => <button key={`${result.kind}-${result.id}`} onClick={() => onOpen(result)} className="cs-record-row"><div><p className="text-[9px] font-bold uppercase tracking-[.06em] text-[#155EEF]">{result.kind}</p><p className="mt-1 font-semibold">{result.title}</p></div><span className="text-[10px] text-[#74839A]">{result.detail}</span></button>)}{results.length === 0 && <EmptyInline label="No scoped records match this search." />}</div></Surface></>;
+  return <><PageHeading eyebrow="Scoped search" title="Search results" detail="Results are limited to the selected company and brand." /><Surface title={`${results.length} matching records`} detail="Ideas, briefs, content, assets, community, and listening"><div className="divide-y divide-[#E8EDF4]">{results.map((result) => <button key={`${result.kind}-${result.id}`} onClick={() => onOpen(result)} className="cs-record-row"><div><p className="text-[9px] font-bold uppercase tracking-[.06em] text-[#155EEF]">{result.kind}</p><p className="mt-1 font-semibold">{result.title}</p></div><span className="text-[10px] text-[#74839A]">{result.detail}</span></button>)}{results.length === 0 && <EmptyInline label="No scoped records match this search." />}</div></Surface></>;
 }
 
 function PageHeading({ eyebrow, title, detail, actions }: { eyebrow: string; title: string; detail: string; actions?: ReactNode }) { return <PageTitleBar eyebrow={eyebrow} title={title} subtitle={detail} actions={actions} />; }
