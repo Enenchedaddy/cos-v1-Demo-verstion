@@ -61,6 +61,7 @@ import {
   type VersionInput,
 } from './model';
 import { CompanyScope } from './CompanyScope';
+import { applicableRoles, availableBrandScopes, type CompanyDirectory } from './publisher';
 import SocialPublisher from './SocialPublisher';
 import PublisherImage from './PublisherImage';
 import { useContentSocial } from './useContentSocial';
@@ -103,10 +104,10 @@ function errorMessage(error: unknown): string {
 }
 
 export default function ContentSocialModule(props: ContentSocialModuleProps) {
-  return <CompanyScope>{scope => <ScopedContentSocialModule {...props} scope={scope} />}</CompanyScope>;
+  return <CompanyScope>{(scope, controls) => <ScopedContentSocialModule {...props} scope={scope} directory={controls.directory} onScopeChange={controls.selectScope} />}</CompanyScope>;
 }
 
-export function ScopedContentSocialModule({ scope, activeRoute, globalSearch, forcedState = 'loaded', scopeMode, notificationOpen, onNotificationClose, onRouteChange }: ContentSocialModuleProps & { scope: ScopeContext }) {
+export function ScopedContentSocialModule({ scope, directory, onScopeChange, activeRoute, globalSearch, forcedState = 'loaded', scopeMode, notificationOpen, onNotificationClose, onRouteChange }: ContentSocialModuleProps & { scope: ScopeContext; directory?: CompanyDirectory; onScopeChange?: (scope: ScopeContext) => void }) {
   const module = useContentSocial(scope);
   const { state, session, actions } = module;
   const previousRoute = useRef(activeRoute);
@@ -125,6 +126,10 @@ export function ScopedContentSocialModule({ scope, activeRoute, globalSearch, fo
   const [decisionComment, setDecisionComment] = useState('');
   const [credentials, setCredentials] = useState({ email: '', password: '' });
   const [forms, setForms] = useState({ idea: defaultIdea, brief: defaultBrief, version: defaultVersion, schedule: defaultSchedule, publish: defaultPublish, asset: defaultAsset, community: defaultCommunity, listening: defaultListening, metric: defaultMetric });
+  const [ideaBrandId, setIdeaBrandId] = useState(scope.brandId);
+  const ideaScopes = directory ? availableBrandScopes(directory) : [scope];
+  const ideaScope = ideaScopes.find(candidate => candidate.brandId === ideaBrandId);
+  const canCreateIdeaFor = (candidate: ScopeContext) => can(directory ? applicableRoles(directory.memberships, candidate) : session?.roles ?? (session ? [session.role] : []), 'idea.manage');
 
   const effectiveState: WorkspaceState = module.status === 'loaded' ? forcedState : module.status;
   const selectedItem = state.contentItems.find((item) => item.id === selectedItemId) ?? null;
@@ -209,7 +214,12 @@ export function ScopedContentSocialModule({ scope, activeRoute, globalSearch, fo
       <AnimatePresence>{notificationOpen && <NotificationDrawer notifications={state.notifications} onClose={onNotificationClose} onRead={(id) => void actions.markNotificationRead(id)} />}</AnimatePresence>
 
       <AnimatePresence>{modal && <ActionModal title={modalTitle(modal)} onClose={() => { setModal(null); setFormError(undefined); }} error={formError}>
-        {modal === 'idea' && <IdeaForm value={forms.idea} onChange={(idea) => setForms((current) => ({ ...current, idea }))} onSubmit={() => void run(() => actions.createIdea(forms.idea), 'Content idea created.')} />}
+        {modal === 'idea' && <IdeaForm value={forms.idea} scopes={ideaScopes} brandId={ideaBrandId} canCreateFor={canCreateIdeaFor} busy={module.mutating} onBrandChange={setIdeaBrandId} onChange={(idea) => setForms((current) => ({ ...current, idea }))} onSubmit={() => void run(async () => {
+          if (!ideaScope || !canCreateIdeaFor(ideaScope)) throw new Error('Select a brand where you have permission to create ideas.');
+          await actions.createIdea(forms.idea, ideaScope);
+          setForms(current => ({ ...current, idea: defaultIdea }));
+          onScopeChange?.(ideaScope);
+        }, 'Content idea created.')} />}
         {modal === 'brief' && <BriefForm value={forms.brief} onChange={(brief) => setForms((current) => ({ ...current, brief }))} onSubmit={() => void run(() => actions.createBrief(forms.brief), 'Draft brief created.')} />}
         {modal === 'version' && selectedItem && <VersionForm value={forms.version} onChange={(version) => setForms((current) => ({ ...current, version }))} onSubmit={() => void run(() => actions.createVersion(selectedItem.id, forms.version), 'Immutable content version created; superseded approvals are stale.')} />}
         {modal === 'schedule' && selectedItem && <ScheduleForm value={forms.schedule} onChange={(schedule) => setForms((current) => ({ ...current, schedule }))} onSubmit={() => void run(() => actions.scheduleContent(selectedItem.id, forms.schedule), 'Approved version added to the manual publishing queue.')} />}
@@ -372,14 +382,36 @@ function SignInPanel({ detail, credentials, busy, onChange, onSubmit }: { detail
   return <form className="mx-auto mt-16 max-w-md rounded-2xl border border-[#D9E0EA] bg-white p-8 shadow-2xs" onSubmit={(event) => { event.preventDefault(); onSubmit(); }}><span className="grid h-12 w-12 place-items-center rounded-xl bg-[#EEF3FB] text-[#155EEF]"><LockKeyhole size={22} /></span><h1 className="mt-5 text-xl font-bold">Sign in to Content & Social</h1><p className="mt-2 text-sm leading-6 text-[#74839A]">{detail}</p><label className="mt-6 block text-xs font-semibold text-[#344054]">Work email<input className="cs-input mt-2" type="email" autoComplete="username" required value={credentials.email} onChange={(event) => onChange({ ...credentials, email: event.target.value })} /></label><label className="mt-4 block text-xs font-semibold text-[#344054]">Password<input className="cs-input mt-2" type="password" autoComplete="current-password" required minLength={8} value={credentials.password} onChange={(event) => onChange({ ...credentials, password: event.target.value })} /></label><button className="cs-button-primary mt-6 w-full justify-center" type="submit" disabled={busy}>{busy ? <><LoaderCircle size={15} className="animate-spin" />Signing in…</> : 'Sign in securely'}</button><p className="mt-4 text-[11px] leading-5 text-[#74839A]">Access is invite-only. A module administrator must assign your workspace, client, brand, and role before you can open records.</p></form>;
 }
 
-function ActionModal({ title, onClose, error, children }: { title: string; onClose: () => void; error?: string; children: ReactNode }) { return <FloatingLayer className="fixed inset-0 z-[80] grid place-items-center overflow-y-auto bg-[#061B3A]/55 p-4" role="dialog" aria-modal="true" aria-labelledby="cs-modal-title"><div className="my-6 w-full max-w-2xl rounded-2xl border border-[#D9E0EA] bg-white shadow-2xl"><header className="flex items-start justify-between border-b border-[#D9E0EA] p-5"><div><p className="text-[9px] font-bold uppercase tracking-[.1em] text-[#155EEF]">Governed workflow</p><h2 id="cs-modal-title" className="mt-2 text-lg font-bold">{title}</h2></div><button className="cs-icon-button" onClick={onClose} aria-label="Close dialog"><X size={17} /></button></header>{error && <div className="mx-5 mt-5"><InlineNotice tone="danger" title="Action blocked" detail={error} /></div>}{children}</div></FloatingLayer>; }
+function ActionModal({ title, onClose, error, children }: { title: string; onClose: () => void; error?: string; children: ReactNode }) { return <FloatingLayer className="fixed inset-0 z-[80] grid place-items-center overflow-y-auto bg-[#061B3A]/55 p-4" role="dialog" aria-modal="true" aria-labelledby="cs-modal-title"><div className="max-h-[calc(100dvh-2rem)] w-full max-w-2xl overflow-y-auto rounded-2xl border border-[#D9E0EA] bg-white shadow-2xl"><header className="flex items-start justify-between border-b border-[#D9E0EA] p-5"><div><p className="text-[9px] font-bold uppercase tracking-[.1em] text-[#155EEF]">Governed workflow</p><h2 id="cs-modal-title" className="mt-2 text-lg font-bold">{title}</h2></div><button className="cs-icon-button" onClick={onClose} aria-label="Close dialog"><X size={17} /></button></header>{error && <div className="mx-5 mt-5"><InlineNotice tone="danger" title="Action blocked" detail={error} /></div>}{children}</div></FloatingLayer>; }
 function FormShell({ onSubmit, children, submitLabel }: { onSubmit: () => void; children: ReactNode; submitLabel: string }) { return <form onSubmit={(event) => { event.preventDefault(); onSubmit(); }}><div className="grid gap-4 p-5 sm:grid-cols-2">{children}</div><footer className="flex justify-end border-t border-[#D9E0EA] p-5"><button type="submit" className="cs-button-primary">{submitLabel}</button></footer></form>; }
 function Field({ label, children, span = false }: { label: string; children: ReactNode; span?: boolean }) { return <label className={cx('text-xs font-semibold text-[#34445E]', span && 'sm:col-span-2')}>{label}{children}</label>; }
 function TextInput(props: InputHTMLAttributes<HTMLInputElement>) { return <input {...props} className="cs-input mt-2" />; }
 function TextArea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) { return <textarea {...props} className="cs-input mt-2 min-h-24 resize-y" />; }
 function SelectInput(props: SelectHTMLAttributes<HTMLSelectElement>) { return <select {...props} className="cs-input mt-2">{props.children}</select>; }
 
-function IdeaForm({ value, onChange, onSubmit }: { value: IdeaInput; onChange: (value: IdeaInput) => void; onSubmit: () => void }) { return <FormShell onSubmit={onSubmit} submitLabel="Create idea"><Field label="Idea title" span><TextInput autoFocus required value={value.title} onChange={(e) => onChange({ ...value, title: e.target.value })} /></Field><Field label="Summary" span><TextArea required value={value.summary} onChange={(e) => onChange({ ...value, summary: e.target.value })} /></Field><Field label="Source"><TextInput required value={value.source} onChange={(e) => onChange({ ...value, source: e.target.value })} /></Field><Field label="Owner"><TextInput required value={value.owner} onChange={(e) => onChange({ ...value, owner: e.target.value })} /></Field><Field label="Priority"><SelectInput value={value.priority} onChange={(e) => onChange({ ...value, priority: e.target.value as ContentPriority })}><option>LOW</option><option>MEDIUM</option><option>HIGH</option><option>CRITICAL</option></SelectInput></Field></FormShell>; }
+function IdeaForm({ value, scopes, brandId, canCreateFor, busy, onBrandChange, onChange, onSubmit }: {
+  value: IdeaInput; scopes: ScopeContext[]; brandId: string; canCreateFor: (scope: ScopeContext) => boolean; busy: boolean;
+  onBrandChange: (brandId: string) => void; onChange: (value: IdeaInput) => void; onSubmit: () => void;
+}) {
+  const selected = scopes.find(scope => scope.brandId === brandId);
+  const canSubmit = selected && canCreateFor(selected);
+  return <form onSubmit={event => { event.preventDefault(); if (!busy && canSubmit) onSubmit(); }}>
+    <fieldset disabled={busy} className="grid min-w-0 gap-4 p-5 sm:grid-cols-2">
+      <Field label="Brand" span><SelectInput required aria-describedby="idea-brand-help" value={selected?.brandId ?? ''} onChange={event => onBrandChange(event.target.value)}>
+        <option value="" disabled>Select a brand</option>
+        {scopes.map(scope => <option key={scope.brandId} value={scope.brandId} disabled={!canCreateFor(scope)}>{scope.clientName} — {scope.brandName}{canCreateFor(scope) ? '' : ' (view only)'}</option>)}
+      </SelectInput></Field>
+      <p id="idea-brand-help" className="text-xs leading-5 text-[#65758B] sm:col-span-2">Choose from your authorized brands. The idea will be saved under the selected company and brand.</p>
+      {!canSubmit && <p role="status" className="text-xs text-[#65758B] sm:col-span-2">{scopes.length ? 'Select a brand where you have permission to create ideas.' : 'No authorized brands are available. Request a Content & Social membership.'}</p>}
+      <Field label="Idea title" span><TextInput autoFocus required value={value.title} onChange={event => onChange({ ...value, title: event.target.value })} /></Field>
+      <Field label="Summary" span><TextArea required value={value.summary} onChange={event => onChange({ ...value, summary: event.target.value })} /></Field>
+      <Field label="Source"><TextInput required value={value.source} onChange={event => onChange({ ...value, source: event.target.value })} /></Field>
+      <Field label="Owner"><TextInput required value={value.owner} onChange={event => onChange({ ...value, owner: event.target.value })} /></Field>
+      <Field label="Priority"><SelectInput value={value.priority} onChange={event => onChange({ ...value, priority: event.target.value as ContentPriority })}><option>LOW</option><option>MEDIUM</option><option>HIGH</option><option>CRITICAL</option></SelectInput></Field>
+    </fieldset>
+    <footer className="flex justify-end border-t border-[#D9E0EA] p-5"><button type="submit" disabled={busy || !canSubmit} className="cs-button-primary min-h-11">{busy ? 'Creating idea…' : 'Create idea'}</button></footer>
+  </form>;
+}
 function BriefForm({ value, onChange, onSubmit }: { value: BriefInput; onChange: (value: BriefInput) => void; onSubmit: () => void }) { return <FormShell onSubmit={onSubmit} submitLabel="Create draft brief"><Field label="Brief title" span><TextInput autoFocus required value={value.title} onChange={(e) => onChange({ ...value, title: e.target.value })} /></Field><Field label="Objective" span><TextArea required value={value.objective} onChange={(e) => onChange({ ...value, objective: e.target.value })} /></Field><Field label="Audience"><TextArea required value={value.audience} onChange={(e) => onChange({ ...value, audience: e.target.value })} /></Field><Field label="Key message"><TextArea required value={value.keyMessage} onChange={(e) => onChange({ ...value, keyMessage: e.target.value })} /></Field><Field label="Call to action"><TextInput required value={value.callToAction} onChange={(e) => onChange({ ...value, callToAction: e.target.value })} /></Field><Field label="Owner"><TextInput required value={value.owner} onChange={(e) => onChange({ ...value, owner: e.target.value })} /></Field><Field label="Due date"><TextInput type="date" required value={value.dueDate} onChange={(e) => onChange({ ...value, dueDate: e.target.value })} /></Field><Field label="Primary channel"><SelectInput value={value.channels[0]} onChange={(e) => onChange({ ...value, channels: [e.target.value] })}>{['Instagram','Facebook','TikTok','LinkedIn','YouTube','X','Pinterest','Threads','Snapchat','Google Business Profile'].map((item) => <option key={item}>{item}</option>)}</SelectInput></Field><Field label="Primary format"><SelectInput value={value.formats[0]} onChange={(e) => onChange({ ...value, formats: [e.target.value] })}>{['Static','Carousel','Short video','Long video','Story','Text/thread','Article/newsletter','Live/event','Poll/interactive','Repost/UGC'].map((item) => <option key={item}>{item}</option>)}</SelectInput></Field></FormShell>; }
 function VersionForm({ value, onChange, onSubmit }: { value: VersionInput; onChange: (value: VersionInput) => void; onSubmit: () => void }) { return <FormShell onSubmit={onSubmit} submitLabel="Create immutable version"><Field label="Platform copy" span><TextArea autoFocus required value={value.copy} onChange={(e) => onChange({ ...value, copy: e.target.value })} /></Field><Field label="Change summary" span><TextInput required value={value.changeSummary} onChange={(e) => onChange({ ...value, changeSummary: e.target.value })} /></Field><Field label="External asset URL" span><TextInput type="url" value={value.externalAssetUrl} onChange={(e) => onChange({ ...value, externalAssetUrl: e.target.value })} placeholder="https://drive.google.com/..." /></Field></FormShell>; }
 function ScheduleForm({ value, onChange, onSubmit }: { value: ScheduleInput; onChange: (value: ScheduleInput) => void; onSubmit: () => void }) { return <FormShell onSubmit={onSubmit} submitLabel="Add to manual queue"><Field label="Planned date and time"><TextInput type="datetime-local" required value={value.plannedAt} onChange={(e) => onChange({ ...value, plannedAt: e.target.value })} /></Field><Field label="Brand timezone"><SelectInput value={value.timezone} onChange={(e) => onChange({ ...value, timezone: e.target.value })}><option>Europe/London</option><option>Africa/Lagos</option><option>UTC</option></SelectInput></Field><div className="sm:col-span-2"><InlineNotice tone="warning" title="Manual publication" detail="Scheduling does not publish content. A live URL, actual time, and evidence note are required later." /></div></FormShell>; }

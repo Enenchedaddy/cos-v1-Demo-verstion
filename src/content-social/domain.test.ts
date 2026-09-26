@@ -6,15 +6,21 @@ import {
   assertSchedule,
   assertTransition,
   can,
+  createAuditEvent,
   hasCurrentApproval,
   invalidateAffectedApprovals,
   nextVersionNumber,
   searchState,
 } from './domain';
 import { briefInputSchema, ideaInputSchema } from './model';
-import { createSeedState } from './seed';
+import { createSeedState, DELABS_SCOPE } from './seed';
 
 describe('Content & Social governance', () => {
+  it('does not leak scope display labels into audit-table columns', () => {
+    const event = createAuditEvent({ ...DELABS_SCOPE, timezone: 'Africa/Lagos', actorId: 'actor', actorName: 'Planner', action: 'idea.created', targetType: 'ContentIdea', targetId: 'idea', summary: 'Created idea.' } as Parameters<typeof createAuditEvent>[0]);
+    expect(event).toMatchObject({ workspaceId: DELABS_SCOPE.workspaceId, clientId: DELABS_SCOPE.clientId, brandId: DELABS_SCOPE.brandId, result: 'SUCCESS' });
+    expect(Object.keys(event).sort()).toEqual(['id', 'workspaceId', 'clientId', 'brandId', 'occurredAt', 'actorType', 'actorId', 'actorName', 'action', 'targetType', 'targetId', 'targetVersion', 'result', 'summary', 'requestId'].sort());
+  });
   it('enforces the role permission matrix', () => {
     expect(can('CS_MANAGER', 'approval.decide')).toBe(true);
     expect(can('EXECUTIVE_VIEWER', 'content.edit')).toBe(false);

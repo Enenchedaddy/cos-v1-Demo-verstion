@@ -58,6 +58,8 @@ export function useContentSocial(scope: ScopeContext) {
   const [warning, setWarning] = useState<string | undefined>();
   const [error, setError] = useState<string | undefined>();
   const [mutating, setMutating] = useState(false);
+  const creatingIdea = useRef(false);
+  const pendingIdea = useRef<{ key: string; idea: ContentIdea; event: ContentSocialState['auditEvents'][number] } | null>(null);
 
   const applyState = useCallback((next: ContentSocialState) => {
     stateRef.current = next;
@@ -115,16 +117,40 @@ export function useContentSocial(scope: ScopeContext) {
     };
   }, [scope, session]);
 
-  const createIdea = useCallback(async (raw: IdeaInput) => {
-    if (!session) return;
-    assertCan(session.roles ?? [session.role], 'idea.manage');
+  const createIdea = useCallback(async (raw: IdeaInput, targetScope: ScopeContext = scope) => {
+    if (!session) throw new Error('No active Content & Social session.');
+    if (creatingIdea.current) throw new Error('An idea is already being saved.');
     const input = ideaInputSchema.parse(raw);
-    const idea: ContentIdea = { ...recordBase(), ...input, status: 'OPEN' };
-    const event = audit('idea.created', 'ContentIdea', idea.id, `Created idea “${idea.title}”.`);
-    const current = stateRef.current;
-    await commit({ ...current, ideas: [idea, ...current.ideas], auditEvents: [event, ...current.auditEvents] }, ['ideas', 'auditEvents']);
-    return idea;
-  }, [audit, commit, recordBase, session]);
+    const sameScope = targetScope.workspaceId === scope.workspaceId && targetScope.clientId === scope.clientId && targetScope.brandId === scope.brandId;
+    creatingIdea.current = true;
+    setMutating(true);
+    setError(undefined);
+    try {
+      const targetRepository = sameScope ? repository : new ContentSocialRepository(targetScope);
+      const loaded = sameScope ? { state: stateRef.current, session } : await targetRepository.load();
+      // Re-resolve memberships for the destination; source-brand rights are not transferable.
+      if (loaded.session.userId !== session.userId || loaded.session.mode !== session.mode) throw new Error('Your session changed. Reload before creating an idea.');
+      assertCan(loaded.session.roles ?? [loaded.session.role], 'idea.manage');
+      const key = JSON.stringify([session.userId, targetScope.workspaceId, targetScope.clientId, targetScope.brandId, input]);
+      if (pendingIdea.current?.key !== key) {
+        const idea: ContentIdea = { ...recordBase(), ...input, workspaceId: targetScope.workspaceId, clientId: targetScope.clientId, brandId: targetScope.brandId, status: 'OPEN' };
+        const event = createAuditEvent({ ...targetScope, actorId: session.userId, actorName: loaded.session.displayName, action: 'idea.created', targetType: 'ContentIdea', targetId: idea.id, summary: `Created idea “${idea.title}”.` });
+        pendingIdea.current = { key, idea, event };
+      }
+      const { idea, event } = pendingIdea.current;
+      const next = { ...loaded.state, ideas: [idea, ...loaded.state.ideas.filter(record => record.id !== idea.id)], auditEvents: [event, ...loaded.state.auditEvents.filter(record => record.id !== event.id)] };
+      await targetRepository.persist(next, ['ideas', 'auditEvents']);
+      if (sameScope) applyState(next);
+      pendingIdea.current = null;
+      return idea;
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'The idea could not be saved.');
+      throw reason;
+    } finally {
+      creatingIdea.current = false;
+      setMutating(false);
+    }
+  }, [applyState, recordBase, repository, scope, session]);
 
   const convertIdea = useCallback(async (ideaId: string) => {
     if (!session) return;

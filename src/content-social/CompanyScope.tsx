@@ -44,7 +44,12 @@ export function useCompanyDirectory() {
   return { directory, error, reload };
 }
 
-export function CompanyScope({ children }: { children: (scope: ScopeContext) => ReactNode }) {
+export interface CompanyScopeControls {
+  directory: CompanyDirectory;
+  selectScope: (scope: ScopeContext) => void;
+}
+
+export function CompanyScope({ children }: { children: (scope: ScopeContext, controls: CompanyScopeControls) => ReactNode }) {
   const { directory, error, reload } = useCompanyDirectory();
   const [workspaceId, setWorkspaceId] = useState('');
   const [companyId, setCompanyId] = useState('');
@@ -97,6 +102,10 @@ export function CompanyScope({ children }: { children: (scope: ScopeContext) => 
         {saveError && <p role="alert" className="text-sm text-red-700">{saveError}</p>}
       </form>}
     </section>
-    {scope ? <div key={`${scope.workspaceId}:${scope.clientId}:${scope.brandId}`}>{children(scope)}</div> : <p className="p-4 text-sm">No accessible brand in this company. Add a brand if authorized, or request a scoped membership.</p>}
+    {scope ? <div key={`${scope.workspaceId}:${scope.clientId}:${scope.brandId}`}>{children(scope, { directory, selectScope: next => {
+      const available = directory.brands.some(b => b.id === next.brandId && b.client_id === next.clientId && b.workspace_id === next.workspaceId);
+      if (!available) return;
+      setWorkspaceId(next.workspaceId); setCompanyId(next.clientId); setBrandId(next.brandId); setOnboarding(null);
+    } })}</div> : <p className="p-4 text-sm">No accessible brand in this company. Add a brand if authorized, or request a scoped membership.</p>}
   </div>;
 }

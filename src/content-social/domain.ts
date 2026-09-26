@@ -185,7 +185,17 @@ export function createAuditEvent(input: {
     actorType: 'USER',
     requestId: crypto.randomUUID(),
     result: input.result ?? 'SUCCESS',
-    ...input,
+    // ScopeContext also contains display labels. Only persist audit-table fields.
+    workspaceId: input.workspaceId,
+    clientId: input.clientId,
+    brandId: input.brandId,
+    actorId: input.actorId,
+    actorName: input.actorName,
+    action: input.action,
+    targetType: input.targetType,
+    targetId: input.targetId,
+    targetVersion: input.targetVersion ?? null,
+    summary: input.summary,
   };
 }
 

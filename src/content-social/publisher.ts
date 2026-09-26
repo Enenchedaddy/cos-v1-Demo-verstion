@@ -11,6 +11,16 @@ export interface CompanyDirectory {
   brands: BrandContext[];
   memberships: ScopedMembership[];
 }
+
+/** Directory is supplied by the membership-filtered RPC, never a global brand list. */
+export function availableBrandScopes(directory: CompanyDirectory): ScopeContext[] {
+  return directory.brands.flatMap(brand => {
+    const company = directory.companies.find(c => c.id === brand.client_id && c.workspace_id === brand.workspace_id);
+    const workspace = directory.workspaces.find(w => w.id === brand.workspace_id);
+    return company && workspace ? [{ workspaceId: workspace.id, workspaceName: workspace.name,
+      clientId: company.id, clientName: company.name, brandId: brand.id, brandName: brand.name, timezone: brand.timezone }] : [];
+  });
+}
 export interface SocialAccount {
   id: string; workspace_id: string; client_id: string; brand_id: string;
   provider: 'INSTAGRAM'; provider_account_id: string; username: string;

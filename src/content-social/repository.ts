@@ -139,6 +139,7 @@ async function loadSupabase(client: SupabaseClient, scope: ScopeContext, user: U
 
 export class ContentSocialRepository {
   private mode: 'supabase' | 'demo' = 'demo';
+  private readonly savedAppendOnly = { auditEvents: new Set<string>(), versions: new Set<string>() };
 
   constructor(
     private readonly scope: ScopeContext,
@@ -189,6 +190,9 @@ export class ContentSocialRepository {
       }
       const result = await loadSupabase(this.client, this.scope, data.user);
       this.mode = 'supabase';
+      for (const collection of ['auditEvents', 'versions'] as const) {
+        this.savedAppendOnly[collection] = new Set(result.state[collection].map(record => record.id));
+      }
       return result;
     } catch (error) {
       if (error instanceof RepositoryError && error.code === 'RESTRICTED') throw error;
@@ -210,13 +214,18 @@ export class ContentSocialRepository {
     }
 
     for (const collection of changed) {
-      const records = state[collection] as unknown[];
+      const appendOnly = collection === 'auditEvents' || collection === 'versions';
+      // Loaded history may belong to other actors. Never re-submit immutable rows.
+      const records = appendOnly
+        ? state[collection].filter(record => !this.savedAppendOnly[collection].has(record.id))
+        : state[collection];
       if (records.length === 0) continue;
       const payload = records.map(toDatabase);
       const { error } = collection === 'auditEvents' || collection === 'versions'
         ? await this.client.from(TABLES[collection]).upsert(payload, { onConflict: 'id', ignoreDuplicates: true })
         : await this.client.from(TABLES[collection]).upsert(payload, { onConflict: 'id' });
       if (error) throw new RepositoryError(error.message, 'PERSISTENCE');
+      if (appendOnly) records.forEach(record => this.savedAppendOnly[collection].add(record.id));
     }
   }
 
