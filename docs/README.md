@@ -23,7 +23,9 @@ This directory is the canonical description of the implemented system. Product d
 - [API surfaces](api/overview.md)
 - [Security](security/overview.md)
 - [Local setup](development/setup.md)
+- [Social Publisher implementation](development/social-publisher.md)
+- [Hosted staging setup and connection checks](social-publisher-hosted-staging.md)
+- [Instagram CEO summary](project-progress/COS-Instagram-CEO-Summary.md)
 - [Conventions](development/conventions.md)
 - [Troubleshooting](development/troubleshooting.md)
 - [Full codebase audit — 2026-09-09](audit/2026-09-09-codebase-audit.md)
-

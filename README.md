@@ -95,6 +95,7 @@ Full setup and database instructions are in [development setup](docs/development
 | `npm run test:run` | Run the Vitest suite once |
 | `npm run test:e2e` | Run Playwright on desktop and mobile projects |
 | `npm run build` | Produce the production bundle in `dist/` |
+| `npm run check:publisher-origin -- --project-ref <ref> --origin <origin>` | Check publisher CORS/authentication without connecting or publishing |
 | `npm run clean` | Remove generated `dist/` and legacy `server.js` |
 | `npm run seed` | Run the guarded, empty-database-only legacy fixture seed |
 
@@ -112,7 +113,9 @@ The seed script is destructive in effect even though it only inserts. It require
 
 ## Deployment
 
-The SPA has Vercel history-fallback configuration in `vercel.json`. Supabase migrations and Edge Functions deploy separately through the approved Supabase workflow. No CI/CD or Docker configuration is currently committed; deployments remain manual and must not be inferred from a frontend build.
+The SPA has Vercel history-fallback configuration in `vercel.json`. Supabase migrations and Edge Functions deploy separately through the approved Supabase workflow. No CI/CD or Docker configuration is currently committed, but the repository's Vercel Git integration is active: GitHub deployment records checked on 2026-09-29 mark the latest `main` commits as **Production**. Do not push to `main` for a staging-only task. A local production build does not itself deploy anything.
+
+The frontend is not limited to localhost. Instagram uses one server-configured frontend origin for both CORS and the OAuth return destination. Follow the [hosted staging setup and connection checks](docs/social-publisher-hosted-staging.md) before using Connect Instagram on an approved HTTPS staging website. Hosting the frontend alone does not change the publisher's origin setting.
 
 ## Documentation
 

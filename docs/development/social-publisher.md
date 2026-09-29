@@ -2,7 +2,15 @@
 
 Implemented in **Sales & Marketing → Content & Social → Social Publisher**. Company/brand selection is shared by Content & Social so briefs, approvals, calendars and publishing use the same authorized context.
 
-## Release status
+## Current connection status - 2026-09-29
+
+The user has entered the Instagram staging app ID, secret and selected API version in server configuration. A credential-free check on 2026-09-29 confirmed that the publisher accepts preflight from `http://localhost:3000` (204), rejects unauthenticated requests (401) and rejects an untrusted origin (403). These checks do not verify the app-secret value, completion of Instagram authorization or delivery of a post. Final account connection and real publishing verification remain outstanding; leave the scheduler inactive for connection testing.
+
+The frontend supports hosted HTTPS use, but the publisher currently accepts one configured origin. Before connecting from a hosted staging website, confirm its exact origin and follow the [hosted staging guide](../social-publisher-hosted-staging.md). No hosted origin, permission, database or production setting was changed as part of this documentation/check-command update.
+
+The latest Vercel deployment recorded on GitHub is labelled Production. A preflight sent to the staging publisher with that deployment's origin returned 403, confirming that origin is not currently allowed. This was an origin-header check only, not an authenticated hosted browser test. Keep this update on a non-production branch until the intended staging website is confirmed.
+
+## Initial release status - 2026-09-21
 
 With explicit user approval on 2026-09-21, migration `20260921161039_company_brand_social_publisher` was applied to the confirmed staging project `bppjneljqonuouleptgs`. All three publisher Edge Functions were deployed at version 1 and report ACTIVE. The local migration filename matches the version recorded by the deployment service; its reviewed SQL is unchanged. Production was not modified.
 
