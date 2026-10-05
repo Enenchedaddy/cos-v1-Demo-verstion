@@ -17,12 +17,10 @@ const DesignSystemPlatform = lazy(() => import('./components/DesignSystemPlatfor
 const ManagementPlatform = lazy(() => import('./components/ManagementPlatform'));
 const SalesMarketingPlatform = lazy(() => import('./components/SalesMarketingPlatform'));
 
-const DATA_STATUS_MESSAGE: Record<Exclude<PortalDataStatus, 'ready' | 'empty'>, { tone: string; text: string }> = {
-  loading: { tone: 'border-[#D8D6CE] bg-white text-[#5E6872]', text: 'Loading governed business records…' },
-  demo: { tone: 'border-[#8A5A12] bg-[#F5ECD8] text-[#65420D]', text: 'Development fixture mode is active. These records are not production data.' },
-  unauthorized: { tone: 'border-[#A63A32] bg-[#F6E3E1] text-[#7E2D28]', text: 'Business records are restricted by policy. No demo records have been shown.' },
-  error: { tone: 'border-[#A63A32] bg-[#F6E3E1] text-[#7E2D28]', text: 'Business records could not be loaded. No demo records have been shown.' },
-  unavailable: { tone: 'border-[#A63A32] bg-[#F6E3E1] text-[#7E2D28]', text: 'The business data service is unavailable. No demo records have been shown.' },
+const DATA_ERRORS: Partial<Record<PortalDataStatus, string>> = {
+  unauthorized: 'You do not have access to these records. Contact your workspace administrator.',
+  error: 'Records could not be loaded or saved. Please refresh and try again.',
+  unavailable: 'Unable to connect. Check your connection and refresh the page.',
 };
 
 export default function App({ initialPlatform = 'gateway' }: { initialPlatform?: AppPlatform }) {
@@ -54,21 +52,13 @@ export default function App({ initialPlatform = 'gateway' }: { initialPlatform?:
   const canManageUsers = hasPermission('users.view');
   const userLabel = profile ? `${profile.firstName} ${profile.lastName}` : 'Authorized COS user';
   const roleLabel = role?.name ?? 'Authorized role';
-  const dataMessage = portalData.status === 'ready' || portalData.status === 'empty' ? null : DATA_STATUS_MESSAGE[portalData.status];
+  const dataError = DATA_ERRORS[portalData.status];
   const handleExitWorkspace = () => window.location.assign('/app');
 
   return (
     <div className="flex h-[100dvh] min-w-0 flex-col overflow-hidden bg-[#F7F9FC] font-sans text-slate-800">
       <CardInteractionManager />
       {launchTransition && <HexLoader fullPage size="lg" label={launchTransition.label} />}
-      {dataMessage && (
-        <div
-          className={`relative z-30 border-b px-4 py-2 text-center text-xs font-medium sm:px-6 ${dataMessage.tone}`}
-          role={portalData.status === 'loading' ? 'status' : 'alert'}
-        >
-          {dataMessage.text}
-        </div>
-      )}
 
       <main className="relative flex flex-1 flex-col overflow-hidden">
         {activePlatform === 'gateway' && (
@@ -84,12 +74,12 @@ export default function App({ initialPlatform = 'gateway' }: { initialPlatform?:
             onManageUsers={() => window.location.assign('/app/users')}
             onEnterSalesMarketing={() => {
               setSalesMarketingInitialArea('home');
-              beginPlatformTransition('sales-marketing', 'Authenticating & Launching Sales & Marketing Platform…', () => {
+              beginPlatformTransition('sales-marketing', 'Opening Sales & Marketing…', () => {
                 void portalData.addLog('Sales & Marketing Session Authorized', 'Permission', 'Commercial Workspace', 'S&M', 'Entered the unified Sales & Marketing platform through the governed gateway').catch(() => undefined);
               });
             }}
             onEnterManagement={() => {
-              beginPlatformTransition('management', 'Authenticating & Launching Executive Management Suite…', () => {
+              beginPlatformTransition('management', 'Opening Management…', () => {
                 void portalData.addLog('Executive Session Authorized', 'Permission', 'CEO', 'Management', 'Entered Management from governed gateway').catch(() => undefined);
               });
             }}
@@ -128,6 +118,9 @@ export default function App({ initialPlatform = 'gateway' }: { initialPlatform?:
             <DesignSystemPlatform onExitToGateway={handleExitWorkspace} />
           )}
         </Suspense>
+        {dataError && (activePlatform === 'sales-marketing' || activePlatform === 'management') && (
+          <p role="alert" className="mx-4 my-2 text-sm text-red-800">{dataError}</p>
+        )}
       </main>
     </div>
   );

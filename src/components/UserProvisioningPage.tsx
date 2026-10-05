@@ -83,7 +83,7 @@ export default function UserProvisioningPage() {
       setMessage(action === 'approve_ceo'
         ? `CEO approval recorded. ${request.requested_email} is ready for invitation.`
         : action === 'send_invitation'
-          ? `The Supabase invitation was sent to ${request.requested_email}.`
+          ? `The invitation was sent to ${request.requested_email}.`
           : `Request for ${request.requested_email} was updated.`);
       await refresh();
     } catch (nextError) {
@@ -176,7 +176,7 @@ export default function UserProvisioningPage() {
               </div>
               <div className="mt-4 flex flex-wrap gap-2">
                 {isCeoApprovalAllowed(role, permissions, request.status) && <><Action label="Approve — ready for invitation" action="approve_ceo" request={request} busy={busy} onAction={perform} /><Action label="Reject" action="reject_ceo" request={request} busy={busy} onAction={perform} /></>}
-                {isInvitationAllowed(role, permissions, request.status, request.ceo_approval_status, request.technical_approval_status) && <Action label="Send Supabase invitation" action="send_invitation" request={request} busy={busy} onAction={perform} />}
+                {isInvitationAllowed(role, permissions, request.status, request.ceo_approval_status, request.technical_approval_status) && <Action label="Send invitation" action="send_invitation" request={request} busy={busy} onAction={perform} />}
                 {canRequest && request.status !== 'INVITATION_SENT' && <Action label="Cancel request" action="cancel_request" request={request} busy={busy} onAction={perform} />}
               </div>
             </article>)}

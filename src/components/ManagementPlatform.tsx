@@ -274,7 +274,7 @@ export default function ManagementPlatform({
           {/* Simulated view states */}
           {simulatedState === 'loading' ? (
             <ContentSkeleton
-              label="Loading corporate entities & executive controls…"
+              label="Loading workspace…"
             />
           ) : simulatedState === 'error' ? (
             <div className="cos-surface flex flex-col items-center justify-center h-full py-20 bg-white rounded-xl border border-red-200 p-8 shadow-sm">
@@ -290,7 +290,7 @@ export default function ManagementPlatform({
                 <Ban size={28} />
               </div>
               <h3 className="text-sm font-bold text-slate-800 font-display">•••• Access Forbidden</h3>
-              <p className="text-xs text-slate-500 mt-1 max-w-md text-center">Access to this registry entity requires GATED board-director clearance or multifactor token verification.</p>
+              <p className="text-xs text-slate-500 mt-1 max-w-md text-center">You do not have access to this information. Contact your workspace administrator.</p>
             </div>
           ) : simulatedState === 'empty' ? (
             <div className="cos-surface flex flex-col items-center justify-center h-full py-20 bg-white rounded-xl border border-[#D9E0EA] p-8 shadow-sm">
