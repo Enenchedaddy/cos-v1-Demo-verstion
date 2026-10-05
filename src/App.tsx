@@ -17,10 +17,9 @@ const DesignSystemPlatform = lazy(() => import('./components/DesignSystemPlatfor
 const ManagementPlatform = lazy(() => import('./components/ManagementPlatform'));
 const SalesMarketingPlatform = lazy(() => import('./components/SalesMarketingPlatform'));
 
-const DATA_STATUS_MESSAGE: Record<Exclude<PortalDataStatus, 'ready'>, { tone: string; text: string }> = {
+const DATA_STATUS_MESSAGE: Record<Exclude<PortalDataStatus, 'ready' | 'empty'>, { tone: string; text: string }> = {
   loading: { tone: 'border-[#D8D6CE] bg-white text-[#5E6872]', text: 'Loading governed business records…' },
   demo: { tone: 'border-[#8A5A12] bg-[#F5ECD8] text-[#65420D]', text: 'Development fixture mode is active. These records are not production data.' },
-  empty: { tone: 'border-[#D8D6CE] bg-white text-[#5E6872]', text: 'No business records are available for this workspace yet.' },
   unauthorized: { tone: 'border-[#A63A32] bg-[#F6E3E1] text-[#7E2D28]', text: 'Business records are restricted by policy. No demo records have been shown.' },
   error: { tone: 'border-[#A63A32] bg-[#F6E3E1] text-[#7E2D28]', text: 'Business records could not be loaded. No demo records have been shown.' },
   unavailable: { tone: 'border-[#A63A32] bg-[#F6E3E1] text-[#7E2D28]', text: 'The business data service is unavailable. No demo records have been shown.' },
@@ -55,7 +54,7 @@ export default function App({ initialPlatform = 'gateway' }: { initialPlatform?:
   const canManageUsers = hasPermission('users.view');
   const userLabel = profile ? `${profile.firstName} ${profile.lastName}` : 'Authorized COS user';
   const roleLabel = role?.name ?? 'Authorized role';
-  const dataMessage = portalData.status === 'ready' ? null : DATA_STATUS_MESSAGE[portalData.status];
+  const dataMessage = portalData.status === 'ready' || portalData.status === 'empty' ? null : DATA_STATUS_MESSAGE[portalData.status];
   const handleExitWorkspace = () => window.location.assign('/app');
 
   return (
