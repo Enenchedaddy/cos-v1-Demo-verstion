@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { usePortalData, type PortalDataStatus } from './app/usePortalData';
 import { useAuthorization } from './auth/AuthorizationProvider';
 import CardInteractionManager from './components/CardInteractionManager';
@@ -25,25 +25,15 @@ const DATA_ERRORS: Partial<Record<PortalDataStatus, string>> = {
 
 export default function App({ initialPlatform = 'gateway' }: { initialPlatform?: AppPlatform }) {
   const { canAccessWorkspace, hasPermission, permissions, profile, role } = useAuthorization();
-  const portalData = usePortalData();
   const [activePlatform, setActivePlatform] = useState<AppPlatform>(initialPlatform);
+  const portalData = usePortalData(
+    activePlatform === 'sales-marketing' && canAccessWorkspace('sales-marketing') ? 'sales-marketing'
+      : activePlatform === 'management' && canAccessWorkspace('management') ? 'management' : 'inactive',
+  );
   const [salesMarketingInitialArea, setSalesMarketingInitialArea] = useState('home');
-  const [launchTransition, setLaunchTransition] = useState<{ target: AppPlatform; label: string } | null>(null);
-  const transitionTimer = useRef<number | null>(null);
-
-  useEffect(() => () => {
-    if (transitionTimer.current) window.clearTimeout(transitionTimer.current);
-  }, []);
-
-  const beginPlatformTransition = (target: AppPlatform, label: string, onComplete?: () => void) => {
-    if (transitionTimer.current) window.clearTimeout(transitionTimer.current);
-    setLaunchTransition({ target, label });
-    transitionTimer.current = window.setTimeout(() => {
-      setActivePlatform(target);
-      setLaunchTransition(null);
-      transitionTimer.current = null;
-      onComplete?.();
-    }, 1750);
+  const beginPlatformTransition = (target: AppPlatform, onComplete?: () => void) => {
+    setActivePlatform(target);
+    onComplete?.();
   };
 
   const canAccessSalesMarketing = canAccessWorkspace('sales-marketing');
@@ -58,7 +48,6 @@ export default function App({ initialPlatform = 'gateway' }: { initialPlatform?:
   return (
     <div className="flex h-[100dvh] min-w-0 flex-col overflow-hidden bg-[#F7F9FC] font-sans text-slate-800">
       <CardInteractionManager />
-      {launchTransition && <HexLoader fullPage size="lg" label={launchTransition.label} />}
 
       <main className="relative flex flex-1 flex-col overflow-hidden">
         {activePlatform === 'gateway' && (
@@ -70,16 +59,16 @@ export default function App({ initialPlatform = 'gateway' }: { initialPlatform?:
             canManageUsers={canManageUsers}
             userLabel={userLabel}
             roleLabel={roleLabel}
-            onOpenDesignSystem={() => beginPlatformTransition('design-system', 'Opening COS Design System…')}
+            onOpenDesignSystem={() => beginPlatformTransition('design-system')}
             onManageUsers={() => window.location.assign('/app/users')}
             onEnterSalesMarketing={() => {
               setSalesMarketingInitialArea('home');
-              beginPlatformTransition('sales-marketing', 'Opening Sales & Marketing…', () => {
+              beginPlatformTransition('sales-marketing', () => {
                 void portalData.addLog('Sales & Marketing Session Authorized', 'Permission', 'Commercial Workspace', 'S&M', 'Entered the unified Sales & Marketing platform through the governed gateway').catch(() => undefined);
               });
             }}
             onEnterManagement={() => {
-              beginPlatformTransition('management', 'Opening Management…', () => {
+              beginPlatformTransition('management', () => {
                 void portalData.addLog('Executive Session Authorized', 'Permission', 'CEO', 'Management', 'Entered Management from governed gateway').catch(() => undefined);
               });
             }}

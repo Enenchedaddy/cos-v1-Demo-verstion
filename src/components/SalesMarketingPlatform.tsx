@@ -1,6 +1,6 @@
 import { AnimatePresence } from 'motion/react';
 import { FloatingLayer, ContentSkeleton, useContentFade } from './SurfaceMotion';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import {
   Activity,
   AlertTriangle,
@@ -26,7 +26,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import './WorkspaceTheme.css';
-import ContentSocialModule from '../content-social/ContentSocialModule';
+const ContentSocialModule = lazy(() => import('../content-social/ContentSocialModule'));
 import { useCompanyDirectory } from '../content-social/CompanyScope';
 import { SALES_MARKETING_NAVIGATION_AREAS, type SalesMarketingNavigationArea } from '../navigation/salesMarketing';
 import SalesMarketingSidebar from './SalesMarketingSidebar';
@@ -312,7 +312,7 @@ export default function SalesMarketingPlatform({
 
         <main ref={contentRef} className=" relative z-10 flex-1 overflow-y-auto p-4 sm:p-6">
           {activeAreaId === 'content-social' && (
-            <ContentSocialModule
+            <Suspense fallback={<ContentSkeleton label="Loading Content & Social" />}><ContentSocialModule
               activeRoute={activeRoute}
               globalSearch={globalSearch}
               forcedState={workspaceState}
@@ -320,7 +320,7 @@ export default function SalesMarketingPlatform({
               notificationOpen={contentNotificationsOpen}
               onNotificationClose={() => setContentNotificationsOpen(false)}
               onRouteChange={setActiveRoute}
-            />
+            /></Suspense>
           )}
           {activeAreaId !== 'content-social' && <>
           {workspaceState === 'loading' && <StatePanel icon={RefreshCw} title="Loading workspace" detail="Loading your records." spinning />}

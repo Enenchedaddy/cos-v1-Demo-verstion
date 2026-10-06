@@ -36,18 +36,33 @@ export default function CardInteractionManager() {
     let scanFrame = 0;
     const managedCards = new Set<HTMLElement>();
 
+    // Only inspect inserted subtrees. A text update must not measure the entire page.
+    const pendingRoots = new Set<Element>();
+    const registerCard = (element: Element) => {
+      if (managedCards.has(element as HTMLElement) || !isCardSurface(element)) return;
+      element.setAttribute('data-card-surface', 'true');
+      managedCards.add(element as HTMLElement);
+    };
     const registerCards = () => {
       scanFrame = 0;
-      document.querySelectorAll<HTMLElement>(CARD_QUERY).forEach((element) => {
-        if (!isCardSurface(element)) return;
-        element.setAttribute('data-card-surface', 'true');
-        managedCards.add(element);
-      });
+      for (const root of pendingRoots) {
+        if (!root.isConnected) continue;
+        registerCard(root);
+        root.querySelectorAll(CARD_QUERY).forEach(registerCard);
+      }
+      pendingRoots.clear();
+      for (const card of managedCards) {
+        if (!card.isConnected) managedCards.delete(card);
+      }
+      if (selectedCard && !selectedCard.isConnected) selectedCard = null;
     };
-
     const scheduleScan = () => {
       if (scanFrame) return;
       scanFrame = window.requestAnimationFrame(registerCards);
+    };
+    const scanResizedPage = () => {
+      pendingRoots.add(document.body);
+      scheduleScan();
     };
 
     const findCard = (target: EventTarget | null) => {
@@ -88,18 +103,28 @@ export default function CardInteractionManager() {
       }
     };
     const handleFocusIn = (event: FocusEvent) => selectCard(event.target);
-    const observer = new MutationObserver(scheduleScan);
+    const observer = new MutationObserver((mutations) => {
+      let removed = false;
+      for (const mutation of mutations) {
+        removed ||= mutation.removedNodes.length > 0;
+        for (const node of mutation.addedNodes) {
+          if (node instanceof Element) pendingRoots.add(node);
+        }
+      }
+      if (pendingRoots.size || removed) scheduleScan();
+    });
 
+    pendingRoots.add(document.body);
     scheduleScan();
     observer.observe(document.body, { childList: true, subtree: true });
-    window.addEventListener('resize', scheduleScan);
+    window.addEventListener('resize', scanResizedPage);
     document.addEventListener('pointerover', handlePointerOver, true);
     document.addEventListener('pointerdown', handlePointerDown, true);
     document.addEventListener('focusin', handleFocusIn, true);
 
     return () => {
       observer.disconnect();
-      window.removeEventListener('resize', scheduleScan);
+      window.removeEventListener('resize', scanResizedPage);
       document.removeEventListener('pointerover', handlePointerOver, true);
       document.removeEventListener('pointerdown', handlePointerDown, true);
       document.removeEventListener('focusin', handleFocusIn, true);

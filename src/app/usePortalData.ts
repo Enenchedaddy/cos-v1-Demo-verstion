@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   INITIAL_APPROVALS,
   INITIAL_AUDIT_LOGS,
@@ -142,7 +142,16 @@ function recordCount(collections: PortalCollections): number {
  * development-only flag, live rows are mapped from PostgreSQL naming, and
  * every failed mutation is rolled back and exposed through the hook state.
  */
-export function usePortalData(): PortalData {
+export type PortalDataScope = 'all' | 'sales-marketing' | 'management' | 'inactive';
+const SCOPE_TABLES: Record<PortalDataScope, readonly PortalTable[]> = {
+  all: ['companies', 'products', 'orders', 'invoices', 'cylinder_balances', 'support_tickets', 'deals', 'quotes', 'campaigns', 'approvals', 'audit_logs'],
+  'sales-marketing': ['companies', 'deals', 'campaigns', 'approvals', 'audit_logs'],
+  management: ['companies', 'orders', 'approvals', 'audit_logs'],
+  inactive: [],
+};
+
+export function usePortalData(scope: PortalDataScope = 'all'): PortalData {
+  const requestVersion = useRef(0);
   const [collections, setCollections] = useState<PortalCollections>(() => (
     isPortalDemoEnabled ? DEMO_COLLECTIONS : EMPTY_COLLECTIONS
   ));
@@ -152,6 +161,11 @@ export function usePortalData(): PortalData {
   const [error, setError] = useState<string | null>(null);
 
   const reload = useCallback(async () => {
+    const version = ++requestVersion.current;
+    if (scope === 'inactive') return;
+    const read = <T,>(table: PortalTable, orderBy?: string): Promise<T[]> => (
+      SCOPE_TABLES[scope].includes(table) ? readCollection<T>(table, orderBy) : Promise.resolve([])
+    );
     if (!isSupabaseConfigured) {
       setCollections(isPortalDemoEnabled ? DEMO_COLLECTIONS : EMPTY_COLLECTIONS);
       setStatus(isPortalDemoEnabled ? 'demo' : 'unavailable');
@@ -163,30 +177,33 @@ export function usePortalData(): PortalData {
     setError(null);
     try {
       const [companies, products, orders, invoices, cylinders, tickets, deals, quotes, campaigns, approvals, auditLogs] = await Promise.all([
-        readCollection<Company>('companies'),
-        readCollection<Product>('products'),
-        readCollection<Order>('orders'),
-        readCollection<Invoice>('invoices'),
-        readCollection<CylinderBalance>('cylinder_balances'),
-        readCollection<SupportTicket>('support_tickets'),
-        readCollection<Deal>('deals'),
-        readCollection<Quote>('quotes'),
-        readCollection<Campaign>('campaigns'),
-        readCollection<ApprovalRequest>('approvals'),
-        readCollection<AuditLog>('audit_logs', 'timestamp'),
+        read<Company>('companies'),
+        read<Product>('products'),
+        read<Order>('orders'),
+        read<Invoice>('invoices'),
+        read<CylinderBalance>('cylinder_balances'),
+        read<SupportTicket>('support_tickets'),
+        read<Deal>('deals'),
+        read<Quote>('quotes'),
+        read<Campaign>('campaigns'),
+        read<ApprovalRequest>('approvals'),
+        read<AuditLog>('audit_logs', 'timestamp'),
       ]);
+      if (version !== requestVersion.current) return;
       const next = { companies, products, orders, invoices, cylinders, tickets, deals, quotes, campaigns, approvals, auditLogs };
       setCollections(next);
       setStatus(recordCount(next) === 0 ? 'empty' : 'ready');
     } catch (loadError) {
+      if (version !== requestVersion.current) return;
       setCollections(isPortalDemoEnabled ? DEMO_COLLECTIONS : EMPTY_COLLECTIONS);
       setStatus(isPortalDemoEnabled ? 'demo' : classifyPortalDataError(loadError));
       setError(errorMessage(loadError));
     }
-  }, []);
+  }, [scope]);
 
   useEffect(() => {
     void reload();
+    return () => { requestVersion.current += 1; };
   }, [reload]);
 
   const mutateCollection = async <K extends keyof PortalCollections>(
